@@ -7,7 +7,7 @@
 
 #if defined(_MSC_VER) && _MSC_VER < 1299 // VC6 doesn't support template specialization
 
-#include "BitStream.h"
+#include "raknet/BitStream.h"
 #include <stdlib.h>
 #include <memory.h>
 #include <stdio.h>
@@ -15,11 +15,11 @@
 #include <cmath>
 #include <float.h>
 #if defined(_XBOX) || defined(X360)
-#include "XBOX360Includes.h"
+#include "raknet/XBOX360Includes.h"
 #elif defined(_WIN32)
 #include <winsock2.h> // htonl
 #elif defined(_CONSOLE_2)
-#include "PS3Includes.h"
+#include "raknet/PS3Includes.h"
 #else
 #include <arpa/inet.h>
 #endif

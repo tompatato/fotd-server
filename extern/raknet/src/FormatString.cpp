@@ -1,8 +1,8 @@
-#include "FormatString.h"
+#include "raknet/FormatString.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-#include "LinuxStrings.h"
+#include "raknet/LinuxStrings.h"
 
 char * FormatString(const char *format, ...)
 {

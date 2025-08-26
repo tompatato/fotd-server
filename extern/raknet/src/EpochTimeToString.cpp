@@ -1,11 +1,11 @@
-#include "FormatString.h"
-#include "EpochTimeToString.h"
+#include "raknet/FormatString.h"
+#include "raknet/EpochTimeToString.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
 // localtime
 #include <time.h>
-#include "LinuxStrings.h"
+#include "raknet/LinuxStrings.h"
 
 char * EpochTimeToString(long long time)
 {

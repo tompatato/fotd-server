@@ -5,9 +5,9 @@
 /// Usage of RakNet is subject to the appropriate license agreement.
 
 
-#include "NetworkIDManager.h"
-#include "NetworkIDObject.h"
-#include "RakAssert.h"
+#include "raknet/NetworkIDManager.h"
+#include "raknet/NetworkIDObject.h"
+#include "raknet/RakAssert.h"
 #include <string.h> // For memset
 
 bool NetworkIDNode::operator==( const NetworkIDNode& right ) const

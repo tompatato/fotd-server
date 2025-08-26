@@ -1,8 +1,8 @@
-#include "ReplicaManager2.h"
-#include "MessageIdentifiers.h"
-#include "RakAssert.h"
-#include "RakPeerInterface.h"
-#include "NetworkIDManager.h"
+#include "raknet/ReplicaManager2.h"
+#include "raknet/MessageIdentifiers.h"
+#include "raknet/RakAssert.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/NetworkIDManager.h"
 
 using namespace RakNet;
 

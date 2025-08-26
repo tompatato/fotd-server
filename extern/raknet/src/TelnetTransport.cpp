@@ -1,9 +1,9 @@
-#include "TelnetTransport.h"
-#include "TCPInterface.h"
+#include "raknet/TelnetTransport.h"
+#include "raknet/TCPInterface.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-#include "LinuxStrings.h"
+#include "raknet/LinuxStrings.h"
 
 // #define _PRINTF_DEBUG
 

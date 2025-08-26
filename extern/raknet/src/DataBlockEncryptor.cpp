@@ -5,14 +5,14 @@
 /// Usage of RakNet is subject to the appropriate license agreement.
 
 
-#include "DataBlockEncryptor.h"
-#include "CheckSum.h"
-#include "GetTime.h"
-#include "Rand.h"
-#include "RakAssert.h"
+#include "raknet/DataBlockEncryptor.h"
+#include "raknet/CheckSum.h"
+#include "raknet/GetTime.h"
+#include "raknet/Rand.h"
+#include "raknet/RakAssert.h"
 #include <string.h>
-#include "Rijndael.h"
-//#include "Types.h"
+#include "raknet/Rijndael.h"
+//#include "raknet/Types.h"
 
 DataBlockEncryptor::DataBlockEncryptor()
 {

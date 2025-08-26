@@ -15,11 +15,11 @@
 /// Software Foundation; either version 2 of the License, or (at your
 /// option) any later version.
 
-#include "TCPInterface.h"
-#include "HTTPConnection.h"
-#include "RakSleep.h"
-#include "RakString.h"
-#include "RakAssert.h"
+#include "raknet/TCPInterface.h"
+#include "raknet/HTTPConnection.h"
+#include "raknet/RakSleep.h"
+#include "raknet/RakString.h"
+#include "raknet/RakAssert.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>

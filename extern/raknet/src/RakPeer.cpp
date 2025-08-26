@@ -5,9 +5,9 @@
 // Usage of RakNet is subject to the appropriate license agreement.
 
 
-#include "RakNetDefines.h"
-#include "RakPeer.h"
-#include "RakNetTypes.h"
+#include "raknet/RakNetDefines.h"
+#include "raknet/RakPeer.h"
+#include "raknet/RakNetTypes.h"
 
 #ifdef _WIN32
 #elif defined(_PS3) || defined(__PS3__) || defined(SN_TARGET_PS3)
@@ -21,23 +21,23 @@
 
 #include <ctype.h> // toupper
 #include <string.h>
-#include "GetTime.h"
-#include "MessageIdentifiers.h"
-#include "DS_HuffmanEncodingTree.h"
-#include "Rand.h"
-#include "PluginInterface2.h"
-#include "StringCompressor.h"
-#include "StringTable.h"
-#include "NetworkIDObject.h"
-#include "RakNetTypes.h"
-#include "SHA1.h"
-#include "RakSleep.h"
-#include "RouterInterface.h"
-#include "RakAssert.h"
-#include "RakNetVersion.h"
+#include "raknet/GetTime.h"
+#include "raknet/MessageIdentifiers.h"
+#include "raknet/DS_HuffmanEncodingTree.h"
+#include "raknet/Rand.h"
+#include "raknet/PluginInterface2.h"
+#include "raknet/StringCompressor.h"
+#include "raknet/StringTable.h"
+#include "raknet/NetworkIDObject.h"
+#include "raknet/RakNetTypes.h"
+#include "raknet/SHA1.h"
+#include "raknet/RakSleep.h"
+#include "raknet/RouterInterface.h"
+#include "raknet/RakAssert.h"
+#include "raknet/RakNetVersion.h"
 
-#include "NetworkIDManager.h"
-#include "DataBlockEncryptor.h"
+#include "raknet/NetworkIDManager.h"
+#include "raknet/DataBlockEncryptor.h"
 
 RAK_THREAD_DECLARATION(UpdateNetworkLoop);
 RAK_THREAD_DECLARATION(UDTConnect);
@@ -71,7 +71,7 @@ extern void Console2GetIPAndPort(unsigned int, char *, unsigned short *, unsigne
 */
 #endif
 
-#include "RakAlloca.h"
+#include "raknet/RakAlloca.h"
 
 // Note to self - if I change this it might affect RECIPIENT_OFFLINE_MESSAGE_INTERVAL in Natpunchthrough.cpp
 //static const int MAX_OPEN_CONNECTION_REQUESTS=8;

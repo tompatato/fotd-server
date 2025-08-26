@@ -1,11 +1,11 @@
-#include "RakThread.h"
-#include "RakNetDefines.h"
+#include "raknet/RakThread.h"
+#include "raknet/RakNetDefines.h"
 
 #if defined(_XBOX) || defined(X360)
-#include "XBOX360Includes.h"
+#include "raknet/XBOX360Includes.h"
 #include <process.h>
 #elif defined(_WIN32)
-#include "WindowsIncludes.h"
+#include "raknet/WindowsIncludes.h"
 #include <stdio.h>
 	#if !defined(_WIN32_WCE)
 	#include <process.h>

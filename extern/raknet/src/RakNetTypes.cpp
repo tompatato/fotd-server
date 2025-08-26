@@ -5,8 +5,8 @@
 /// Usage of RakNet is subject to the appropriate license agreement.
 
 
-#include "RakNetTypes.h"
-#include "RakAssert.h"
+#include "raknet/RakNetTypes.h"
+#include "raknet/RakAssert.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -22,8 +22,8 @@
 #endif
 
 #include <string.h> // strncasecmp
-#include "Itoa.h"
-#include "SocketLayer.h"
+#include "raknet/Itoa.h"
+#include "raknet/SocketLayer.h"
 #include <stdlib.h>
 
 SocketDescriptor::SocketDescriptor() {port=0; hostAddress[0]=0; remotePortRakNetWasStartedOn_PS3=0;}

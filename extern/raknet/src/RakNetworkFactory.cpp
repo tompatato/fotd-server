@@ -5,20 +5,20 @@
 /// Usage of RakNet is subject to the appropriate license agreement.
 
 
-#include "LogCommandParser.h"
-#include "RakNetworkFactory.h"
-#include "RakPeerInterface.h"
-#include "RakPeer.h"
-#include "ConsoleServer.h"
-#include "PacketLogger.h"
-#include "RakNetCommandParser.h"
-#include "ReplicaManager.h"
-#include "RakNetTransport.h"
-#include "TelnetTransport.h"
-#include "PacketConsoleLogger.h"
-#include "PacketFileLogger.h"
-#include "Router.h"
-#include "ConnectionGraph.h"
+#include "raknet/LogCommandParser.h"
+#include "raknet/RakNetworkFactory.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/RakPeer.h"
+#include "raknet/ConsoleServer.h"
+#include "raknet/PacketLogger.h"
+#include "raknet/RakNetCommandParser.h"
+#include "raknet/ReplicaManager.h"
+#include "raknet/RakNetTransport.h"
+#include "raknet/TelnetTransport.h"
+#include "raknet/PacketConsoleLogger.h"
+#include "raknet/PacketFileLogger.h"
+#include "raknet/Router.h"
+#include "raknet/ConnectionGraph.h"
 
 RakPeerInterface* RakNetworkFactory::GetRakPeerInterface( void )
 {

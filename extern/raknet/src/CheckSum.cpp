@@ -3,7 +3,7 @@
 * @brief CheckSum implementation from http://www.flounder.com/checksum.htm
 * 
 */
-#include "CheckSum.h"
+#include "raknet/CheckSum.h"
 
 /****************************************************************************
 *        CheckSum::add

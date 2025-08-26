@@ -1,9 +1,9 @@
-#include "StringTable.h"
+#include "raknet/StringTable.h"
 #include <string.h>
-#include "RakAssert.h"
+#include "raknet/RakAssert.h"
 #include <stdio.h>
-#include "BitStream.h"
-#include "StringCompressor.h"
+#include "raknet/BitStream.h"
+#include "raknet/StringCompressor.h"
 using namespace RakNet;
 
 StringTable* StringTable::instance=0;

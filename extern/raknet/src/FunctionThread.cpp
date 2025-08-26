@@ -1,5 +1,5 @@
-#include "FunctionThread.h"
-#include "RakSleep.h"
+#include "raknet/FunctionThread.h"
+#include "raknet/RakSleep.h"
 
 using namespace RakNet;
 

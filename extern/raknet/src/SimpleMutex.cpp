@@ -5,8 +5,8 @@
 /// Usage of RakNet is subject to the appropriate license agreement.
 
 
-#include "SimpleMutex.h"
-#include "RakAssert.h"
+#include "raknet/SimpleMutex.h"
+#include "raknet/RakAssert.h"
 
 SimpleMutex::SimpleMutex() : isInitialized(false)
 {

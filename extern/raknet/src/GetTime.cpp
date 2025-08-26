@@ -6,12 +6,12 @@
 
 
 #if defined(_WIN32) && !defined(_XBOX) && !defined(X360)
-#include "WindowsIncludes.h"
+#include "raknet/WindowsIncludes.h"
 #endif
 
-#include "GetTime.h"
+#include "raknet/GetTime.h"
 #if defined(_XBOX) || defined(X360)
-#include "XBOX360Includes.h"
+#include "raknet/XBOX360Includes.h"
 #endif
 #if defined(_WIN32)
 DWORD mProcMask;
@@ -19,7 +19,7 @@ DWORD mSysMask;
 HANDLE mThread;
 static LARGE_INTEGER yo;
 #elif defined(_PS3) || defined(__PS3__) || defined(SN_TARGET_PS3)
-#include "PS3Includes.h"
+#include "raknet/PS3Includes.h"
 #include <sys/sys_time.h> // GetTime.cpp
 #include <stdint.h> // GetTime.cpp
 #include <sys/time_util.h> // GetTime.cpp

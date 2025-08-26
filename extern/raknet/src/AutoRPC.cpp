@@ -1,13 +1,13 @@
-#include "AutoRPC.h"
-#include "RakMemoryOverride.h"
-#include "RakAssert.h"
-#include "StringCompressor.h"
-#include "BitStream.h"
-//#include "Types.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "NetworkIDObject.h"
-#include "NetworkIDManager.h"
+#include "raknet/AutoRPC.h"
+#include "raknet/RakMemoryOverride.h"
+#include "raknet/RakAssert.h"
+#include "raknet/StringCompressor.h"
+#include "raknet/BitStream.h"
+//#include "raknet/Types.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/MessageIdentifiers.h"
+#include "raknet/NetworkIDObject.h"
+#include "raknet/NetworkIDManager.h"
 #include <stdlib.h>
 
 using namespace RakNet;

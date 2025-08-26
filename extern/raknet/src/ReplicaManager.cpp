@@ -1,16 +1,16 @@
-#include "ReplicaManager.h"
-#include "RakPeerInterface.h"
-#include "GetTime.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
-#include "Replica.h"
+#include "raknet/ReplicaManager.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/GetTime.h"
+#include "raknet/MessageIdentifiers.h"
+#include "raknet/BitStream.h"
+#include "raknet/Replica.h"
 #if !defined(_PS3) && !defined(__PS3__) && !defined(SN_TARGET_PS3)
 #include <memory.h>
 #endif
-#include "RakAssert.h"
+#include "raknet/RakAssert.h"
 #include <stdio.h> // For my debug printfs
-#include "RakAssert.h"
-#include "NetworkIDManager.h"
+#include "raknet/RakAssert.h"
+#include "raknet/NetworkIDManager.h"
 
 #ifdef _MSC_VER
 #pragma warning( push )

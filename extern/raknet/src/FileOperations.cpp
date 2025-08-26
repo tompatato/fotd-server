@@ -1,6 +1,6 @@
-#include "RakMemoryOverride.h"
-#include "_FindFirst.h" // For linux
-#include "FileOperations.h"
+#include "raknet/RakMemoryOverride.h"
+#include "raknet/_FindFirst.h" // For linux
+#include "raknet/FileOperations.h"
 #include <stdio.h>
 #include <string.h>
 #ifdef _WIN32 
@@ -10,7 +10,7 @@
 #else
 #include <sys/stat.h>
 #include <unistd.h>
-#include "_FindFirst.h"
+#include "raknet/_FindFirst.h"
 #endif
 #include "errno.h"
 

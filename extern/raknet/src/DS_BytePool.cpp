@@ -1,5 +1,5 @@
-#include "DS_BytePool.h"
-#include "RakAssert.h"
+#include "raknet/DS_BytePool.h"
+#include "raknet/RakAssert.h"
 #ifndef __APPLE__
 // Use stdlib and not malloc for compatibility
 #include <stdlib.h>

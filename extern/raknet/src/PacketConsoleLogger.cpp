@@ -1,5 +1,5 @@
-#include "PacketConsoleLogger.h"
-#include "LogCommandParser.h"
+#include "raknet/PacketConsoleLogger.h"
+#include "raknet/LogCommandParser.h"
 #include <stdio.h>
 
 PacketConsoleLogger::PacketConsoleLogger()

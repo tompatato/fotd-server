@@ -1,14 +1,14 @@
-#include "WSAStartupSingleton.h"
+#include "raknet/WSAStartupSingleton.h"
 
 #if defined(_XBOX) || defined(X360)
-#include "XBOX360Includes.h"
+#include "raknet/XBOX360Includes.h"
 extern void X360Startup(void);
 extern void X360Shutdown(void);
 #elif defined(_WIN32)
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #endif
-#include "RakNetDefines.h"
+#include "raknet/RakNetDefines.h"
 #include <stdio.h>
 
 int WSAStartupSingleton::refCount;

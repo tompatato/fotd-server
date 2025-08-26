@@ -24,14 +24,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "Rijndael.h"
+#include "raknet/Rijndael.h"
 
 // KevinJ - Added this to just generate a random initialization vector
-#include "Rand.h"
+#include "raknet/Rand.h"
 
 #define SC	((BC - 4) >> 1)
 
-#include "Rijndael-Boxes.h"
+#include "raknet/Rijndael-Boxes.h"
 
 static int ROUNDS;
 

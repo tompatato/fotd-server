@@ -6,7 +6,7 @@
 /// Usage of RakNet is subject to the appropriate license agreement.
 
 
-#include "TCPInterface.h"
+#include "raknet/TCPInterface.h"
 #ifdef _WIN32
 typedef int socklen_t;
 #else
@@ -15,18 +15,18 @@ typedef int socklen_t;
 #include <pthread.h>
 #endif
 #include <string.h>
-#include "RakAssert.h"
+#include "raknet/RakAssert.h"
 #include <stdio.h>
-#include "RakAssert.h"
-#include "RakSleep.h"
-#include "StringCompressor.h"
-#include "StringTable.h"
+#include "raknet/RakAssert.h"
+#include "raknet/RakSleep.h"
+#include "raknet/StringCompressor.h"
+#include "raknet/StringTable.h"
 
 #ifdef _DO_PRINTF
 #endif
 
 #ifdef _WIN32
-#include "WSAStartupSingleton.h"
+#include "raknet/WSAStartupSingleton.h"
 #endif
 
 RAK_THREAD_DECLARATION(UpdateTCPInterfaceLoop);

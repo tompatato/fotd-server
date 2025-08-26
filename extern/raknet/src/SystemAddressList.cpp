@@ -1,7 +1,7 @@
-#include "SystemAddressList.h"
-#include "Rand.h"
-#include "RakAssert.h"
-#include "BitStream.h"
+#include "raknet/SystemAddressList.h"
+#include "raknet/Rand.h"
+#include "raknet/RakAssert.h"
+#include "raknet/BitStream.h"
 #include <stdio.h>
 
 SystemAddressList::SystemAddressList()

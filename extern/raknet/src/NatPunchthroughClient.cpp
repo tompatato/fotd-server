@@ -1,9 +1,9 @@
-#include "NatPunchthroughClient.h"
-#include "BitStream.h"
-#include "MessageIdentifiers.h"
-#include "RakPeerInterface.h"
-#include "GetTime.h"
-#include "PacketLogger.h"
+#include "raknet/NatPunchthroughClient.h"
+#include "raknet/BitStream.h"
+#include "raknet/MessageIdentifiers.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/GetTime.h"
+#include "raknet/PacketLogger.h"
 
 // As I add more out of band messages this will be moved elsewhere
 static const char ID_NAT_ESTABLISH_UNIDIRECTIONAL=0;

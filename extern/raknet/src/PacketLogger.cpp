@@ -5,22 +5,22 @@
 /// Usage of RakNet is subject to the appropriate license agreement.
 
 
-#include "PacketLogger.h"
-#include "BitStream.h"
-#include "DS_List.h"
-#include "InternalPacket.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "StringCompressor.h"
-#include "RPCMap.h"
-#include "GetTime.h"
+#include "raknet/PacketLogger.h"
+#include "raknet/BitStream.h"
+#include "raknet/DS_List.h"
+#include "raknet/InternalPacket.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/MessageIdentifiers.h"
+#include "raknet/StringCompressor.h"
+#include "raknet/RPCMap.h"
+#include "raknet/GetTime.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "Itoa.h"
+#include "raknet/Itoa.h"
 #include <time.h>
-#include "SocketIncludes.h"
-#include "gettimeofday.h"
+#include "raknet/SocketIncludes.h"
+#include "raknet/gettimeofday.h"
 
 #ifdef _MSC_VER
 #pragma warning( push )

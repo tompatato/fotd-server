@@ -1,9 +1,9 @@
-#include "UDPProxyClient.h"
-#include "BitStream.h"
-#include "UDPProxyCommon.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "GetTime.h"
+#include "raknet/UDPProxyClient.h"
+#include "raknet/BitStream.h"
+#include "raknet/UDPProxyCommon.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/MessageIdentifiers.h"
+#include "raknet/GetTime.h"
 
 using namespace RakNet;
 static const int DEFAULT_UNRESPONSIVE_PING_TIME=1000;

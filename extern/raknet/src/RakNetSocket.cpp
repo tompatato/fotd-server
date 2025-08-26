@@ -1,5 +1,5 @@
-#include "RakNetSocket.h"
-#include "SocketIncludes.h"
+#include "raknet/RakNetSocket.h"
+#include "raknet/SocketIncludes.h"
 
 RakNetSocket::RakNetSocket() {
 	s = (unsigned int)-1;

@@ -1,6 +1,6 @@
-#include "SuperFastHash.h"
-#include "RakNetTypes.h"
-#include "RakAssert.h"
+#include "raknet/SuperFastHash.h"
+#include "raknet/RakNetTypes.h"
+#include "raknet/RakAssert.h"
 #include <stdlib.h>
 
 #if !defined(_WIN32)

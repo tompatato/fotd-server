@@ -6,12 +6,12 @@
 /// Usage of RakNet is subject to the appropriate license agreement.
 
 
-#include "SocketLayer.h"
-#include "RakAssert.h"
-#include "RakNetTypes.h"
+#include "raknet/SocketLayer.h"
+#include "raknet/RakAssert.h"
+#include "raknet/RakNetTypes.h"
 
 #ifndef _USE_RAKNET_FLOW_CONTROL
-#include "udt.h"
+#include "raknet/udt.h"
 #endif
 
 #ifdef _WIN32
@@ -25,16 +25,16 @@
 #endif
 
 #if defined(_PS3) || defined(__PS3__) || defined(SN_TARGET_PS3)
-#include "np/common.h"
+#include "raknet/np/common.h"
 #include <netdb.h>
 #include <string.h>
 #endif
 
 #if defined(_XBOX) || defined(X360)
 //#define RAKNET_USE_VDP
-#include "WSAStartupSingleton.h"
+#include "raknet/WSAStartupSingleton.h"
 #elif defined(_WIN32)
-#include "WSAStartupSingleton.h"
+#include "raknet/WSAStartupSingleton.h"
 #include <ws2tcpip.h> // 'IP_DONTFRAGMENT' 'IP_TTL'
 #elif defined(_PS3) || defined(__PS3__) || defined(SN_TARGET_PS3)
 #define closesocket socketclose
@@ -43,10 +43,10 @@
 #include <unistd.h>
 #endif
 
-#include "RakSleep.h"
+#include "raknet/RakSleep.h"
 #include <stdio.h>
 
-#include "ExtendedOverlappedPool.h"
+#include "raknet/ExtendedOverlappedPool.h"
 
 #ifdef _MSC_VER
 #pragma warning( push )
@@ -482,7 +482,7 @@ void SocketLayer::Write( const SOCKET writeSocket, const char* data, const int l
 	send( writeSocket, data, length, 0 );
 }
 // REMOVEME
-//#include "BitStream.h"
+//#include "raknet/BitStream.h"
 int SocketLayer::RecvFrom( const SOCKET s, RakPeer *rakPeer, int *errorCode, RakNetSmartPtr<RakNetSocket> rakNetSocket, unsigned short remotePortRakNetWasStartedOn_PS3 )
 {
 	int len=0;
@@ -780,8 +780,8 @@ int SocketLayer::SendTo( SOCKET s, const char *data, int length, unsigned int bi
 
 	return 1; // error
 }
-#include "RakNetTime.h"
-#include "GetTime.h"
+#include "raknet/RakNetTime.h"
+#include "raknet/GetTime.h"
 #ifndef _USE_RAKNET_FLOW_CONTROL // Use UDT
 int SocketLayer::SendToUDT( int s, const char *data, int length, unsigned short remotePortRakNetWasStartedOn_PS3, int ttl )
 {

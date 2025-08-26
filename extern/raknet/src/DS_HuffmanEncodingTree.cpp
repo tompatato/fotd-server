@@ -5,10 +5,10 @@
 /// Usage of RakNet is subject to the appropriate license agreement.
 
 
-#include "DS_HuffmanEncodingTree.h"
-#include "DS_Queue.h"
-#include "BitStream.h"
-#include "RakAssert.h" 
+#include "raknet/DS_HuffmanEncodingTree.h"
+#include "raknet/DS_Queue.h"
+#include "raknet/BitStream.h"
+#include "raknet/RakAssert.h" 
 
 #ifdef _MSC_VER
 #pragma warning( push )

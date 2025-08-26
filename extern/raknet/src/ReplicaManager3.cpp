@@ -1,8 +1,8 @@
-#include "ReplicaManager3.h"
-#include "GetTime.h"
-#include "MessageIdentifiers.h"
-#include "RakPeerInterface.h"
-#include "NetworkIDManager.h"
+#include "raknet/ReplicaManager3.h"
+#include "raknet/GetTime.h"
+#include "raknet/MessageIdentifiers.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/NetworkIDManager.h"
 
 using namespace RakNet;
 

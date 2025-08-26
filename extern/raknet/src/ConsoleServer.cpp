@@ -1,13 +1,13 @@
-#include "ConsoleServer.h"
-#include "TransportInterface.h"
-#include "CommandParserInterface.h"
+#include "raknet/ConsoleServer.h"
+#include "raknet/TransportInterface.h"
+#include "raknet/CommandParserInterface.h"
 #include <string.h>
 #include <stdlib.h>
 
 #define COMMAND_DELINATOR ' '
 #define COMMAND_DELINATOR_TOGGLE '"'
 
-#include "LinuxStrings.h"
+#include "raknet/LinuxStrings.h"
 
 ConsoleServer::ConsoleServer()
 {

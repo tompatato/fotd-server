@@ -18,7 +18,7 @@
 */
 
 
-#include "SHA1.h"
+#include "raknet/SHA1.h"
 #include <stdlib.h>
 
 

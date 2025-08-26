@@ -1,12 +1,12 @@
 #if !defined(_XBOX) && !defined(X360)
 
-#include "BigInt.h"
+#include "raknet/BigInt.h"
 #include <ctype.h>
 #include <string.h>
 
-#include "RakAlloca.h"
-#include "RakMemoryOverride.h"
-#include "Rand.h"
+#include "raknet/RakAlloca.h"
+#include "raknet/RakMemoryOverride.h"
+#include "raknet/Rand.h"
 
 #if defined(_MSC_VER) && !defined(_DEBUG) && _MSC_VER > 1300
 #include <intrin.h>

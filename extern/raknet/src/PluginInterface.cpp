@@ -6,7 +6,7 @@
 
 
 /*
-#include "PluginInterface.h"
+#include "raknet/PluginInterface.h"
 
 #ifdef _MSC_VER
 #pragma warning( push )

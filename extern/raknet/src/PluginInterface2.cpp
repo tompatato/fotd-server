@@ -5,9 +5,9 @@
 /// Usage of RakNet is subject to the appropriate license agreement.
 
 
-#include "PluginInterface2.h"
-#include "RakPeerInterface.h"
-#include "BitStream.h"
+#include "raknet/PluginInterface2.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/BitStream.h"
 
 PluginInterface2::PluginInterface2()
 {

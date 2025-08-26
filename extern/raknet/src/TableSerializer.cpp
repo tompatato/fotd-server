@@ -1,8 +1,8 @@
-#include "TableSerializer.h"
-#include "DS_Table.h"
-#include "BitStream.h"
-#include "StringCompressor.h"
-#include "RakAssert.h"
+#include "raknet/TableSerializer.h"
+#include "raknet/DS_Table.h"
+#include "raknet/BitStream.h"
+#include "raknet/StringCompressor.h"
+#include "raknet/RakAssert.h"
 
 void TableSerializer::SerializeTable(DataStructures::Table *in, RakNet::BitStream *out)
 {

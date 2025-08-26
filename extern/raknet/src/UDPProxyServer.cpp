@@ -1,8 +1,8 @@
-#include "UDPProxyServer.h"
-#include "BitStream.h"
-#include "UDPProxyCommon.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
+#include "raknet/UDPProxyServer.h"
+#include "raknet/BitStream.h"
+#include "raknet/UDPProxyCommon.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/MessageIdentifiers.h"
 
 using namespace RakNet;
 

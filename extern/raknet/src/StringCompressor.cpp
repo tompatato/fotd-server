@@ -5,17 +5,17 @@
 /// Usage of RakNet is subject to the appropriate license agreement.
 
 
-#include "StringCompressor.h"
-#include "DS_HuffmanEncodingTree.h"
-#include "BitStream.h"
-#include "RakString.h"
-#include "RakAssert.h"
+#include "raknet/StringCompressor.h"
+#include "raknet/DS_HuffmanEncodingTree.h"
+#include "raknet/BitStream.h"
+#include "raknet/RakString.h"
+#include "raknet/RakAssert.h"
 #include <string.h>
 #if !defined(_PS3) && !defined(__PS3__) && !defined(SN_TARGET_PS3)
 #include <memory.h>
 #endif
 #if defined(_PS3) || defined(__PS3__) || defined(SN_TARGET_PS3)
-#include "PS3Includes.h"
+#include "raknet/PS3Includes.h"
 #endif
 
 using namespace RakNet;

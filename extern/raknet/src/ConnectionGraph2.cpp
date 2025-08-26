@@ -1,7 +1,7 @@
-#include "ConnectionGraph2.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
+#include "raknet/ConnectionGraph2.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/MessageIdentifiers.h"
+#include "raknet/BitStream.h"
 
 void ConnectionGraph2::OnClosedConnection(SystemAddress systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason )
 {

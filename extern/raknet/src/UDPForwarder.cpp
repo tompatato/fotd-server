@@ -1,9 +1,9 @@
-#include "UDPForwarder.h"
-#include "GetTime.h"
-#include "MTUSize.h"
-#include "SocketLayer.h"
-#include "WSAStartupSingleton.h"
-#include "RakSleep.h"
+#include "raknet/UDPForwarder.h"
+#include "raknet/GetTime.h"
+#include "raknet/MTUSize.h"
+#include "raknet/SocketLayer.h"
+#include "raknet/WSAStartupSingleton.h"
+#include "raknet/RakSleep.h"
 
 using namespace RakNet;
 static const unsigned short DEFAULT_MAX_FORWARD_ENTRIES=64;

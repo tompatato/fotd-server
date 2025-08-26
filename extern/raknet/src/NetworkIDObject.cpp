@@ -5,11 +5,11 @@
 /// Usage of RakNet is subject to the appropriate license agreement.
 
 
-#include "NetworkIDObject.h"
-#include "NetworkIDManager.h"
-#include "RakAssert.h"
+#include "raknet/NetworkIDObject.h"
+#include "raknet/NetworkIDManager.h"
+#include "raknet/RakAssert.h"
 
-#include "RakAlloca.h"
+#include "raknet/RakAlloca.h"
 
 uint32_t NetworkIDObject::nextAllocationNumber=0;
 

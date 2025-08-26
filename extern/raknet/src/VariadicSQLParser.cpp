@@ -1,5 +1,5 @@
-#include "VariadicSQLParser.h"
-#include "BitStream.h"
+#include "raknet/VariadicSQLParser.h"
+#include "raknet/BitStream.h"
 #include <stdarg.h>
 
 using namespace VariadicSQLParser;

@@ -1,8 +1,8 @@
-#include "ReadyEvent.h"
-#include "RakPeerInterface.h"
-#include "BitStream.h"
-#include "MessageIdentifiers.h"
-#include "RakAssert.h"
+#include "raknet/ReadyEvent.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/BitStream.h"
+#include "raknet/MessageIdentifiers.h"
+#include "raknet/RakAssert.h"
 
 #ifdef _MSC_VER
 #pragma warning( push )

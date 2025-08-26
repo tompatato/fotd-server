@@ -5,11 +5,11 @@
 /// Usage of RakNet is subject to the appropriate license agreement.
 
 
-#include "RakNetStatistics.h"
+#include "raknet/RakNetStatistics.h"
 #include <stdio.h> // sprintf
-#include "BitStream.h" // BITS_TO_BYTES
-#include "GetTime.h"
-#include "RakString.h"
+#include "raknet/BitStream.h" // BITS_TO_BYTES
+#include "raknet/GetTime.h"
+#include "raknet/RakString.h"
 
 using namespace RakNet;
 

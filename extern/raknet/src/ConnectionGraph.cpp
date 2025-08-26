@@ -5,15 +5,15 @@
 /// Usage of RakNet is subject to the appropriate license agreement.
 
 
-#include "ConnectionGraph.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
-#include "StringCompressor.h"
-#include "GetTime.h"
+#include "raknet/ConnectionGraph.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/MessageIdentifiers.h"
+#include "raknet/BitStream.h"
+#include "raknet/StringCompressor.h"
+#include "raknet/GetTime.h"
 #include <string.h>
-#include "RakAssert.h"
-#include "SHA1.h"
+#include "raknet/RakAssert.h"
+#include "raknet/SHA1.h"
 
 #ifdef _MSC_VER
 #pragma warning( push )

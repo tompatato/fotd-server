@@ -1,10 +1,10 @@
-#include "LightweightDatabaseClient.h"
-#include "StringCompressor.h"
-#include "MessageIdentifiers.h"
-#include "RakPeerInterface.h"
-#include "TableSerializer.h"
-#include "BitStream.h"
-#include "RakAssert.h"
+#include "raknet/LightweightDatabaseClient.h"
+#include "raknet/StringCompressor.h"
+#include "raknet/MessageIdentifiers.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/TableSerializer.h"
+#include "raknet/BitStream.h"
+#include "raknet/RakAssert.h"
 
 #ifdef _MSC_VER
 #pragma warning( push )

@@ -1,8 +1,8 @@
-#include "RakNetCommandParser.h"
-#include "TransportInterface.h"
-#include "RakPeerInterface.h"
-#include "BitStream.h"
-#include "RakAssert.h"
+#include "raknet/RakNetCommandParser.h"
+#include "raknet/TransportInterface.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/BitStream.h"
+#include "raknet/RakAssert.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

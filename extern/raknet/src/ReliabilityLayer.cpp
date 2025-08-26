@@ -5,13 +5,13 @@
 /// Usage of RakNet is subject to the appropriate license agreement.
 
 
-#include "ReliabilityLayer.h"
-#include "GetTime.h"
-#include "SocketLayer.h"
-#include "PluginInterface2.h"
-#include "RakAssert.h"
-#include "Rand.h"
-#include "MessageIdentifiers.h"
+#include "raknet/ReliabilityLayer.h"
+#include "raknet/GetTime.h"
+#include "raknet/SocketLayer.h"
+#include "raknet/PluginInterface2.h"
+#include "raknet/RakAssert.h"
+#include "raknet/Rand.h"
+#include "raknet/MessageIdentifiers.h"
 #include <math.h>
 
 // Can't figure out which library has this function on the PS3
@@ -44,7 +44,7 @@ typedef uint32_t BitstreamLengthEncoding;
 #ifdef _WIN32
 //#define _DEBUG_LOGGER
 #ifdef _DEBUG_LOGGER
-#include "WindowsIncludes.h"
+#include "raknet/WindowsIncludes.h"
 #endif
 #endif
 

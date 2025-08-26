@@ -1,8 +1,8 @@
-#include "Router.h"
-#include "BitStream.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "RakAssert.h"
+#include "raknet/Router.h"
+#include "raknet/BitStream.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/MessageIdentifiers.h"
+#include "raknet/RakAssert.h"
 
 //#define _DO_PRINTF
 

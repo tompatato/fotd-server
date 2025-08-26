@@ -5,13 +5,13 @@
 /// Usage of RakNet is subject to the appropriate license agreement.
 
 
-#include "FullyConnectedMesh.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
-#include "ConnectionGraph.h"
+#include "raknet/FullyConnectedMesh.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/MessageIdentifiers.h"
+#include "raknet/BitStream.h"
+#include "raknet/ConnectionGraph.h"
 #include <string.h>
-#include "RakAssert.h"
+#include "raknet/RakAssert.h"
 
 #ifdef _MSC_VER
 #pragma warning( push )

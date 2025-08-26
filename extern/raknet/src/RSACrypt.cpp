@@ -1,11 +1,11 @@
 #if !defined(_XBOX) && !defined(X360)
 
-#include "RSACrypt.h"
-//#include "Random.hpp"
-#include "Rand.h"
-#include "BigInt.h"
-#include "RakAlloca.h"
-#include "RakMemoryOverride.h"
+#include "raknet/RSACrypt.h"
+//#include "raknet/Random.hpp"
+#include "raknet/Rand.h"
+#include "raknet/BigInt.h"
+#include "raknet/RakAlloca.h"
+#include "raknet/RakMemoryOverride.h"
 using namespace big;
 
 

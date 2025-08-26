@@ -1,11 +1,11 @@
-#include "UDPProxyCoordinator.h"
-#include "BitStream.h"
-#include "UDPProxyCommon.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "Rand.h"
-#include "GetTime.h"
-#include "UDPForwarder.h"
+#include "raknet/UDPProxyCoordinator.h"
+#include "raknet/BitStream.h"
+#include "raknet/UDPProxyCommon.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/MessageIdentifiers.h"
+#include "raknet/Rand.h"
+#include "raknet/GetTime.h"
+#include "raknet/UDPForwarder.h"
 
 // Larger than the client version
 static const int DEFAULT_CLIENT_UNRESPONSIVE_PING_TIME=2000;

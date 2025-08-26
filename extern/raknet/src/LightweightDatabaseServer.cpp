@@ -1,12 +1,12 @@
-#include "LightweightDatabaseServer.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
-#include "StringCompressor.h"
-#include "RakPeerInterface.h"
-#include "TableSerializer.h"
-#include "RakAssert.h"
-#include "GetTime.h"
-#include "Rand.h"
+#include "raknet/LightweightDatabaseServer.h"
+#include "raknet/MessageIdentifiers.h"
+#include "raknet/BitStream.h"
+#include "raknet/StringCompressor.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/TableSerializer.h"
+#include "raknet/RakAssert.h"
+#include "raknet/GetTime.h"
+#include "raknet/Rand.h"
 
 static const int SEND_PING_INTERVAL=15000;
 static const int DROP_SERVER_INTERVAL=75000;

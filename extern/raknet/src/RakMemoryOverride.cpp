@@ -1,12 +1,12 @@
-#include "RakMemoryOverride.h"
-#include "RakAssert.h"
+#include "raknet/RakMemoryOverride.h"
+#include "raknet/RakAssert.h"
 #include <stdlib.h>
 #ifdef _LINK_DL_MALLOC
-#include "DLMalloc-2.8.4.h"
+#include "raknet/DLMalloc-2.8.4.h"
 #endif
 
 #if defined(_PS3) || defined(__PS3__) || defined(SN_TARGET_PS3)
-#include "PS3Includes.h"
+#include "raknet/PS3Includes.h"
 #endif
 
 using namespace RakNet;

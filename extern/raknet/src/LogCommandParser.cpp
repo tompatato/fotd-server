@@ -1,5 +1,5 @@
-#include "LogCommandParser.h"
-#include "TransportInterface.h"
+#include "raknet/LogCommandParser.h"
+#include "raknet/TransportInterface.h"
 #if !defined(_PS3) && !defined(__PS3__) && !defined(SN_TARGET_PS3)
 #include <memory.h>
 #endif
@@ -7,7 +7,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include "LinuxStrings.h"
+#include "raknet/LinuxStrings.h"
 
 #ifdef _MSC_VER
 #pragma warning( push )

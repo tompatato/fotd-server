@@ -1,12 +1,12 @@
-#include "RakNetTransport2.h"
-#include "RakNetworkFactory.h"
-#include "RakPeerInterface.h"
-#include "BitStream.h"
-#include "MessageIdentifiers.h"
+#include "raknet/RakNetTransport2.h"
+#include "raknet/RakNetworkFactory.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/BitStream.h"
+#include "raknet/MessageIdentifiers.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-#include "LinuxStrings.h"
+#include "raknet/LinuxStrings.h"
 
 #ifdef _MSC_VER
 #pragma warning( push )

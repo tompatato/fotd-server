@@ -1,6 +1,6 @@
-#include "DataCompressor.h"
-#include "DS_HuffmanEncodingTree.h"
-#include "RakAssert.h"
+#include "raknet/DataCompressor.h"
+#include "raknet/DS_HuffmanEncodingTree.h"
+#include "raknet/RakAssert.h"
 #include <string.h> // Use string.h rather than memory.h for a console
 
 void DataCompressor::Compress( unsigned char *userData, unsigned sizeInBytes, RakNet::BitStream * output )

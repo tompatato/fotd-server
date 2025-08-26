@@ -1,5 +1,5 @@
-#include "RakAssert.h"
-#include "GridSectorizer.h"
+#include "raknet/RakAssert.h"
+#include "raknet/GridSectorizer.h"
 //#include <stdlib.h>
 #include <math.h>
 

@@ -1,9 +1,9 @@
-#include "DS_Table.h"
-#include "DS_OrderedList.h"
+#include "raknet/DS_Table.h"
+#include "raknet/DS_OrderedList.h"
 #include <string.h>
-#include "RakAssert.h"
-#include "RakAssert.h"
-#include "Itoa.h"
+#include "raknet/RakAssert.h"
+#include "raknet/RakAssert.h"
+#include "raknet/Itoa.h"
 
 using namespace DataStructures;
 

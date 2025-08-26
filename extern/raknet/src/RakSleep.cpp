@@ -1,9 +1,9 @@
 #if defined(_XBOX) || defined(X360)
-#include "XBOX360Includes.h"
+#include "raknet/XBOX360Includes.h"
 #elif defined(_WIN32)
-#include "WindowsIncludes.h" // Sleep
+#include "raknet/WindowsIncludes.h" // Sleep
 #elif defined(_PS3) || defined(__PS3__) || defined(SN_TARGET_PS3)
-#include "PS3Includes.h"
+#include "raknet/PS3Includes.h"
 #include <sys/timer.h>
 #else
 #include <unistd.h> // usleep
@@ -11,7 +11,7 @@
 #endif
 
 
-#include "RakSleep.h"
+#include "raknet/RakSleep.h"
 
 void RakSleep(unsigned int ms)
 {

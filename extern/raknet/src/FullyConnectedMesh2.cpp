@@ -5,13 +5,13 @@
 /// Usage of RakNet is subject to the appropriate license agreement.
 
 
-#include "FullyConnectedMesh2.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
-#include "RakAssert.h"
-#include "GetTime.h"
-#include "Rand.h"
+#include "raknet/FullyConnectedMesh2.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/MessageIdentifiers.h"
+#include "raknet/BitStream.h"
+#include "raknet/RakAssert.h"
+#include "raknet/GetTime.h"
+#include "raknet/Rand.h"
 
 FullyConnectedMesh2::FullyConnectedMesh2()
 {

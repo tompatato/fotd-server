@@ -1,11 +1,11 @@
-#include "NatPunchthroughServer.h"
-#include "SocketLayer.h"
-#include "BitStream.h"
-#include "MessageIdentifiers.h"
-#include "RakPeerInterface.h"
-#include "MTUSize.h"
-#include "GetTime.h"
-#include "PacketLogger.h"
+#include "raknet/NatPunchthroughServer.h"
+#include "raknet/SocketLayer.h"
+#include "raknet/BitStream.h"
+#include "raknet/MessageIdentifiers.h"
+#include "raknet/RakPeerInterface.h"
+#include "raknet/MTUSize.h"
+#include "raknet/GetTime.h"
+#include "raknet/PacketLogger.h"
 
 void NatPunchthroughServerDebugInterface_Printf::OnServerMessage(const char *msg)
 {

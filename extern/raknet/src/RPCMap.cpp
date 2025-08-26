@@ -5,7 +5,7 @@
 /// Usage of RakNet is subject to the appropriate license agreement.
 
 
-#include "RPCMap.h"
+#include "raknet/RPCMap.h"
 #include <string.h>
 
 RPCMap::RPCMap()

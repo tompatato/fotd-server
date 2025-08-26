@@ -1,12 +1,12 @@
-#include "RakString.h"
-#include "RakAssert.h"
-#include "RakMemoryOverride.h"
-#include "BitStream.h"
+#include "raknet/RakString.h"
+#include "raknet/RakAssert.h"
+#include "raknet/RakMemoryOverride.h"
+#include "raknet/BitStream.h"
 #include <stdarg.h>
 #include <string.h>
-#include "LinuxStrings.h"
-#include "StringCompressor.h"
-#include "SimpleMutex.h"
+#include "raknet/LinuxStrings.h"
+#include "raknet/StringCompressor.h"
+#include "raknet/SimpleMutex.h"
 
 using namespace RakNet;
 
@@ -900,9 +900,9 @@ void RakString::UnlockMutex(void)
 }
 
 /*
-#include "RakString.h"
+#include "raknet/RakString.h"
 #include <string>
-#include "GetTime.h"
+#include "raknet/GetTime.h"
 
 using namespace RakNet;
 

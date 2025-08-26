@@ -1,4 +1,4 @@
-#include "Gen_RPC8.h"
+#include "raknet/Gen_RPC8.h"
 
 unsigned int GenRPC::BuildStack(char *stack)
 {

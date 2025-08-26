@@ -6,23 +6,23 @@
 
 
 #if defined(_MSC_VER) && _MSC_VER < 1299 // VC6 doesn't support template specialization
-#include "BitStream_NoTemplate.cpp"
+#include "raknet/BitStream_NoTemplate.cpp"
 #else
 
-#include "BitStream.h"
+#include "raknet/BitStream.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 #if defined(_XBOX) || defined(X360)
-#include "XBOX360Includes.h"
+#include "raknet/XBOX360Includes.h"
 #elif defined(_WIN32)
 #include <winsock2.h> // htonl
 #include <memory.h>
 #include <cmath>
 #include <float.h>
 #elif defined(_PS3) || defined(__PS3__) || defined(SN_TARGET_PS3)
-#include "PS3Includes.h"
+#include "raknet/PS3Includes.h"
 #else
 #include <arpa/inet.h>
 #include <memory.h>
