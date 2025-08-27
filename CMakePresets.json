@@ -80,5 +80,17 @@
 				"CMAKE_BUILD_TYPE": "Release"
 			}
 		}
+	],
+	"buildPresets": [
+		{
+			"name": "debug",
+			"configurePreset": "debug",
+			"displayName": "Debug"
+		},
+		{
+			"name": "release",
+			"configurePreset": "release",
+			"displayName": "Release"
+		}
 	]
 }
