@@ -10,14 +10,14 @@ case "$COMMAND" in
   build)
 	case "$TARGET" in
 	  cpp)
-		docker compose -f docker/linux/docker-compose.yml run --rm cpp-build build.sh "$@"
+		docker compose run --rm cpp-build build.sh "$@"
 		;;
 	  dotnet)
-		docker compose -f docker/linux/docker-compose.yml run --rm dotnet-build build.sh "$@"
+		docker compose run --rm dotnet-build build.sh "$@"
 		;;
 	  all)
-		docker compose -f docker/linux/docker-compose.yml run --rm cpp-build build.sh
-		docker compose -f docker/linux/docker-compose.yml run --rm dotnet-build build.sh "$@"
+		docker compose run --rm cpp-build build.sh
+		docker compose run --rm dotnet-build build.sh "$@"
 		;;
 	  *)
 		echo "Unknown build target: $TARGET"
@@ -28,14 +28,14 @@ case "$COMMAND" in
   test)
 	case "$TARGET" in
 	  cpp)
-		docker compose -f docker/linux/docker-compose.yml run --rm cpp-build test.sh "$@"
+		docker compose run --rm cpp-build test.sh "$@"
 		;;
 	  dotnet)
-		docker compose -f docker/linux/docker-compose.yml run --rm dotnet-build test.sh "$@"
+		docker compose run --rm dotnet-build test.sh "$@"
 		;;
 	  all)
-		docker compose -f docker/linux/docker-compose.yml run --rm cpp-build test.sh "$@"
-		docker compose -f docker/linux/docker-compose.yml run --rm dotnet-build test.sh "$@"
+		docker compose run --rm cpp-build test.sh "$@"
+		docker compose run --rm dotnet-build test.sh "$@"
 		;;
 	  *)
 		echo "Unknown test target: $TARGET"
