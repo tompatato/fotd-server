@@ -1,0 +1,77 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build",
+			"type": "shell",
+			"command": "./docker/linux/dev.sh",
+			"args": [
+				"build",
+				"${input:targetProject}",
+				"${input:buildType}"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": [],
+			"windows": {
+				"command": "powershell.exe",
+				"args": [
+					"-ExecutionPolicy",
+					"Bypass",
+					"-File",
+					"./docker/linux/dev.ps1",
+					"build",
+					"${input:targetProject}",
+					"${input:buildType}"
+				]
+			}
+		},
+		{
+			"label": "Test",
+			"type": "shell",
+			"command": "./docker/linux/dev.sh",
+			"args": [
+				"test",
+				"${input:targetProject}"
+			],
+			"group": "test",
+			"problemMatcher": [],
+			"windows": {
+				"command": "powershell.exe",
+				"args": [
+					"-ExecutionPolicy",
+					"Bypass",
+					"-File",
+					"./docker/linux/dev.ps1",
+					"test",
+					"${input:targetProject}"
+				]
+			}
+		}
+	],
+	"inputs": [
+		{
+			"id": "targetProject",
+			"type": "pickString",
+			"description": "Select project",
+			"options": [
+				"cpp",
+				"csharp",
+				"all"
+			],
+			"default": "all"
+		},
+		{
+			"id": "buildType",
+			"type": "pickString",
+			"description": "Select build type",
+			"options": [
+				"Debug",
+				"Release"
+			],
+			"default": "Debug"
+		},
+	]
+}

@@ -4,7 +4,10 @@ Thumbs.db
 
 # Editor Files
 .vs
-.vscode
+.vscode/*
+
+# Keep Shared Configuration
+!.vscode/tasks.json
 
 # User Files
 CMakeUserPresets.json
