@@ -12,22 +12,22 @@
 
 	<!-- Windows host (default) -->
 	<PropertyGroup>
-		<FOMInterfaceLibFile>$(MSBuildThisFileDirectory)../out/build/$(Configuration)/fom-interface/FOMInterface.dll</FOMInterfaceLibFile>
+		<FOMNetworkLibFile>$(MSBuildThisFileDirectory)../out/build/$(Configuration)/fom-network/FOMNetwork.dll</FOMNetworkLibFile>
 	</PropertyGroup>
 
 	<!-- Linux host -->
 	<PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
-		<FOMInterfaceLibFile>$(MSBuildThisFileDirectory)../out/build/$(Configuration)/fom-interface/libFOMInterface.so</FOMInterfaceLibFile>
+		<FOMNetworkLibFile>$(MSBuildThisFileDirectory)../out/build/$(Configuration)/fom-network/libFOMNetwork.so</FOMNetworkLibFile>
 	</PropertyGroup>
 
 	<!-- Docker Linux -->
 	<PropertyGroup Condition="'$(FOMServerBuildEnvironment)' == 'Docker'">
-		<FOMInterfaceLibFile>/out/cpp/build/$(Configuration)/fom-interface/libFOMInterface.so</FOMInterfaceLibFile>
+		<FOMNetworkLibFile>/out/cpp/build/$(Configuration)/fom-network/libFOMNetwork.so</FOMNetworkLibFile>
 	</PropertyGroup>
 
-	<!-- Include FOMInterface -->
+	<!-- Include FOMNetwork -->
 	<ItemGroup>
-		<None Include="$(FOMInterfaceLibFile)">
+		<None Include="$(FOMNetworkLibFile)">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>

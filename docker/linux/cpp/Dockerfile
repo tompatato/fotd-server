@@ -3,13 +3,13 @@ FROM ubuntu:14.04
 
 # Install basic tools and GCC 4.8 + CMake
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    build-essential \
-    gcc-4.8 g++-4.8 \
-    rsync \
-    git \
-    wget \
-    tar \
-    && rm -rf /var/lib/apt/lists/*
+	build-essential \
+	gcc-4.8 g++-4.8 \
+	rsync \
+	git \
+	wget \
+	tar \
+	&& rm -rf /var/lib/apt/lists/*
 
 # Set GCC/G++ 4.8 as default
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 100 \
