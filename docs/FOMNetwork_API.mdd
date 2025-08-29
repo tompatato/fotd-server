@@ -23,11 +23,11 @@ namespace Public {
 
 	class FOMNetwork_RECEIVE_API[ "EXPORTED RECEIVE FUNCTIONS" ] {
 		+FOMNetwork_ReceivePackets( RakPeerInterface* peer ) ReceivedPackets
-		+FOMNetwork_ProcessPackets( RakPeerInterface* peer, ReceivedPackets packets, out uint8_t* packetBuffer ) void
+		+FOMNetwork_ProcessPackets( RakPeerInterface* peer, ReceivedPackets received, out FOMPacket[] packetBuffer ) void
 	}
 
 	class FOMNetwork_SEND_API[ "EXPORTED SEND FUNCTIONS" ] {
-		+FOMNetwork_Send( RakPeerInterface* peer, SendPacketHeader* headers, uint8_t* packetBuffer, int numPackets ) void
+		+FOMNetwork_Send( RakPeerInterface* peer, SendPacket[] packets, int numPackets ) void
 	}
 
 	class ExamplePacket {
@@ -40,53 +40,41 @@ namespace Public {
 		<<struct>>
 		+Packet* buffer
 		+int numPackets
-		+int packetBufferSize
 	}
 
-	class SendPacketHeader {
+	class SendPacket {
 		<<struct>>
 		+SystemAddress address
+		+FOMPacket data
 		+int priority
 		+int reliability
 		+byte broadcast
 	}
 }
 ExamplePacket <|-- BasePacket
-PacketSerializer ..> BasePacket
+
+class FOMPacket
+FOMPacket <|-- BasePacket
+FOMPacket <|-- ExamplePacket
+PacketSerializer ..> FOMPacket
+
+note for FOMPacket "A discriminated union of all of the packet struct types."
 
 FOMNetwork_RECEIVE_API ..> ReceivedPackets
-FOMNetwork_SEND_API ..> SendPacketHeader
+FOMNetwork_SEND_API ..> SendPacket
 
-note for FOMNetwork_RECEIVE_API "First, ReceivePackets is called and collects packets from RakNet. It
-								 will return a ReceivedPackets with pointers to all of the packets it has
-								 and a buffer size that should be allocated to be filled with the
-								 processed packet structs. This is calculated by reading the types
-								 and counting the number of bytes each type's struct will take up.
-
-								 After that, ProcessPackets is called with the ReceivedPackets returned
-								 earlier and a buffer that can be filled with the processed packet
-								 structures. Each packet's type is read again and then it is parsed
-								 by the appropriate PacketSerializer into the buffer."
-
-note for ReceivedPackets "packetBufferSize is the sum of the sizes of all the different
-						  structs that the packets will be parsed into when processed."
-
-class InteropSerializer {
-	+SerializePackets( BasePacket[] packets, int numPackets, uint8_t* buffer ) void
-	+DeserializePackets( uint8_t* buffer, int numPackets ) BasePacket[]
-}
-InteropSerializer ..> ExamplePacket
-FOMNetwork_RECEIVE_API ..> InteropSerializer
-FOMNetwork_SEND_API ..> InteropSerializer
-
-note for InteropSerializer "A utility class that handles packing and unpacking arrays of packet
-							structs. Using a buffer across the interop boundary allows for
-							more efficient usage of memory and maximizes performance."
+note for FOMNetwork_RECEIVE_API "First, ReceivePackets is called and it collects pending packets from
+								 RakPeerInterface. It loads pointers to all of the packets into an
+								 array and returns a ReceivedPackets struct.
+								 
+								 After that, ProcessPackets is called with the ReceivedPackets struct
+								 and is given an array of memory by the caller. It will deserialize
+								 the packet data into the buffer and free all of the RakNet packets."
 
 class PacketSerializer {
 	<<abstract>>
-	+Serialize( BasePacket packet ) BitStream
-	+Deserialize( Packet* packet ) BasePacket
+	+Serialize( FOMPacket packet ) BitStream
+	+Deserialize( Packet* packet ) FOMPacket
 }
 
 class ExamplePacketSerializer {
