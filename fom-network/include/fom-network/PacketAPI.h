@@ -1,7 +1,7 @@
 #pragma once
 
 #include <raknet/RakNetTypes.h>
-#include <raknet/RakPeer.h>
+#include <raknet/RakPeerInterface.h>
 #include <fom-network/Common.h>
 #include <fom-network/FOMNetworkExport.h>
 #include <fom-network/FOMPacket.h>

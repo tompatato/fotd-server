@@ -1,6 +1,6 @@
 #pragma once
 
-#include <raknet/RakPeer.h>
+#include <raknet/RakPeerInterface.h>
 #include <fom-network/Common.h>
 #include <fom-network/FOMNetworkExport.h>
 
@@ -22,7 +22,7 @@ extern "C" {
 	*
 	* @param peer The interface instance to shut down.
 	*/
-	FOM_API void FOMNetwork_Server_Shutdown(RakPeerInterface* peer);
+	FOM_API void FOMNetwork_Server_Shutdown(RakPeerInterface* server);
 
 #ifdef __cplusplus
 }
