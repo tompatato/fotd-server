@@ -9,10 +9,10 @@
 #pragma pack(push, 1)
 
 /**
-* Container for passing a buffer of received packets around.
-*
-* @note This structure MUST only contain C# blittable types.
-*/
+ * Container for passing a buffer of received packets around.
+ *
+ * @note This structure MUST only contain C# blittable types.
+ */
 struct ReceivedPackets {
 	/* A buffer of packets that have been received and need to be deserialized and released. */
 	Packet* packets;
@@ -21,11 +21,11 @@ struct ReceivedPackets {
 	uint32_t count;
 };
 
-/*
-* The network address for a system.
-*
-* @note This structure MUST only contain C# blittable types.
-*/
+/**
+ * The network address for a system.
+ *
+ * @note This structure MUST only contain C# blittable types.
+ */
 struct FOMNetworkAddress {
 	/* The binary destination address for the packet or the excluded address if it's broadcasted. */
 	uint32_t binaryAddress;
@@ -36,10 +36,10 @@ struct FOMNetworkAddress {
 
 
 /**
-* Container for passing packets to be sent around.
-*
-* @note This structure MUST only contain C# blittable types.
-*/
+ * Container for passing packets to be sent around.
+ *
+ * @note This structure MUST only contain C# blittable types.
+ */
 struct SendPacket {
 	/* The destination for the packet or the excluded address if it is a broadcast. */
 	FOMNetworkAddress address;
@@ -63,7 +63,7 @@ struct SendPacket {
 extern "C" {
 #endif
 
-	/*
+	/**
 	* Polls the network interface for packets and returns them in a buffer.
 	*
 	* @param peer A pointer to the network interface.
@@ -72,7 +72,7 @@ extern "C" {
 	*/
 	FOM_API ReceivedPackets FOMNetwork_ReceivePackets(RakPeerInterface* peer);
 
-	/*
+	/**
 	* Uses the received packets to fill a buffer with deserialized packet structures.
 	*
 	* @param peer A pointer to the network interface.
@@ -82,16 +82,16 @@ extern "C" {
 	*
 	* @return The number of packets that were deserialized and placed in the packet buffer.
 	*/
-	FOM_API uint32_t FOMNetwork_ProcessPackets(RakPeerInterface* peer, ReceivedPackets received, FOMPacket* packetBuffer, uint32_t packetBufferLen);
+	FOM_API uint32_t FOMNetwork_ProcessPackets(RakPeerInterface* peer, ReceivedPackets received, const FOMPacket* packetBuffer, uint32_t packetBufferLen);
 
-	/*
+	/**
 	* Sends a buffer of packet structures through the network interface.
 	*
 	* @param peer A pointer to the network interface.
 	* @param packets A buffer of packet structures to serialize and send.
 	* @param count The number of packets in the buffer.
 	*/
-	FOM_API void FOMNetwork_Send(RakPeerInterface* peer, SendPacket* packets, uint32_t count);
+	FOM_API void FOMNetwork_Send(RakPeerInterface* peer, const SendPacket* packets, uint32_t count);
 
 #ifdef __cplusplus
 }

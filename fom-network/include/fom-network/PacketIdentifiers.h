@@ -3,11 +3,16 @@
 #include <fom-network/Common.h>
 
 /**
-* @enum PacketIdentifier
-*
-* The identifiers used to indicate how a packet should be serialized and deserialized.
-*/
+ * @enum PacketIdentifier
+ *
+ * The identifiers used to indicate how a packet should be serialized and deserialized.
+ */
 enum PacketIdentifier : uint8_t {
+	/**
+	* The first index for user packets to start at.
+	*/
+	ID_USER_PACKET_ENUM = 104,
+
 	// 104
 	// 105
 	// 106

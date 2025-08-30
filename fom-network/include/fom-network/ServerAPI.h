@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-	/*
+	/**
 	* Starts an interface for sending and receiving packets as a server.
 	*
 	* @param port The port to listen for incoming connections on.

@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-	/*
+	/**
 	* Connects to a server at the specified address and port.
 	*
 	* @param hostAddress The string IP address or domain of the server to connect to.
