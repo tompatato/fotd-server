@@ -1,7 +1,3 @@
-cmake_minimum_required(VERSION 3.28)
-
-project(FOMNetworkTests)
-
 # GoogleTest requires at least C++11
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -17,20 +13,28 @@ FetchContent_MakeAvailable(googletest)
 
 # Disable Microsoft Code Analysis for GoogleTest targets
 if (MSVC)
-    set_target_properties(gtest PROPERTIES VS_GLOBAL_EnableMicrosoftCodeAnalysis false)
-    set_target_properties(gtest_main PROPERTIES VS_GLOBAL_EnableMicrosoftCodeAnalysis false)
+	set_target_properties(gtest PROPERTIES VS_GLOBAL_EnableMicrosoftCodeAnalysis false)
+	set_target_properties(gtest_main PROPERTIES VS_GLOBAL_EnableMicrosoftCodeAnalysis false)
 endif()
 
 add_executable(FOMNetworkTests
 	"test_main.cpp"
+	"packet-serializers/ExamplePacketSerializer_test.cpp"
+)
+
+target_include_directories(FOMNetworkTests PRIVATE
+	${PROJECT_SOURCE_DIR}/include
+	${PROJECT_SOURCE_DIR}/src
 )
 
 target_link_libraries(FOMNetworkTests
-    PRIVATE
-    FOMNetwork
-    gtest
-    gtest_main
+	PRIVATE
+	FOMNetwork
+	RakNet
+	gtest_main
 )
 
 include(GoogleTest)
-gtest_discover_tests(FOMNetworkTests)
+gtest_discover_tests(FOMNetworkTests
+  EXTRA_ARGS --gtest_color=yes
+)

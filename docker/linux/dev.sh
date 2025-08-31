@@ -45,12 +45,19 @@ case "$COMMAND" in
 		;;
 	test)
 		case "$TARGET" in
-		cpp)    run_docker cpp-build test.sh "$@" ;;
-		dotnet) run_docker dotnet-build test.sh "$@" ;;
+		cpp)
+			[[ "${DEV_SKIP_BUILD:-0}" != "1" ]] && run_docker cpp-build build.sh "$@"
+			run_docker cpp-build test.sh "$@"
+			;;
+		dotnet)
+			[[ "${DEV_SKIP_BUILD:-0}" != "1" ]] && run_docker dotnet-build build.sh "$@"
+			run_docker dotnet-build test.sh "$@"
+			;;
 		all)
+			[[ "${DEV_SKIP_BUILD:-0}" != "1" ]] && run_docker cpp-build build.sh "$@"
+			[[ "${DEV_SKIP_BUILD:-0}" != "1" ]] && run_docker dotnet-build build.sh "$@"
 			run_docker cpp-build test.sh "$@"
 			run_docker dotnet-build test.sh "$@"
 			;;
-		esac
-		;;
+esac
 esac

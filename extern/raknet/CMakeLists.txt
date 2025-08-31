@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.28)
-
 project(
 	"RakNet"
 	DESCRIPTION "RakNet is a C++ game networking engine."
@@ -127,6 +125,9 @@ if(UNIX)
 	set_target_properties(RakNet PROPERTIES
         RULE_LAUNCH_COMPILE ">/dev/null 2>&1"
     )
+
+    # Make sure that it can be linked correctly.
+    set_target_properties(RakNet PROPERTIES POSITION_INDEPENDENT_CODE ON)
 endif()
 
 install(TARGETS RakNet

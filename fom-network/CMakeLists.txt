@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.28)
-
 project(FOMNetwork)
 
 # Use C++11 so that we can take advantage of some of its features.
@@ -33,3 +31,5 @@ if(WIN32)
 		wsock32 ws2_32
 	)
 endif()
+
+add_subdirectory(tests)
