@@ -11,7 +11,8 @@
  * same memory without copying it.
  */
 #define ASSERT_BLITTABLE(T) \
-    static_assert(std::is_trivially_copyable<T>::value, #T " must be trivially copyable"); \
+    static_assert(std::has_trivial_copy_constructor<T>::value, #T " must have trivial copy ctor"); \
+    static_assert(std::has_trivial_copy_assign<T>::value, #T " must have trivial copy assign"); \
     static_assert(std::is_standard_layout<T>::value, #T " must have standard layout")
 
 /**
