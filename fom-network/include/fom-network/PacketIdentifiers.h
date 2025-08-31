@@ -3,6 +3,11 @@
 #include <fom-network/Common.h>
 
 /**
+ * The identifier used to indicate an invalid packet.
+ */
+#define INVALID_PACKET_ID 0
+
+/**
  * @enum PacketIdentifier
  *
  * The identifiers used to indicate how a packet should be serialized and deserialized.

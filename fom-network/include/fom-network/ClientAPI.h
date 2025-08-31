@@ -13,7 +13,6 @@ extern "C" {
 	*
 	* @param hostAddress The string IP address or domain of the server to connect to.
 	* @param port The port number of the server to connect to.
-	*
 	* @return A pointer to the initialized interface, or null on failure.
 	*/
 	FOM_API RakPeerInterface* FOMNetwork_Client_Connect(const uint8_t* hostAddress, uint16_t port);

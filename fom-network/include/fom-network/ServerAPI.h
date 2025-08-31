@@ -12,7 +12,6 @@ extern "C" {
 	* Starts an interface for sending and receiving packets as a server.
 	*
 	* @param port The port to listen for incoming connections on.
-	*
 	* @return A pointer to the initialized interface, or null on failure.
 	*/
 	FOM_API RakPeerInterface* FOMNetwork_Server_Startup(uint16_t port);

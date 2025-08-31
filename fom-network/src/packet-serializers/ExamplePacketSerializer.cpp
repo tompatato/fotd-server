@@ -2,17 +2,14 @@
 #include <fom-network/FOMPacket.h>
 #include "PacketSerializers.h"
 
-class ExamplePacketSerializer : public IPacketIDSerializer<ExamplePacket> {
-public:
-	RakNet::BitStream Serialize(const ExamplePacket& packet) override {
-		RakNet::BitStream bitstream;
-		bitstream.Write(packet.exampleField1);
-		return bitstream;
-	}
+bool ExamplePacketSerializer::Serialize(RakNet::BitStream& bs, const ExamplePacket& p) override {
+	bs.Write(p.exampleField1);
+	return bs;
+}
 
-	ExamplePacket Deserialize(RakNet::BitStream& bitstream) override {
-		ExamplePacket packet;
-		bitstream.Read(packet.exampleField1);
-		return packet;
-	}
-};
+ExamplePacket ExamplePacketSerializer::Deserialize(RakNet::BitStream& bs) override {
+	ExamplePacket p;
+	bs.Read(p.exampleField1);
+	return p;
+}
+
