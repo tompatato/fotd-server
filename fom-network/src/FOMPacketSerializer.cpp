@@ -1,36 +1,26 @@
 #include <unordered_map>
 #include "FOMPacketSerializer.h"
 
-FOMPacketSerializer::FOMPacketSerializer() {
-    FOMPacketSerializer::FOMPacketSerializer() {
-    auto registerSerializer = [this](PacketIdentifier id, IPacketIDSerializer* s) {
-        this->packetSerializers[id] = s;
-    };
+/**
+ * We need to initialize the map with all of the serializers we want to be able to use.
+ */
+static std::unordered_map<uint32_t, IPacketSerializer*> serializerMap = {
+	{ ID_USER_PACKET_ENUM, &ExamplePacketSerializer::GetInstance() }
+};
 
-    registerSerializer(ID_USER_PACKET_ENUM, new ExamplePacketSerializer());
-}
-
-FOMPacketSerializer::~FOMPacketSerializer() {
-    for (auto& entry : this->packetSerializers) {
-        delete entry.second;
-    }
-}
-
-RakNet::BitStream FOMPacketSerializer::Serialize(const FOMPacket& p) const {
+bool FOMPacketSerializer::Serialize(RakNet::BitStream& bs, const FOMPacket& p) {
     const auto* serializer = GetSerializer(p.ID);
     if (!serializer) {
-        return RakNet::BitStream{};
+		return false;
     }
 
-    RakNet::BitStream bs;
-
     // The first byte in the BitStream will always be the packet ID.
-    bs.Write(p.ID); 
+    bs.Write(p.ID);
 
-    return serializer->Serialize(bs, p);
+    return serializer->SerializePacket(bs, p);
 }
 
-FOMPacket FOMPacketSerializer::Deserialize(RakNet::BitStream& bs) const {
+FOMPacket FOMPacketSerializer::Deserialize(RakNet::BitStream& bs) {
     // The first byte in the BitStream will always be the packet ID.
     PacketIdentifier id;
     if (!bs.Read(id)) {
@@ -42,12 +32,12 @@ FOMPacket FOMPacketSerializer::Deserialize(RakNet::BitStream& bs) const {
         return INVALID_PACKET;
     }
 
-    return serializer->Deserialize(bs);
+    return serializer->DeserializePacket(bs);
 }
 
-const IPacketSerializer* FOMPacketSerializer::GetSerializer(PacketIdentifier id) const {
-    auto it = this->packetSerializers.find(id);
-    if (it == this->packetSerializers.end()) {
+const IPacketSerializer* FOMPacketSerializer::GetSerializer(PacketIdentifier id) {
+    auto it = serializerMap.find(id);
+    if (it == serializerMap.end()) {
         return NULL;
     }
     return it->second;

@@ -8,26 +8,32 @@
  * don't want to stall the thread permanently when there are
  * more packets being received than pulled off the queue.
  */
-#define MAX_BUFFERED_PACKETS 256;
+namespace FOM {
+	constexpr std::size_t MaxBufferedPackets = 256;
+}
 
 ReceivedPackets FOMNetwork_ReceivePackets(RakPeerInterface* peer) {
 	if (!peer) {
         return { NULL, 0 };
     }
 
-    // Limit the number of packets 
-    std::vector<const Packet*> receiveBuffer;
-    receiveBuffer.reserve(MAX_BUFFERED_PACKETS)
-    while (receiveBuffer.size() < MAX_BUFFERED_PACKETS) {
-        const Packet* packet = peer->Receive();
+    // Make sure to re-use the same buffer since we are just using
+	// it to aggregate the pointers before copying them to return.
+    static std::vector<Packet*> receiveBuffer;
+	receiveBuffer.clear();
+	receiveBuffer.reserve(FOM::MaxBufferedPackets);
+
+	// Limit the number of packets 
+    while (receiveBuffer.size() < FOM::MaxBufferedPackets) {
+        Packet* packet = peer->Receive();
         if (!packet) {
             break;
         }
 
-        receiveBuffer.push(packet);
+        receiveBuffer.push_back(packet);
     }
 
-    ReceivedPackets received;
+	ReceivedPackets received{};
 
     // We're going to pass an array of packets back to the consumer.
     // The array and the packets contained must all be deallocated
@@ -39,7 +45,7 @@ ReceivedPackets FOMNetwork_ReceivePackets(RakPeerInterface* peer) {
     return received;
 }
 
-int8_t FOMNetwork_ProcessPackets(RakPeerInterface* peer, ReceivedPackets received, const FOMPacket* packetBuffer, uint32_t packetBufferLen) {
+int8_t FOMNetwork_ProcessPackets(RakPeerInterface* peer, const ReceivedPackets received, FOMPacket* packetBuffer, uint32_t packetBufferLen) {
     if (!peer || !received.packets || received.count == 0) {
         return 0;
     }
@@ -49,7 +55,7 @@ int8_t FOMNetwork_ProcessPackets(RakPeerInterface* peer, ReceivedPackets receive
     }
 
     for (uint32_t i = 0; i < received.count; i++) {
-        const Packet* p = received.packets[i];
+        Packet* p = received.packets[i];
         if (!p) {
             continue;
         }
@@ -74,11 +80,22 @@ void FOMNetwork_Send(RakPeerInterface* peer, const SendPacket* packets, uint32_t
 
     for (uint32_t i = 0; i < count; i++) {
         const SendPacket& s = packets[i];
-        RakNet::BitStream bs = FOMPacketSerializer::Serialize(s.data);
+
+		SystemAddress address = UNASSIGNED_SYSTEM_ADDRESS;
+		if (s.address.binaryAddress != 0 ) {
+			address.binaryAddress = s.address.binaryAddress;
+			address.port = s.address.port;
+		}
+
+		RakNet::BitStream bs;
+		if (!FOMPacketSerializer::Serialize(bs, s.data)) {
+			continue;
+		}
+
         if (s.broadcast) {
-            peer->Send(&bs, s.priority, s.reliability, s.orderingChannel, UNASSIGNED_SYSTEM_ADDRESS, true);
+            peer->Send(&bs, (PacketPriority)s.priority, (PacketReliability)s.reliability, s.orderingChannel, address, !!s.broadcast);
         } else {
-            peer->Send(&bs, s.priority, s.reliability, s.orderingChannel, s.address.systemAddress, false);
+            peer->Send(&bs, (PacketPriority)s.priority, (PacketReliability)s.reliability, s.orderingChannel, address, !!s.broadcast);
         }
     }
 }

@@ -10,7 +10,6 @@
  * is that it doesn't require using managed memory and uses the
  * same memory without copying it.
  */
-
 #define ASSERT_BLITTABLE(T) \
     static_assert(std::is_trivially_copyable<T>::value, #T " must be trivially copyable"); \
     static_assert(std::is_standard_layout<T>::value, #T " must have standard layout")
@@ -40,6 +39,6 @@ struct FOMPacket {
 	} data;
 };
 
-#define INVALID_PACKET FOMPacket{ INVALID_PACKET_ID }
+#define INVALID_PACKET FOMPacket{ (PacketIdentifier)INVALID_PACKET_ID }
 
 #pragma pack(pop)

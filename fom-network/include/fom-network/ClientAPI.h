@@ -15,7 +15,7 @@ extern "C" {
 	* @param port The port number of the server to connect to.
 	* @return A pointer to the initialized interface, or null on failure.
 	*/
-	FOM_API RakPeerInterface* FOMNetwork_Client_Connect(const uint8_t* hostAddress, uint16_t port);
+	FOM_API RakPeerInterface* FOMNetwork_Client_Connect(const char* hostAddress, uint16_t port);
 
 	/**
 	* Disconnects from the server and shuts down the client interface.

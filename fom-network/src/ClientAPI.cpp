@@ -1,7 +1,7 @@
 #include <raknet/RakNetworkFactory.h>
 #include <fom-network/ClientAPI.h>
 
-RakPeerInterface* FOMNetwork_Client_Connect(const uint8_t* hostAddress, uint16_t port) {
+RakPeerInterface* FOMNetwork_Client_Connect(const char* hostAddress, uint16_t port) {
 	if (!hostAddress || port == 0) {
         return NULL;
     }
@@ -17,7 +17,7 @@ RakPeerInterface* FOMNetwork_Client_Connect(const uint8_t* hostAddress, uint16_t
         return NULL;
     }
 
-    if (!client->Connect(hostAddress, port)) {
+    if (!client->Connect(hostAddress, port, 0, 0)) {
         RakNetworkFactory::DestroyRakPeerInterface(client);
         return NULL;
     }

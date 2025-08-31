@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <unordered_map>
 #include <fom-network/FOMPacket.h>
 #include <raknet/BitStream.h>
@@ -15,14 +16,14 @@ public:
 	*
 	* @param packet The packet to serialize.
 	*/
-	static RakNet::BitStream Serialize(const FOMPacket& packet) const;
+	static bool Serialize(RakNet::BitStream& bs, const FOMPacket& packet);
 
 	/**
 	* Deserializes a bitstream buffer into a packet structure.
 	*
 	* @param bitstream The bitstream to deserialize.
 	*/
-	static FOMPacket Deserialize(RakNet::BitStream& bitstream) const;
+	static FOMPacket Deserialize(RakNet::BitStream& bitstream);
 
 private:
     FOMPacketSerializer();
@@ -33,12 +34,5 @@ private:
 	*
 	* @param id The packet ID to fetch the serializer for.
 	*/
-	static const IPacketIDSerializer* GetSerializer(PacketIdentifier id) const;
-
-	/**
-	* An array of packet serializers to use depending on the packet ID.
-	*
-	* @note We only create serializers for user-defined packets. 
-	*/
-	static const std::unordered_map<uint32_t, const IPacketIDSerializer*> packetSerializers;
+	static const IPacketSerializer* GetSerializer(PacketIdentifier id);
 };

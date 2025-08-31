@@ -2,6 +2,7 @@
 
 #include <raknet/RakNetTypes.h>
 #include <raknet/RakPeerInterface.h>
+#include <raknet/PacketPriority.h>
 #include <fom-network/Common.h>
 #include <fom-network/FOMNetworkExport.h>
 #include <fom-network/FOMPacket.h>
@@ -34,7 +35,6 @@ struct FOMNetworkAddress {
 	uint16_t port;
 };
 
-
 /**
  * Container for passing packets to be sent around.
  *
@@ -48,13 +48,13 @@ struct SendPacket {
 	FOMPacket data;
 
 	/* The priority of the packet to be sent to the networking library. */
-	int32_t priority;
+	uint8_t priority;
 
 	/* The reliability of the packet to be sent to the networking library. */
-	int32_t reliability;
+	uint8_t reliability;
 
     /* The ordering channel for the packet to be sent to the networking library. */
-    int8_t orderingChannel;
+	uint8_t orderingChannel;
 
 	/* A boolean indicating whether or not the packet should be a broadcast. */
 	int8_t broadcast;
@@ -94,7 +94,7 @@ extern "C" {
     * @retval 0 Success.
     * @retval -1 The packetBufferLen does not match the number of received packets to process.
 	*/
-	FOM_API int8_t FOMNetwork_ProcessPackets(RakPeerInterface* peer, ReceivedPackets received, const FOMPacket* packetBuffer, uint32_t packetBufferLen);
+	FOM_API int8_t FOMNetwork_ProcessPackets(RakPeerInterface* peer, const ReceivedPackets received, FOMPacket* packetBuffer, uint32_t packetBufferLen);
 
 	/**
 	* Sends a buffer of packet structures through the network interface.

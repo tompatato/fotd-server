@@ -11,40 +11,38 @@ public:
 	virtual ~IPacketSerializer() = default;
 
 	// Always work with FOMPacket so all serializers can fit into one array
-	virtual bool SerializePacket(RakNet::BitStream& bs, const FOMPacket& p) = 0;
-	virtual FOMPacket DeserializePacket(RakNet::BitStream& bs) = 0;
-};
-
-/**
- * Template for typed packet serializers.
- */
-template <typename T, typename Derived>
-class PacketSerializer : public IPacketSerializer {
-public:
-	bool SerializePacket(RakNet::BitStream& bs, const FOMPacket& p) override {
-		return static_cast<Derived*>(this)->Serialize(bs, packet.As<T>());
-	}
-
-	FOMPacket DeserializePacket(RakNet::BitStream& bs) override {
-		T obj = static_cast<Derived*>(this)->Deserialize(bs);
-		return FOMPacket(obj);
-	}
+	virtual bool SerializePacket(RakNet::BitStream& bs, const FOMPacket& p) const = 0;
+	virtual FOMPacket DeserializePacket(RakNet::BitStream& bs) const = 0;
 };
 
 /**
  * This macro makes it easy to define serializer classes without having to
- * write all of the same declaration boilerplate.
+ * write all of the same declaration boilerplate. It also ensures that we
+ * can use the correct types for each packet.
  */
-#define DECLARE_SERIALIZER(PacketType)								\
-class PacketType##Serializer :										\
-	public PacketSerializer<PacketType, PacketType##Serializer> {	\
-public:																\
-	bool Serialize(RakNet::BitStream& bs, const PacketType& p);		\
-	PacketType Deserialize(RakNet::BitStream& bs);					\
-};
+#define DECLARE_SERIALIZER(TYPE, PACKETID, UNION_FIELD)									\
+class TYPE##Serializer : public IPacketSerializer {										\
+public:																					\
+	static TYPE##Serializer& GetInstance() {											\
+		static TYPE##Serializer instance;												\
+		return instance;																\
+	}																					\
+    bool SerializePacket(RakNet::BitStream& bs, const FOMPacket& p) const override {	\
+        return Serialize(bs, p.data.UNION_FIELD);										\
+    }																					\
+    FOMPacket DeserializePacket(RakNet::BitStream& bs) const override {					\
+        TYPE obj = Deserialize(bs);														\
+        FOMPacket packet{};																\
+        packet.ID = PacketIdentifier::PACKETID;											\
+        packet.data.UNION_FIELD = obj;													\
+        return packet;																	\
+    }																					\
+    bool Serialize(RakNet::BitStream& bs, const TYPE& p) const;							\
+    TYPE Deserialize(RakNet::BitStream& bs) const;										\
+};																			
 
 /**
  * Declare all of the serializers. Keep in mind that they must be:
  * <PacketTypeName>Serializer
  */
-DECLARE_SERIALIZER(ExamplePacket)
+DECLARE_SERIALIZER(ExamplePacket, ID_USER_PACKET_ENUM, example)

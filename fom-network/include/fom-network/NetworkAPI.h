@@ -13,9 +13,9 @@
  * validation.
  */
 struct PacketStructure {
-    PacketIdentifier id;
-    uint32_t size;
-}
+	PacketIdentifier id;
+	uint32_t size;
+};
 
 #ifdef __cplusplus
 extern "C" {
