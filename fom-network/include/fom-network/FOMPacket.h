@@ -38,6 +38,7 @@ struct NetworkAddress {
 	/* The destination port for the packet or the excluded address if it's broadcasted. */
 	uint16_t port;
 };
+ASSERT_BLITTABLE(NetworkAddress);
 
 /**
  * An example packet structure.

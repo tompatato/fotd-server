@@ -88,9 +88,9 @@ void FOMNetwork_Send(RakPeerInterface* peer, const SendPacket* packets, uint32_t
         const SendPacket& s = packets[i];
 
 		SystemAddress address = UNASSIGNED_SYSTEM_ADDRESS;
-		if (s.address.binaryAddress != 0 ) {
-			address.binaryAddress = s.address.binaryAddress;
-			address.port = s.address.port;
+		if (s.destination.binaryAddress != 0 ) {
+			address.binaryAddress = s.destination.binaryAddress;
+			address.port = s.destination.port;
 		}
 
 		RakNet::BitStream bs;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <raknet/MessageIdentifiers.h>
 #include <fom-network/Common.h>
 
 /**
@@ -25,7 +26,7 @@ enum PacketIdentifier : uint8_t {
 	/**
 	* The first index for user packets to start at.
 	*/
-	ID_USER_PACKET_ENUM = 104,
+	ID_FOM_PACKET_START = ID_USER_PACKET_ENUM,
 
 	// 104
 	// 105

@@ -46,4 +46,4 @@ public:																					\
  * Declare all of the serializers. Keep in mind that they must be:
  * <PacketTypeName>Serializer
  */
-DECLARE_SERIALIZER(ExamplePacket, ID_USER_PACKET_ENUM, example)
+DECLARE_SERIALIZER(ExamplePacket, ID_FOM_PACKET_START, example)
