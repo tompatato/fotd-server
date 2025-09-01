@@ -13,20 +13,31 @@
 #if defined(__GNUC__) && (__GNUC__ < 5)
 	// Old GCC: use deprecated traits
 #define ASSERT_BLITTABLE(T) \
-        static_assert(std::has_trivial_copy_constructor<T>::value, #T " must have trivial copy ctor"); \
-        static_assert(std::has_trivial_copy_assign<T>::value, #T " must have trivial copy assign"); \
-        static_assert(std::is_standard_layout<T>::value, #T " must have standard layout");
+		static_assert(std::has_trivial_copy_constructor<T>::value, #T " must have trivial copy ctor"); \
+		static_assert(std::has_trivial_copy_assign<T>::value, #T " must have trivial copy assign"); \
+		static_assert(std::is_standard_layout<T>::value, #T " must have standard layout");
 #else
 	// Modern compilers: use the standard trait
 #define ASSERT_BLITTABLE(T) \
-        static_assert(std::is_trivially_copyable<T>::value, #T " must be trivially copyable"); \
-        static_assert(std::is_standard_layout<T>::value, #T " must have standard layout");
+		static_assert(std::is_trivially_copyable<T>::value, #T " must be trivially copyable"); \
+		static_assert(std::is_standard_layout<T>::value, #T " must have standard layout");
 #endif
 
 /**
  * Make sure that we pack the structs the same way that C# does.
  */
 #pragma pack(push, 1)
+
+/**
+ * The network address for a system.
+ */
+struct NetworkAddress {
+	/* The binary destination address for the packet or the excluded address if it's broadcasted. */
+	uint32_t binaryAddress;
+
+	/* The destination port for the packet or the excluded address if it's broadcasted. */
+	uint16_t port;
+};
 
 /**
  * An example packet structure.
@@ -41,6 +52,7 @@ ASSERT_BLITTABLE(ExamplePacket);
  */
 struct FOMPacket {
 	PacketIdentifier ID;
+	NetworkAddress sender;
 
 	union
 	{

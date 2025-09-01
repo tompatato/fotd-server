@@ -61,7 +61,13 @@ int8_t FOMNetwork_ProcessPackets(RakPeerInterface* peer, const ReceivedPackets r
         }
 
         RakNet::BitStream bs(p->data, p->length, false);
-        packetBuffer[i] = FOMPacketSerializer::Deserialize(bs);
+        FOMPacket deserializedPacket = FOMPacketSerializer::Deserialize(bs);
+
+        // Make sure to record the packet's sender.
+        deserializedPacket.sender.binaryAddress = p->systemAddress.binaryAddress;
+        deserializedPacket.sender.port = p->systemAddress.port;
+
+        packetBuffer[i] = deserializedPacket;
 
         // Release the packet back to RakNet.
         peer->DeallocatePacket(const_cast<Packet*>(p));
