@@ -7,8 +7,12 @@ param(
 	[ValidateSet("cpp", "dotnet", "all")]
 	[string]$Target,
 
-	[Parameter(Position = 2, ValueFromRemainingArguments = $true)]
-	[string[]]$Args
+	[Parameter(Position = 2, Mandatory = $true)]
+	[ValidateSet("Debug", "Release")]
+	[string]$Config,
+
+	[Parameter(Position = 3, ValueFromRemainingArguments = $true)]
+	[string[]]$ExtraArgs
 )
 
 # Locate docker-compose.yml relative to this script
@@ -19,30 +23,30 @@ function Invoke-Docker {
 	param(
 		[string]$Service,
 		[string]$Script,
-		[string[]]$ExtraArgs
+		[string[]]$Args
 	)
-	docker compose -f $ComposeFile run --rm $Service $Script @ExtraArgs
+	docker compose -f $ComposeFile run --rm $Service $Script @Args
 }
 
 switch ($Command) {
 	"build" {
 		switch ($Target) {
-			"cpp" { Invoke-Docker "cpp-build" "build.sh" $Args }
-			"dotnet" { Invoke-Docker "dotnet-build" "build.sh" $Args }
+			"cpp"    { Invoke-Docker "cpp-build" "build.sh" @($Config + $ExtraArgs) }
+			"dotnet" { Invoke-Docker "dotnet-build" "build.sh" @($Config + $ExtraArgs) }
 			"all" {
-				Invoke-Docker "cpp-build" "build.sh" $Args
+				Invoke-Docker "cpp-build" "build.sh" @($Config + $ExtraArgs)
 				if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-				Invoke-Docker "dotnet-build" "build.sh" $Args
+				Invoke-Docker "dotnet-build" "build.sh" @($Config + $ExtraArgs)
 			}
 		}
 	}
 	"test" {
 		switch ($Target) {
-			"cpp" { Invoke-Docker "cpp-build" "test.sh" $Args }
-			"dotnet" { Invoke-Docker "dotnet-build" "test.sh" $Args }
+			"cpp"    { Invoke-Docker "cpp-build" "test.sh" @($Config + $ExtraArgs) }
+			"dotnet" { Invoke-Docker "dotnet-build" "test.sh" @($Config + $ExtraArgs) }
 			"all" {
-				Invoke-Docker "cpp-build" "test.sh" $Args
-				Invoke-Docker "dotnet-build" "test.sh" $Args
+				Invoke-Docker "cpp-build" "test.sh" @($Config + $ExtraArgs)
+				Invoke-Docker "dotnet-build" "test.sh" @($Config + $ExtraArgs)
 			}
 		}
 	}

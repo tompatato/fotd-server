@@ -26,8 +26,6 @@ public:
 	static FOMPacket Deserialize(RakNet::BitStream& bitstream);
 
 private:
-    FOMPacketSerializer();
-	~FOMPacketSerializer();
 
 	/**
 	* Fetches the serializer for a given packet ID.

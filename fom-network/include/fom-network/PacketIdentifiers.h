@@ -4,11 +4,6 @@
 #include <fom-network/Common.h>
 
 /**
- * The identifier used to indicate an invalid packet.
- */
-#define INVALID_PACKET_ID 0
-
-/**
  * For every packet identifier, you must also update:
  *
  * - include/fom-network/FOMPacket.h: Requires a packet struct.
@@ -24,11 +19,19 @@
  */
 enum PacketIdentifier : uint8_t {
 	/**
-	* The first index for user packets to start at.
+	* This packet ID overlaps with RakNet's ID_INTERNAL_PING.
+    * Since the library does not allow sending/receiving
+    * this packet, we don't need to worry about overlap.
 	*/
-	ID_FOM_PACKET_START = ID_USER_PACKET_ENUM,
+	ID_FOM_PACKET_ERROR = 0,
 
-	// 104
+    /**
+     * ID_USER_PACKET_ENUM is used by RakNet to indicate the
+     * FIRST packet id that users are allowed to use.
+     */
+    ID_FOM_PACKET_START = ID_USER_PACKET_ENUM,
+
+	// 104 ( = ID_FOM_PACKET_START)
 	// 105
 	// 106
 	ID_NOTIFY = 107,

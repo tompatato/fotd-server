@@ -9,23 +9,33 @@ static std::unordered_map<uint32_t, IPacketSerializer*> serializerMap = {
 };
 
 bool FOMPacketSerializer::Serialize(RakNet::BitStream& bs, const FOMPacket& p) {
-    const auto* serializer = GetSerializer(p.ID);
-    if (!serializer) {
+	const auto* serializer = GetSerializer(p.ID);
+	if (!serializer) {
 		return false;
-    }
+	}
 
-    // The first byte in the BitStream will always be the packet ID.
-    bs.Write(p.ID);
+	// Make sure to catch any serialization error so that the
+	// library does not crash the consuming application.
+	try {
+		// The first byte in the BitStream will always be the packet ID.
+		bs.Write(p.ID);
 
-    return serializer->SerializePacket(bs, p);
+		return serializer->SerializePacket(bs, p);
+	} catch (const std::exception& e) {
+		return false;
+	}
 }
 
 FOMPacket FOMPacketSerializer::Deserialize(RakNet::BitStream& bs) {
-    // The first byte in the BitStream will always be the packet ID.
-    PacketIdentifier id;
-    if (!bs.Read(id)) {
-        return INVALID_PACKET;
-    }
+	// The first byte in the BitStream will always be the packet ID.
+	PacketIdentifier id;
+    if (!bs.Read((uint8_t&)id)) {
+		return FOMPacket{
+			ID_FOM_PACKET_ERROR,
+			{},
+			{ FOMPacketError{ id, FOMPacketErrorCode::ERROR_MISSING_PACKET_ID } }
+		};
+	}
 
 	// RakNet client packets should be forwarded with the ID so that the consumer
 	// can handle these kinds of packets too.
@@ -55,18 +65,32 @@ FOMPacket FOMPacketSerializer::Deserialize(RakNet::BitStream& bs) {
 			return FOMPacket{ id };
 	}
 
-    const auto* serializer = GetSerializer(id);
-    if (!serializer) {
-        return INVALID_PACKET;
-    }
+	const auto* serializer = GetSerializer(id);
+	if (!serializer) {
+		return FOMPacket{
+			ID_FOM_PACKET_ERROR,
+			{},
+			{ FOMPacketError{ id, FOMPacketErrorCode::ERROR_UNHANDLED_PACKET_ID } }
+		};
+	}
 
-    return serializer->DeserializePacket(bs);
+	// Make sure to catch any deserialization errors so that
+	// the library does not crash the consuming application.
+	try {
+		return serializer->DeserializePacket(bs);
+	} catch (const std::exception& e) {
+		return FOMPacket{
+			ID_FOM_PACKET_ERROR,
+			{},
+			{ FOMPacketError{ id, FOMPacketErrorCode::ERROR_DESERIALIZATION } }
+		};
+	}
 }
 
 const IPacketSerializer* FOMPacketSerializer::GetSerializer(PacketIdentifier id) {
-    auto it = serializerMap.find(id);
-    if (it == serializerMap.end()) {
-        return NULL;
-    }
-    return it->second;
+	auto it = serializerMap.find(id);
+	if (it == serializerMap.end()) {
+		return NULL;
+	}
+	return it->second;
 }
