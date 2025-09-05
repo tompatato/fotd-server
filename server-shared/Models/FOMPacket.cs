@@ -15,20 +15,19 @@ using System.Runtime.InteropServices;
  */
 namespace FOMServer.Shared.Models
 {
-	/**
-	 * The main packet structure that encapsulates all packet types.
-	 * This structure is used for sending and receiving packets over the network.
-	 */
+	/// <summary>
+	/// The main structure for all packets.
+	/// </summary>
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
 	public struct FOMPacket
 	{
-		/**
-		 * A union of all possible packet data types.
-		 * 
-		 * This replicates the structure of the FOMPacket union in C++.
-		 * Make sure to always use `[FieldOffset(0)]` to ensure that
-		 * their memory overlaps the same as way as a union in C++.
-		 */
+		/// <summary>
+		/// Represents a union of possible packet data types.
+		/// </summary>
+		/// <remarks>
+		/// This structure uses explicit layout to allow overlapping fields, enabling it to store different kinds
+		/// of packet data. Only one of the fields should be accessed at a time, as they share the same memory space.
+		/// </remarks>
 		[StructLayout(LayoutKind.Explicit, Pack = 1)]
 		public struct FOMPacketData
 		{

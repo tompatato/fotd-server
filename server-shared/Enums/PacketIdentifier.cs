@@ -1,12 +1,11 @@
 namespace FOMServer.Shared.Enums
 {
-	/**
-	 * The packet identifiers returned by the network service.
-	 * 
-	 * These MUST be kept up-to-date with `fom-network/include/fom-network/PacketIdentifier.h`
-	 */
+	/// <summary>
+	/// The packet identifiers used in the FOM server-client communication.
+	/// </summary>
 	public enum PacketIdentifier : byte
 	{
+		// These MUST be kept up-to-date with `fom-network/include/fom-network/PacketIdentifier.h`
 		ID_FOM_PACKET_ERROR = 0,
 		ID_FOM_PACKET_START = 104,
 

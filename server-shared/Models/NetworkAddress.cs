@@ -2,10 +2,9 @@ using System.Runtime.InteropServices;
 
 namespace FOMServer.Shared.Models
 {
-	/**
-	 * Represents a network address with an IP address and port number.
-	 * This structure is used for specifying the source or destination of network packets.
-	 */
+	/// <summary>
+	/// Represents the IP address and port of a packet source or destination.
+	/// </summary>
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
 	public struct NetworkAddress
 	{
