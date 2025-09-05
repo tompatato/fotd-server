@@ -6,7 +6,6 @@ namespace FOMServer.Shared.Services.FOMNetwork
 {
 	public partial class PacketService : IPacketService
 	{
-		private static readonly MemoryPool<FOMPacket> Pool = MemoryPool<FOMPacket>.Shared;
 
 		/// <inheritdoc />
 		public ReceivedPackets Receive(IntPtr peer) => FOMNetwork_ReceivePackets(peer);
