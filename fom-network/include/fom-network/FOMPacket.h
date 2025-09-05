@@ -1,7 +1,7 @@
 #pragma once
 
 #include <type_traits>
-#include <fom-network/PacketIdentifiers.h>
+#include <fom-network/PacketIdentifier.h>
 
 /**
  * All network packets MUST be C# blittable types. This ensures that
@@ -53,7 +53,7 @@ ASSERT_BLITTABLE(NetworkAddress);
  * An error took place when processing/sending a packet.
  */
 struct FOMPacketError {
-    PacketIdentifier errorPacketID;
+    PacketIdentifier offendingID;
     FOMPacketErrorCode errorCode;
 };
 ASSERT_BLITTABLE(FOMPacketError);

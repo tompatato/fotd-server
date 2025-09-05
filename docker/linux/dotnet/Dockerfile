@@ -1,5 +1,5 @@
-# Latest Ubuntu LTS with .NET 8 SDK
-FROM mcr.microsoft.com/dotnet/sdk:8.0
+# Latest Ubuntu LTS with .NET 9 SDK
+FROM mcr.microsoft.com/dotnet/sdk:9.0
 
 # Install rsync for source syncing
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \

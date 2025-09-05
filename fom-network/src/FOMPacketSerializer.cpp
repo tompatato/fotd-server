@@ -27,15 +27,17 @@ bool FOMPacketSerializer::Serialize(RakNet::BitStream& bs, const FOMPacket& p) {
 }
 
 FOMPacket FOMPacketSerializer::Deserialize(RakNet::BitStream& bs) {
-	// The first byte in the BitStream will always be the packet ID.
-	PacketIdentifier id;
-    if (!bs.Read((uint8_t&)id)) {
+	if (bs.GetNumberOfBitsUsed() < 8) {
 		return FOMPacket{
 			ID_FOM_PACKET_ERROR,
 			{},
-			{ FOMPacketError{ id, FOMPacketErrorCode::ERROR_MISSING_PACKET_ID } }
+			{ FOMPacketError{ ID_FOM_PACKET_ERROR, FOMPacketErrorCode::ERROR_MISSING_PACKET_ID } }
 		};
 	}
+
+	// The first byte in the BitStream will always be the packet ID.
+	PacketIdentifier id;
+	bs.Read((uint8_t&)id);
 
 	// RakNet client packets should be forwarded with the ID so that the consumer
 	// can handle these kinds of packets too.
