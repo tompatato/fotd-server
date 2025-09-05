@@ -37,7 +37,7 @@ extern "C" {
 	 * @retval -2 Library missing struct.
 	 * @retval -3 Mismatched struct size.
 	 */
-	FOM_API int8_t FOMNetwork_ValidatePacketStructs(const PacketStructure* structures, uint32_t count);
+	FOM_API int8_t FOMNetwork_ValidatePacketStructs(const PacketStructure* structures, int32_t count);
 
 #ifdef __cplusplus
 }

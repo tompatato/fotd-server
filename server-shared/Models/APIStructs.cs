@@ -27,7 +27,7 @@ namespace FOMServer.Shared.Models
 	{
 		// Must match the struct in `fom-network/include/fom-network/PacketAPI.h`
 		public IntPtr packets;
-		public uint count;
+		public int count;
 	}
 
 	/// <summary>

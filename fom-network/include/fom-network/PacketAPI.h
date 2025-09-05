@@ -19,7 +19,7 @@ struct ReceivedPackets {
 	Packet** packets;
 
 	/* The number of packets in the buffer. */
-	uint32_t count;
+	int32_t count;
 };
 
 /**
@@ -81,7 +81,7 @@ extern "C" {
 	* @retval 0 Success.
 	* @retval -1 The packetBufferLen does not match the number of received packets to process.
 	*/
-	FOM_API int8_t FOMNetwork_ProcessPackets(RakPeerInterface* peer, const ReceivedPackets received, FOMPacket* packetBuffer, uint32_t packetBufferLen);
+	FOM_API int8_t FOMNetwork_ProcessPackets(RakPeerInterface* peer, const ReceivedPackets received, FOMPacket* packetBuffer, int32_t packetBufferLen);
 
 	/**
 	* Sends a buffer of packet structures through the network interface.
@@ -90,7 +90,7 @@ extern "C" {
 	* @param packets A buffer of packet structures to serialize and send.
 	* @param count The number of packets in the buffer.
 	*/
-	FOM_API void FOMNetwork_Send(RakPeerInterface* peer, const SendPacket* packets, uint32_t count);
+	FOM_API void FOMNetwork_Send(RakPeerInterface* peer, const SendPacket* packets, int32_t count);
 
 #ifdef __cplusplus
 }

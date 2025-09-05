@@ -9,7 +9,7 @@
  * more packets being received than pulled off the queue.
  */
 namespace FOM {
-	constexpr uint32_t MaxBufferedPackets = 256;
+	constexpr int32_t MaxBufferedPackets = 256;
 }
 
 ReceivedPackets FOMNetwork_ReceivePackets(RakPeerInterface* peer) {
@@ -45,7 +45,7 @@ ReceivedPackets FOMNetwork_ReceivePackets(RakPeerInterface* peer) {
 	return received;
 }
 
-int8_t FOMNetwork_ProcessPackets(RakPeerInterface* peer, const ReceivedPackets received, FOMPacket* packetBuffer, uint32_t packetBufferLen) {
+int8_t FOMNetwork_ProcessPackets(RakPeerInterface* peer, const ReceivedPackets received, FOMPacket* packetBuffer, int32_t packetBufferLen) {
 	if (!peer || !received.packets || received.count == 0) {
 		return 0;
 	}
@@ -54,7 +54,7 @@ int8_t FOMNetwork_ProcessPackets(RakPeerInterface* peer, const ReceivedPackets r
 		return -1;
 	}
 
-	for (uint32_t i = 0; i < received.count; i++) {
+	for (int32_t i = 0; i < received.count; i++) {
 		Packet* p = received.packets[i];
 		if (!p) {
 			continue;
@@ -79,12 +79,12 @@ int8_t FOMNetwork_ProcessPackets(RakPeerInterface* peer, const ReceivedPackets r
 	return 0;
 }
 
-void FOMNetwork_Send(RakPeerInterface* peer, const SendPacket* packets, uint32_t count) {
+void FOMNetwork_Send(RakPeerInterface* peer, const SendPacket* packets, int32_t count) {
 	if (!peer || !packets || count == 0) {
 		return;
 	}
 
-	for (uint32_t i = 0; i < count; i++) {
+	for (int32_t i = 0; i < count; i++) {
 		const SendPacket& s = packets[i];
 
 		SystemAddress address = UNASSIGNED_SYSTEM_ADDRESS;

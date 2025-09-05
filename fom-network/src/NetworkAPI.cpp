@@ -3,7 +3,7 @@
 #include <fom-network/NetworkAPI.h>
 #include <fom-network/FOMPacket.h>
 
-int8_t FOMNetwork_ValidatePacketStructs(const PacketStructure* structures, uint32_t count) {
+int8_t FOMNetwork_ValidatePacketStructs(const PacketStructure* structures, int32_t count) {
 #pragma warning(push)
 #pragma warning(disable: 4267)
 	// List all of the structs that we have defined in the library
@@ -22,7 +22,7 @@ int8_t FOMNetwork_ValidatePacketStructs(const PacketStructure* structures, uint3
 	// This is not a comprehensive check but the
 	// consumer can perform any additional
 	// verification that may be needed.
-	for (uint32_t i = 0; i < count; i++) {
+	for (int32_t i = 0; i < count; i++) {
 		auto it = libraryMap.find(structures[i].id);
 		if (it == libraryMap.end()) {
 			return -2;
