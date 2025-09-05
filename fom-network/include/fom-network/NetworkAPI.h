@@ -18,7 +18,7 @@
  */
 struct PacketStructure {
 	PacketIdentifier id;
-	uint32_t size;
+	int32_t size;
 };
 
 #pragma pack(pop)

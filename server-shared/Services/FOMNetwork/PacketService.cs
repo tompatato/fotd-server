@@ -6,7 +6,6 @@ namespace FOMServer.Shared.Services.FOMNetwork
 {
 	public partial class PacketService : IPacketService
 	{
-
 		/// <inheritdoc />
 		public ReceivedPackets Receive(IntPtr peer) => FOMNetwork_ReceivePackets(peer);
 
@@ -14,7 +13,7 @@ namespace FOMServer.Shared.Services.FOMNetwork
 		public void Process(IntPtr peer, ref ReceivedPackets received, Span<FOMPacket> packetBuffer)
 		{
 			if (packetBuffer.Length < received.count)
-				throw new ArgumentException("Buffer too small");
+				throw new ArgumentException("Buffer too small.");
 
 			unsafe
 			{

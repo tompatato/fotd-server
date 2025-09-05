@@ -11,7 +11,6 @@ using System.Runtime.InteropServices;
  * - Match the C++ structure's data type sizes and layout EXACTLY.
  * - Use only blittable types (no bools, no strings, no arrays, no reference types)
  * - Be marked with `[StructLayout(LayoutKind.Sequential, Pack = 1)]` to ensure no padding is added.
- * - Use only `readonly` fields to ensure immutability.
  */
 namespace FOMServer.Shared.Models
 {
@@ -35,8 +34,8 @@ namespace FOMServer.Shared.Models
 			[FieldOffset(0)] public ExamplePacket example;
 		}
 
-		public readonly PacketIdentifier ID;
-		public readonly NetworkAddress sender;
-		public readonly FOMPacketData data;
+		public PacketIdentifier ID;
+		public NetworkAddress sender;
+		public FOMPacketData data;
 	}
 }
