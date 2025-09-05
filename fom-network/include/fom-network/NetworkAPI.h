@@ -2,7 +2,7 @@
 
 #include <raknet/RakPeer.h>
 #include <fom-network/Common.h>
-#include <fom-network/PacketIdentifiers.h>
+#include <fom-network/PacketIdentifier.h>
 #include <fom-network/FOMNetworkExport.h>
 
 /**
