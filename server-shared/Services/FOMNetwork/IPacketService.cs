@@ -16,14 +16,14 @@ namespace FOMServer.Shared.Services.FOMNetwork
 		/// </summary>
 		/// <param name="peer">The network peer to read.</param>
 		/// <param name="received">The packets received from a call to Receive().</param>
-		/// <param name="packets">A buffer for the number of FOMPacket instances received by the library.</param>
-		void Process(IntPtr peer, ref ReceivedPackets received, ref FOMPacket[] packets);
+		/// <param name="packetBuffer">A buffer for the number of FOMPacket instances received by the library.</param>
+		void Process(IntPtr peer, ref ReceivedPackets received, Span<FOMPacket> packetBuffer);
 
 		/// <summary>
 		/// Sends packets to the specified destinations.
 		/// </summary>
 		/// <param name="peer">The peer to send packets using.</param>
 		/// <param name="packets">An array of packets to send.</param>
-		void Send(IntPtr peer, ref SendPacket[] packets);
+		void Send(IntPtr peer, SendPacket[] packets);
 	}
 }

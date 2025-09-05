@@ -5,10 +5,10 @@ namespace FOMServer.Shared.Services.FOMNetwork
 		/// <summary>
 		/// Connects to a remote server.
 		/// </summary>
-		/// <param name="ip">The IP to connect to.</param>
+		/// <param name="hostAddress">The domain or IP to connect to.</param>
 		/// <param name="port">The port to connect to.</param>
 		/// <returns>A pointer to the opened connection, 0 if there was a failure.</returns>
-		IntPtr Connect(string ip, ushort port);
+		IntPtr Connect(string hostAddress, ushort port);
 
 		/// <summary>
 		/// Disconnects from a remote server.
