@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterServer", "master-serv
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorldServer", "world-server\WorldServer.csproj", "{1A360984-D3E7-91A0-32A7-9C3315FA0E01}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NativeLib", "NativeLib\NativeLib.vcxproj", "{302F700C-184A-F712-82ED-F406D0FC1381}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FOMNetwork", "fom-network\FOMNetwork.vcxproj", "{302F700C-184A-F712-82ED-F406D0FC1381}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerTests", "server-tests\ServerTests.csproj", "{C1962643-B55E-253F-7AD6-08846BCB9B86}"
 EndProject

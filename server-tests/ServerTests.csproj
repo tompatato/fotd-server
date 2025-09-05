@@ -21,7 +21,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\base-server\ServerShared.csproj" />
+		<ProjectReference Include="..\server-shared\ServerShared.csproj" />
 		<ProjectReference Include="..\world-server\WorldServer.csproj" />
 		<ProjectReference Include="..\master-server\MasterServer.csproj" />
 	</ItemGroup>
