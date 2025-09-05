@@ -3,13 +3,13 @@
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net8.0</TargetFramework>
 		<RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
-		<RootNamespace>FaceOfMankind.MasterServer</RootNamespace>
+		<RootNamespace>FOMServer.Master</RootNamespace>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<SelfContained>false</SelfContained>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\base-server\BaseServer.csproj" />
+		<ProjectReference Include="..\base-server\ServerShared.csproj" />
 	</ItemGroup>
 </Project>
