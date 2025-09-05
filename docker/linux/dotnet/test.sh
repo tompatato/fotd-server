@@ -11,4 +11,4 @@ shift # drop the config argument, leaving the rest in "$@"
 
 # Run tests, passing through any arguments.
 # Targeting the DLL avoids CLI warnings.
-dotnet test "/out/dotnet/ServerTests/$FOMSERVER_BUILD_CONFIG/net8.0/ServerTests.dll" "$@"
+dotnet test "/out/dotnet/ServerTests/$FOMSERVER_BUILD_CONFIG/net9.0/ServerTests.dll" "$@"
