@@ -17,6 +17,7 @@ RakPeerInterface* FOMNetwork_Server_Startup(uint16_t port) {
 		return NULL;
 	}
 
+	server->SetIncomingPassword("37eG87Ph", 8);
 	server->SetMaximumIncomingConnections(1000);
 
 	return server;

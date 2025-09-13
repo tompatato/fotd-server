@@ -17,7 +17,7 @@ RakPeerInterface* FOMNetwork_Client_Connect(const char* hostAddress, uint16_t po
 		return NULL;
 	}
 
-	if (!client->Connect(hostAddress, port, 0, 0)) {
+	if (!client->Connect(hostAddress, port, "37eG87Ph", 8)) {
 		RakNetworkFactory::DestroyRakPeerInterface(client);
 		return NULL;
 	}
