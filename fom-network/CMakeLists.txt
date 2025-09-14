@@ -9,8 +9,8 @@ add_library(FOMNetwork SHARED
 	src/ServerAPI.cpp
 	src/PacketAPI.cpp
 	src/NetworkAPI.cpp
-	src/FOMPacketSerializer.cpp
-	src/packet-serializers/ExamplePacketSerializer.cpp
+	src/FOMDataSerializer.cpp
+	src/serializers/FOMPacketErrorSerializer.cpp
 )
 
 target_include_directories(FOMNetwork

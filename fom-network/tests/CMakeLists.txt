@@ -13,8 +13,8 @@ FetchContent_MakeAvailable(googletest)
 
 # Create the test executable FIRST
 add_executable(FOMNetworkTests
-	"FOMPacketSerializer_test.cpp"
-	"packet-serializers/ExamplePacketSerializer_test.cpp"
+	FOMDataSerializer_test.cpp
+	serializers/FOMPacketErrorSerializer_test.cpp
 )
 
 target_include_directories(FOMNetworkTests PRIVATE

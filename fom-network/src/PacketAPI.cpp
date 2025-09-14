@@ -1,7 +1,7 @@
 #include <vector>
 #include <iostream>
 #include <fom-network/PacketAPI.h>
-#include <fom-network/FOMPacketSerializer.h>
+#include <fom-network/FOMDataSerializer.h>
 
 /**
  * The maximum number of packets that can be received each tick.
@@ -24,7 +24,7 @@ ReceivedPackets FOMNetwork_ReceivePackets(RakPeerInterface* peer) {
 	receiveBuffer.clear();
 	receiveBuffer.reserve(FOM::MaxBufferedPackets);
 
-	// Limit the number of packets 
+	// Limit the number of packets
 	while (receiveBuffer.size() < FOM::MaxBufferedPackets) {
 		Packet* packet = peer->Receive();
 		if (!packet) {
@@ -64,13 +64,13 @@ int8_t FOMNetwork_ProcessPackets(RakPeerInterface* peer, const ReceivedPackets r
 		}
 
 		RakNet::BitStream bs(p->data, p->length, false);
-		FOMPacket deserializedPacket = FOMPacketSerializer::Deserialize(bs);
 
-		// Make sure to record the packet's sender.
-		deserializedPacket.sender.binaryAddress = p->systemAddress.binaryAddress;
-		deserializedPacket.sender.port = p->systemAddress.port;
-
-		packetBuffer[i] = deserializedPacket;
+		// Deserialize the bitstream into a packet structure that can be returned to the consumer.
+		FOMPacket& fp = packetBuffer[i]; // Don't allocate, just use the provided buffer.
+		bs.Read(fp.ID); // First byte is always the packet ID.
+		fp.data = FOMDataSerializer::Deserialize(bs, fp.ID);
+		fp.sender.binaryAddress = p->systemAddress.binaryAddress;
+		fp.sender.port = p->systemAddress.port;
 
 		// Release the packet back to RakNet.
 		peer->DeallocatePacket(const_cast<Packet*>(p));
@@ -90,21 +90,27 @@ void FOMNetwork_Send(RakPeerInterface* peer, const SendPacket* packets, int32_t 
 	for (int32_t i = 0; i < count; i++) {
 		const SendPacket& s = packets[i];
 
+		// Make sure that we can't send RakNet packets.
+		if (s.id < ID_FOM_PACKET_START) {
+			continue;
+		}
+
 		SystemAddress address = UNASSIGNED_SYSTEM_ADDRESS;
-		if (s.destination.binaryAddress != 0 ) {
-			address.binaryAddress = s.destination.binaryAddress;
-			address.port = s.destination.port;
+		if (s.networkAddress.binaryAddress != 0 ) {
+			address.binaryAddress = s.networkAddress.binaryAddress;
+			address.port = s.networkAddress.port;
 		}
 
 		RakNet::BitStream bs;
-		if (!FOMPacketSerializer::Serialize(bs, s.data)) {
+		bs.Write(s.id);
+		if (!FOMDataSerializer::Serialize(bs, s.id, s.data)) {
 			continue;
 		}
 
 		if (s.broadcast) {
-			peer->Send(&bs, (PacketPriority)s.priority, (PacketReliability)s.reliability, s.orderingChannel, address, !!s.broadcast);
+			peer->Send(&bs, (PacketPriority)s.priority, (PacketReliability)s.reliability, s.orderingChannel, address, s.broadcast);
 		} else {
-			peer->Send(&bs, (PacketPriority)s.priority, (PacketReliability)s.reliability, s.orderingChannel, address, !!s.broadcast);
+			peer->Send(&bs, (PacketPriority)s.priority, (PacketReliability)s.reliability, s.orderingChannel, address, s.broadcast);
 		}
 	}
 }
