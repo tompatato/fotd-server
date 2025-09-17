@@ -1,5 +1,4 @@
 #include <vector>
-#include <iostream>
 #include <fom-network/PacketAPI.h>
 #include <fom-network/FOMDataSerializer.h>
 
@@ -48,7 +47,7 @@ ReceivedPackets FOMNetwork_ReceivePackets(RakPeerInterface* peer) {
 	return received;
 }
 
-int32_t FOMNetwork_ProcessPackets(RakPeerInterface* peer, const ReceivedPackets received, FOMPacket* packetBuffer, int32_t packetBufferLen) {
+int32_t FOMNetwork_ProcessPackets(RakPeerInterface* peer, const ReceivedPackets received, FOMPacket::FOMPacket* packetBuffer, int32_t packetBufferLen) {
 	if (!peer || !received.packets || received.count == 0) {
 		return 0;
 	}
@@ -66,15 +65,15 @@ int32_t FOMNetwork_ProcessPackets(RakPeerInterface* peer, const ReceivedPackets 
 		RakNet::BitStream bs(p->data, p->length, false);
 
 		// Deserialize the bitstream into a packet structure that can be returned to the consumer.
-		FOMPacket& fp = packetBuffer[i]; // Don't allocate, just use the provided buffer.
+		FOMPacket::FOMPacket& fp = packetBuffer[i]; // Don't allocate, just use the provided buffer.
 		bs.Read(fp.ID); // First byte is always the packet ID.
 
 		try {
 			fp.data = FOMDataSerializer::Read(bs, fp.ID);
 		} catch (const FOMDataSerializer::ReadError& e) {
 			// Make sure that read errors are communicated to the consumer.
-			fp.ID = ID_FOM_PACKET_ERROR;
-			fp.data.error = e.error;
+			fp.ID = ID_FOM_PACKET_READ_ERROR;
+			fp.data.readError = e.readError;
 		}
 
 		fp.sender.binaryAddress = p->systemAddress.binaryAddress;

@@ -7,8 +7,8 @@
  * For every packet identifier, you must also update:
  *
  * - include/fom-network/FOMPacket.h: Requires a packet struct.
- * - src/packet-serializers/PacketSerializers.h: Requires a serializer declaration.
- * - src/packet-serializers/<PacketName>Serializer.cpp: Requires a serializer implementation.
+ * - src/serializers/PacketSerializers.h: Requires a serializer declaration.
+ * - src/serializers/<PacketName>Serializer.cpp: Requires a serializer implementation.
  * - src/FOMDataSerializer.cpp: Requires adding to the serializer map.
  */
 
@@ -23,7 +23,7 @@ enum PacketIdentifier : uint8_t {
     * Since the library does not allow sending/receiving
     * this packet, we don't need to worry about overlap.
 	*/
-	ID_FOM_PACKET_ERROR = 0,
+	ID_FOM_PACKET_READ_ERROR = 0,
 
     /**
      * ID_USER_PACKET_ENUM is used by RakNet to indicate the
