@@ -1,4 +1,5 @@
 using FOMServer.Master;
+using FOMServer.Master.Application;
 using Microsoft.Extensions.DependencyInjection;
 
 class Program
@@ -7,7 +8,7 @@ class Program
 	{
 		IServiceProvider serviceProvider = CompositionRoot.BuildContainer();
 
-		Server server = serviceProvider.GetRequiredService<Server>();
+		var server = serviceProvider.GetRequiredService<Server>();
 		server.Run();
 	}
 }
