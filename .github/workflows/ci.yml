@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  pull_request:
+
+jobs:
+  format-check:
+    name: Verify Code Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+
+      - name: Setup Command Runner
+        uses: extractions/setup-just@v3
+
+      - name: Setup C++ Formatter
+        run: sudo apt-get install -y clang-format
+
+      - name: Setup .NET Formatter
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Check C++ Formatting
+        run: just format-check-cpp
+
+      - name: Check .NET Formatting
+        run: just format-check-dotnet
+
+  test:
+    name: Check Test Suites
+    runs-on: ubuntu-latest
+    needs: format-check
+    env:
+      BUILD_VOLUME_BIND: ${{ github.workspace }}/.cache/build
+      NUGET_CACHE_BIND: ${{ github.workspace }}/.cache/nuget
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+
+      - name: Setup Command Runner
+        uses: extractions/setup-just@v3
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
+        with:
+          build-cache-dir: ${{ env.BUILD_VOLUME_BIND }}
+          nuget-cache-dir: ${{ env.NUGET_CACHE_BIND }}
+
+      - name: Run C++ Tests
+        run: just test-cpp
+
+      - name: Run .NET Tests
+        run: just test-dotnet
