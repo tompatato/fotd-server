@@ -1,17 +1,17 @@
 #pragma once
 
-#include <fom-network/PacketIdentifier.h>
+#include <fom-network/Common.h>
 
-/**
- * Make sure that we pack the structs the same way that C# does.
- */
+namespace FOMNetwork {
+namespace Packet {
+
 #pragma pack(push, 1)
-
-namespace FOMPacket {
 struct CheckNameReturn {
-  uint32_t existingPlayerID;
+  uint32_t existingAccountID;
 };
-ASSERT_BLITTABLE(CheckNameReturn);
-}  // namespace FOMPacket
-
 #pragma pack(pop)
+
+ASSERT_BLITTABLE(CheckNameReturn);
+
+}  // namespace Packet
+}  // namespace FOMNetwork

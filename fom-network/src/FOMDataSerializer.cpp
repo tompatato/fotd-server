@@ -2,6 +2,8 @@
 
 #include <unordered_map>
 
+namespace FOMNetwork {
+
 /**
  * We need to initialize the map with all of the serializers we want to be able
  * to use.
@@ -16,6 +18,7 @@ static std::unordered_map<uint32_t, IReader*> readerMap = {
     {ID_LOGIN_REQUEST, &LoginRequestSerializer::GetInstance()},
     {ID_LOGIN, &LoginSerializer::GetInstance()},
     {ID_CHECK_NAME, &CheckNameSerializer::GetInstance()},
+    {ID_CREATE_CHARACTER, &CreateCharacterSerializer::GetInstance()},
 };
 
 bool FOMDataSerializer::Write(RakNet::BitStream& bs, const PacketIdentifier id,
@@ -47,8 +50,8 @@ FOMDataUnion FOMDataSerializer::Read(RakNet::BitStream& bs,
 
   const auto* reader = GetReader(id);
   if (!reader) {
-    throw ReadError(FOMPacket::ReadPacketError{
-        id, FOMPacket::ReadPacketErrorCode::ERROR_UNHANDLED_PACKET_ID});
+    throw ReadError(Packet::ReadPacketError{
+        id, Packet::ReadPacketErrorCode::ERROR_UNHANDLED_PACKET_ID});
   }
 
   // Make sure to catch any deserialization errors so that
@@ -56,8 +59,8 @@ FOMDataUnion FOMDataSerializer::Read(RakNet::BitStream& bs,
   try {
     return reader->Read(bs);
   } catch (const std::exception& e) {
-    throw ReadError(FOMPacket::ReadPacketError{
-        id, FOMPacket::ReadPacketErrorCode::ERROR_READ});
+    throw ReadError(
+        Packet::ReadPacketError{id, Packet::ReadPacketErrorCode::ERROR_READ});
   }
 }
 
@@ -76,3 +79,5 @@ const IReader* FOMDataSerializer::GetReader(PacketIdentifier id) {
   }
   return it->second;
 }
+
+}  // namespace FOMNetwork

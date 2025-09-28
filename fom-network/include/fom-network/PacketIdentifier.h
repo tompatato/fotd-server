@@ -3,13 +3,15 @@
 #include <fom-network/Common.h>
 #include <raknet/MessageIdentifiers.h>
 
+namespace FOMNetwork {
+
 /**
  * For every packet identifier, you must also update:
  *
  * - include/fom-network/packets/<PacketName>.h: Requires a packet struct.
  * - include/fom-network/FOMPacket.h: Add packet struct to union.
  * - include/fom-network/PacketSerializers.h: Requires a serializer declaration.
- * - src/serializers/<PacketName>Serializer.cpp: Requires a serializer
+ * - src/packet-serializers/<PacketName>Serializer.cpp: Requires a serializer
  * implementation.
  * - src/FOMDataSerializer.cpp: Requires adding to the serializer map.
  * - src/NetworkAPI.cpp: Requires adding to the validation map.
@@ -174,3 +176,5 @@ enum PacketIdentifier : uint8_t {
   ID_FRAME_SET_PACKET_END = 240,
   ID_DISCONNECT_FROM_WORLD = 241
 };
+
+}  // namespace FOMNetwork

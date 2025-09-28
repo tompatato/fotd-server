@@ -10,12 +10,13 @@ set(FOMNETWORK_SRC
   "src/PacketAPI.cpp"
   "src/NetworkAPI.cpp"
   "src/FOMDataSerializer.cpp"
-  "src/serializers/LoginRequestSerializer.cpp"
-  "src/serializers/LoginRequestReturnSerializer.cpp"
-  "src/serializers/LoginSerializer.cpp"
-  "src/serializers/LoginReturnSerializer.cpp"
-  "src/serializers/CheckNameSerializer.cpp"
-  "src/serializers/CheckNameReturnSerializer.cpp"
+  "src/packet-serializers/LoginRequestSerializer.cpp"
+  "src/packet-serializers/LoginRequestReturnSerializer.cpp"
+  "src/packet-serializers/LoginSerializer.cpp"
+  "src/packet-serializers/LoginReturnSerializer.cpp"
+  "src/packet-serializers/CheckNameSerializer.cpp"
+  "src/packet-serializers/CheckNameReturnSerializer.cpp"
+  "src/packet-serializers/CreateCharacterSerializer.cpp"
 )
 set(FOMNETWORK_INC
   "include/fom-network/ClientAPI.h"
@@ -28,6 +29,14 @@ set(FOMNETWORK_INC
   "include/fom-network/PacketIdentifier.h"
   "include/fom-network/PacketSerializers.h"
   "include/fom-network/ServerAPI.h"
+
+  "src/model-serializers/ModelSerializer.h"
+  "src/model-serializers/NetworkAddressSerializer.h"
+  "src/model-serializers/AvatarSerializer.h"
+
+  "include/fom-network/models/NetworkAddress.h"
+  "include/fom-network/models/Avatar.h"
+
   "include/fom-network/packets/ReadPacketError.h"
   "include/fom-network/packets/LoginRequest.h"
   "include/fom-network/packets/LoginRequestReturn.h"
@@ -35,6 +44,7 @@ set(FOMNETWORK_INC
   "include/fom-network/packets/LoginReturn.h"
   "include/fom-network/packets/CheckName.h"
   "include/fom-network/packets/CheckNameReturn.h"
+  "include/fom-network/packets/CreateCharacter.h"
 )
 set(FOMNETWORK_TEST
   "tests/FOMDataSerializer_test.cpp"

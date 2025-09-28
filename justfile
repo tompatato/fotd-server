@@ -1,3 +1,5 @@
+set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
+
 BUILD_CONFIG := "debug"
 CPP_CACHE_IMAGE := "fom/build-cpp"
 DOTNET_CACHE_IMAGE := "fom/build-dotnet"
@@ -19,8 +21,14 @@ NUGET_CACHE_MOUNT := if NUGET_CACHE_BIND == "" {
 }
 
 [group("format")]
+[unix]
 format-check-cpp:
-  clang-format --dry-run --Werror $(git ls-files ./fom-network/**/*.cpp ./fom-network/**/*.h)
+  clang-format --dry-run --Werror $(find fom-network -name "*.cpp" -o -name "*.h")
+
+[group("format")]
+[windows]
+format-check-cpp:
+    Get-ChildItem -Path "fom-network" -Recurse -Include *.cpp,*.h -File | ForEach-Object { clang-format --dry-run --Werror $_.FullName }
 
 [group("format")]
 format-check-dotnet:
@@ -31,8 +39,14 @@ format-check-dotnet:
 format: format-cpp format-dotnet
 
 [group("format")]
+[unix]
 format-cpp:
-  clang-format -i $(git ls-files ./fom-network/**/*.cpp ./fom-network/**/*.h)
+  clang-format -i $(find fom-network -name "*.cpp" -o -name "*.h")
+
+[group("format")]
+[windows]
+format-cpp:
+    Get-ChildItem -Path "fom-network" -Recurse -Include *.cpp,*.h -File | ForEach-Object { clang-format -i $_.FullName }
 
 [group("format")]
 format-dotnet:

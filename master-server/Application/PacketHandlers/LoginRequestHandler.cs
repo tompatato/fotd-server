@@ -6,7 +6,6 @@ using FOMServer.Shared.Core;
 using FOMServer.Shared.Core.Enums;
 using FOMServer.Shared.Core.Models;
 using FOMServer.Shared.Core.Models.FOMData;
-using FOMServer.Shared.Infrastructure.Services;
 
 namespace FOMServer.Master.Application.PacketHandlers
 {
@@ -39,7 +38,7 @@ namespace FOMServer.Master.Application.PacketHandlers
                     response.RawUsername[i] = data.RawUsername[i];
             }
 
-            var accountID = accountRepository.AccountExists(data.Username);
+            var accountID = accountRepository.Exists(data.Username);
             if (accountID == null)
                 response.Status = LoginRequestReturn.StatusCode.LOGIN_REQUEST_INVALID_INFORMATION;
             else if (accountService.Get(accountID.Value) != null)
