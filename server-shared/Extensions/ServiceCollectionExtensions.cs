@@ -1,4 +1,3 @@
-using FOMServer.Shared.Application.Networking;
 using FOMServer.Shared.Application.PacketHandlers;
 using FOMServer.Shared.Infrastructure.FOMNetwork;
 using FOMServer.Shared.Infrastructure.Services;
@@ -9,29 +8,35 @@ namespace FOMServer.Shared.Extensions
 {
     public static class ServiceCollectionExtensions
     {
+        public static void StartLogService(this IServiceCollection services, bool writeToConsole = true, string? logFilePath = null)
+        {
+            var logService = new LogService(writeToConsole, logFilePath);
+            services.AddSingleton<ILogService>(logService);
+
+            logService.Start();
+        }
+
         public static void AddServerShared(this IServiceCollection services)
         {
-            // FOMNetwork API Services
+            services.AddInteropServices();
+            services.AddSharedServices();
+            services.AddPacketHandlers();
+        }
+
+        private static void AddInteropServices(this IServiceCollection services)
+        {
             services.AddSingleton<INetworkService, NetworkService>();
             services.AddSingleton<IServerService, ServerService>();
             services.AddSingleton<IClientService, ClientService>();
             services.AddSingleton<IPacketService, PacketService>();
+        }
 
-            // Shared Services
-            services.AddSingleton<LogService>();
-            services.AddSingleton<ILogService>(sp => sp.GetRequiredService<LogService>());
-            services.AddSingleton<PacketProcessor>();
+        private static void AddSharedServices(this IServiceCollection services)
+        {
+        }
 
-            // Packet Sender
-            services.AddSingleton<NetworkManager>();
-            services.AddSingleton<IPacketSender, PacketSender>(sp =>
-            {
-                return new PacketSender(
-                    () => sp.GetRequiredService<NetworkManager>()
-                );
-            });
-
-            // Packet Handlers
+        private static void AddPacketHandlers(this IServiceCollection services)
+        {
             services.AddSingleton<IPacketHandler, ReadPacketErrorHandler>();
         }
     }

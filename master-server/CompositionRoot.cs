@@ -1,16 +1,15 @@
 using FluentMigrator.Runner;
 using FOMServer.Master.Application;
+using FOMServer.Master.Application.Networking;
 using FOMServer.Master.Application.PacketHandlers;
 using FOMServer.Master.Application.Services;
 using FOMServer.Master.Core.Interfaces;
 using FOMServer.Master.Core.Models;
 using FOMServer.Master.Infrastructure.Factories;
-using FOMServer.Master.Infrastructure.Migrations;
 using FOMServer.Master.Infrastructure.Repositories;
 using FOMServer.Shared.Application.PacketHandlers;
 using FOMServer.Shared.Extensions;
 using FOMServer.Shared.Infrastructure.Factories;
-using FOMServer.Shared.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -28,11 +27,13 @@ namespace FOMServer.Master
             // Run before anything else so that the cached settings in this class are available.
             services.AddConfiguration();
 
+            // Start the log service as early as possible so that everything is logged.
+            services.StartLogService();
+
             services.AddServerShared();
-            services.AddSingleton<IConnectionFactory, ConnectionFactory>();
+            services.AddMasterServices();
             services.AddDatabaseMigrations();
             services.AddRepositories();
-            services.AddMasterServices();
             services.AddPacketHandlers();
 
             services.AddSingleton<Server>();
@@ -51,8 +52,12 @@ namespace FOMServer.Master
             serverSettings = config.GetSection("Server").Get<ServerSettings>()!;
             dbSettings = config.GetSection("Database").Get<DatabaseSettings>()!;
 
-            if (serverSettings.Port <= 0)
-                throw new InvalidOperationException("Server port must be greater than 0.");
+            if (serverSettings.WorldPort <= 0)
+                throw new InvalidOperationException("World server port must be greater than 0.");
+            if (serverSettings.ClientPort <= 0)
+                throw new InvalidOperationException("Client port must be greater than 0.");
+            if (serverSettings.WorldPort == serverSettings.ClientPort)
+                throw new InvalidOperationException("World and client ports must be different.");
             if (string.IsNullOrWhiteSpace(dbSettings.Name))
                 throw new InvalidOperationException("Database name must be configured.");
             if (string.IsNullOrWhiteSpace(dbSettings.ConnectionString))
@@ -60,6 +65,19 @@ namespace FOMServer.Master
 
             services.AddSingleton(serverSettings);
             services.AddSingleton(dbSettings);
+            return services;
+        }
+
+        private static ServiceCollection AddMasterServices(this ServiceCollection services)
+        {
+            services.AddSingleton<ClientPacketSender>();
+            services.AddSingleton<IClientPacketSender>(sp => sp.GetRequiredService<ClientPacketSender>());
+            services.AddSingleton<WorldPacketSender>();
+            services.AddSingleton<IWorldPacketSender>(sp => sp.GetRequiredService<WorldPacketSender>());
+
+            services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
+            services.AddSingleton<IWorldServerService, WorldServerService>();
+            services.AddSingleton<IAccountService, AccountService>();
             return services;
         }
 
@@ -84,13 +102,6 @@ namespace FOMServer.Master
             return services;
         }
 
-        private static ServiceCollection AddMasterServices(this ServiceCollection services)
-        {
-            services.AddSingleton<AccountService>();
-            services.AddSingleton<IAccountService>(sp => sp.GetRequiredService<AccountService>());
-            return services;
-        }
-
         private static ServiceCollection AddPacketHandlers(this ServiceCollection services)
         {
             services.AddSingleton<IPacketHandler, DisconnectionHandler>();
@@ -98,6 +109,7 @@ namespace FOMServer.Master
             services.AddSingleton<IPacketHandler, LoginHandler>();
             services.AddSingleton<IPacketHandler, CheckNameHandler>();
             services.AddSingleton<IPacketHandler, CreateCharacterHandler>();
+            services.AddSingleton<IPacketHandler, RegisterWorldPacketHandler>();
             return services;
         }
     }

@@ -21,10 +21,7 @@ namespace FOMServer.Shared.Application.Networking
 
         private CancellationTokenSource? cts;
 
-        public PacketProcessor(
-            ILogService logService,
-            IEnumerable<IPacketHandler> handlers
-        )
+        public PacketProcessor(ILogService logService, IEnumerable<IPacketHandler> handlers)
         {
             this.logService = logService;
             this.handlers = handlers.ToDictionary(h => h.PacketID);
@@ -58,7 +55,7 @@ namespace FOMServer.Shared.Application.Networking
 
             for (int i = 0; i < workerCount; i++)
             {
-                // Use a dedicated thread for each worker because RakNet packets
+                // Use a dedicated thread for each worker because new packets
                 // will consistently be arriving and needing to be handled.
                 var task = Task.Factory.StartNew(
                     async () => await WorkerLoopAsync(cts.Token),
@@ -135,7 +132,7 @@ namespace FOMServer.Shared.Application.Networking
         /// </summary>
         private void OnUnhandledPacket(FOMPacket packet)
         {
-            // Any unhandled internal RakNet packets should be ignored.
+            // Any unhandled internal packets should be ignored.
             if (packet.ID < PacketIdentifier.ID_FOM_PACKET_START)
                 return;
 

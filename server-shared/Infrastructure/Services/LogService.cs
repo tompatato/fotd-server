@@ -84,12 +84,12 @@ namespace FOMServer.Shared.Infrastructure.Services
         /// <summary>
         /// Starts the background logging task.
         /// </summary>
-        public void Start(CancellationToken ctParent)
+        public void Start()
         {
             if (loggingTask != null)
                 return;
 
-            cts = CancellationTokenSource.CreateLinkedTokenSource(ctParent);
+            cts = new CancellationTokenSource();
 
             loggingTask = Task.Run(() => ProcessLoopAsync(cts.Token), cts.Token);
         }
