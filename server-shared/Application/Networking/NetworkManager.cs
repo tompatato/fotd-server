@@ -1,8 +1,8 @@
 using FOMServer.Shared.Core.Enums;
-using FOMServer.Shared.Core.Models;
-using FOMServer.Shared.Core.Models.FOMData;
-using FOMServer.Shared.Infrastructure.FOMNetwork;
-using FOMServer.Shared.Infrastructure.Services;
+using FOMServer.Shared.Core.FOMPacket.Data;
+using FOMServer.Shared.Core.FOMPacket.Models;
+using FOMServer.Shared.Core.Logging;
+using FOMServer.Shared.Core.Networking;
 using System.Threading.Channels;
 
 namespace FOMServer.Shared.Application.Networking
@@ -53,15 +53,15 @@ namespace FOMServer.Shared.Application.Networking
             PacketProcessor packetProcessor
         )
         {
-            this.peer = IntPtr.Zero;
-            this.peerShutdown = null;
+            peer = IntPtr.Zero;
+            peerShutdown = null;
             this.logService = logService;
             this.packetService = packetService;
             this.packetProcessor = packetProcessor;
-            this.claimedPacketIDs = new HashSet<PacketIdentifier>();
+            claimedPacketIDs = new HashSet<PacketIdentifier>();
 
             // Single writer, single reader channel is fine here
-            this.sendQueue = Channel.CreateUnbounded<SendPacket>(new UnboundedChannelOptions
+            sendQueue = Channel.CreateUnbounded<SendPacket>(new UnboundedChannelOptions
             {
                 SingleReader = true,
                 SingleWriter = false

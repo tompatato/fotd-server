@@ -1,11 +1,11 @@
 using FluentMigrator.Runner;
 using FOMServer.Master.Application.Networking;
-using FOMServer.Master.Core.Models;
+using FOMServer.Master.Core;
 using FOMServer.Shared.Application.Networking;
-using FOMServer.Shared.Application.PacketHandlers;
 using FOMServer.Shared.Core.Enums;
-using FOMServer.Shared.Infrastructure.FOMNetwork;
-using FOMServer.Shared.Infrastructure.Services;
+using FOMServer.Shared.Core.Handlers;
+using FOMServer.Shared.Core.Logging;
+using FOMServer.Shared.Core.Networking;
 using Microsoft.Extensions.DependencyInjection;
 using MySqlConnector;
 
