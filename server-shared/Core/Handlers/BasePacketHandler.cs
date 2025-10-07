@@ -1,4 +1,5 @@
-using FOMServer.Shared.Core.FOMPacket;
+using FOMServer.Shared.Core.Networking;
+using FOMServer.Shared.Core.Packets;
 
 namespace FOMServer.Shared.Core.Handlers
 {
@@ -11,21 +12,17 @@ namespace FOMServer.Shared.Core.Handlers
         /// <summary>
         /// Handles an incoming packet by extracting its data and passing it to the type-specific handler.
         /// </summary>
-        public void Handle(in Packet packet)
+        public void Handle(in PacketRef packet)
         {
-            var unwrappedData = PacketHelpers.Unwrap<TPacketData>(packet, out var expectedID);
-            if (packet.ID != expectedID)
-                throw new ArgumentException($"Packet ID {packet.ID} does not match handler ID {expectedID}");
-
             Handle(
                 packet.Sender,
-                unwrappedData
+                packet.Data<TPacketData>()
             );
         }
 
         /// <summary>
         /// Handles the data from an incoming packet.
         /// </summary>
-        public abstract void Handle(NetworkAddress sender, in TPacketData data);
+        public abstract void Handle(NetworkAddress sender, in TPacketData packet);
     }
 }

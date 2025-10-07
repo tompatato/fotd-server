@@ -1,6 +1,6 @@
 using FOMServer.Shared.Core.Enums;
-using FOMServer.Shared.Core.FOMPacket;
 using FOMServer.Shared.Core.Networking;
+using FOMServer.Shared.Core.Packets;
 using FOMServer.World.Core.Networking;
 
 namespace FOMServer.World.Application.Networking
@@ -15,7 +15,7 @@ namespace FOMServer.World.Application.Networking
         }
 
         public void Send<TData>(
-            TData data,
+            QueuePacket.PacketData<TData> data,
             PacketPriority priority,
             PacketReliability reliability,
             byte orderingChannel = 0

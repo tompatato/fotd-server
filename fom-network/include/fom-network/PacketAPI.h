@@ -2,7 +2,8 @@
 
 #include <fom-network/Common.h>
 #include <fom-network/FOMNetworkExport.h>
-#include <fom-network/packets/FOMPacket.h>
+#include <fom-network/packets/NetworkAddress.h>
+#include <fom-network/packets/PacketIdentifier.h>
 #include <raknet/PacketPriority.h>
 #include <raknet/RakNetTypes.h>
 #include <raknet/RakPeerInterface.h>
@@ -14,12 +15,26 @@
  */
 #pragma pack(push, 1)
 struct ReceivedPackets {
-  /* A buffer of packets that have been received and need to be deserialized and
-   * released. */
+  /**
+   * The number of packets in the buffer.
+   */
+  uint8_t count;
+
+  /**
+   * A buffer of packets that have been received and need to be deserialized and
+   * released.
+   */
   Packet** packets;
 
-  /* The number of packets in the buffer. */
-  int32_t count;
+  /**
+   * The senders for each of the received packets.
+   */
+  FOMNetwork::NetworkAddress* senders;
+
+  /**
+   * The packet identifiers for each of the received packets.
+   */
+  FOMNetwork::PacketIdentifier* identifiers;
 };
 #pragma pack(pop)
 
@@ -35,8 +50,8 @@ struct SendPacket {
   /* The identifier for the packet being sent. */
   FOMNetwork::PacketIdentifier id;
 
-  /* The discriminated union for communicating packet data. */
-  FOMNetwork::FOMDataUnion data;
+  /* A pointer to the memory containing the packet data. */
+  uint8_t* data;
 
   /* The destination for the packet or the excluded address if it is a
    * broadcast. */
@@ -94,12 +109,12 @@ FOM_API ReceivedPackets FOMNetwork_ReceivePackets(RakPeerInterface* peer);
  * @param packetBufferLen The number of packets in the packet buffer.
  * @return int32_t The status code.
  * @retval 0 Success.
- * @retval -1 The packetBufferLen does not match the number of received packets
- * to process.
+ * @retval -1 The packetBufferLen is not able to hold all of the received
+ * packets.
  */
 FOM_API int32_t FOMNetwork_ProcessPackets(RakPeerInterface* peer,
                                           const ReceivedPackets received,
-                                          FOMNetwork::FOMPacket* packetBuffer,
+                                          uint8_t* packetBuffer,
                                           int32_t packetBufferLen);
 
 /**

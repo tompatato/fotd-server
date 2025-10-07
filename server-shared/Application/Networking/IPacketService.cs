@@ -1,5 +1,3 @@
-using FOMServer.Shared.Core.FOMPacket;
-
 namespace FOMServer.Shared.Core.Networking
 {
     public interface IPacketService
@@ -10,7 +8,7 @@ namespace FOMServer.Shared.Core.Networking
         /// <remarks>
         /// Must match `fom-network/src/PacketAPI.cpp` MaxBufferedPackets.
         /// </remarks>
-        public const int MaxBufferedPackets = 256;
+        public const int MaxBufferedPackets = 64;
 
         /// <summary>
         /// Polls the network interface for packets, parses them, and returns them in a memory buffer.
@@ -21,7 +19,7 @@ namespace FOMServer.Shared.Core.Networking
         /// Receive, as it will be overwritten.
         /// </remarks>
         /// <returns>The buffer containing the received packets.</returns>
-        Span<Packet> Receive(IntPtr peer);
+        Span<PacketRef> Receive(IntPtr peer);
 
         /// <summary>
         /// Sends packets to the specified destinations.

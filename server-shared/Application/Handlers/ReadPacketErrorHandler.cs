@@ -1,7 +1,7 @@
 using FOMServer.Shared.Core.Enums;
-using FOMServer.Shared.Core.FOMPacket;
-using FOMServer.Shared.Core.FOMPacket.Data;
 using FOMServer.Shared.Core.Logging;
+using FOMServer.Shared.Core.Packets;
+using FOMServer.Shared.Core.Packets.Data;
 using FOMServer.Shared.Metadata;
 
 namespace FOMServer.Shared.Core.Handlers
@@ -16,12 +16,12 @@ namespace FOMServer.Shared.Core.Handlers
             _logService = logService;
         }
 
-        public override void Handle(NetworkAddress sender, in ReadPacketError data)
+        public override void Handle(NetworkAddress sender, in ReadPacketError p)
         {
             _logService.Write(
                 MessageLogEntry.Create(
                     LogLevel.Error,
-                    $"Received read error from {sender}: Packet={data.OffendingID} Code={data.ErrorCode}"
+                    $"Received read error from {sender}: Packet={p.OffendingID} Code={p.ErrorCode}"
                 )
             );
         }

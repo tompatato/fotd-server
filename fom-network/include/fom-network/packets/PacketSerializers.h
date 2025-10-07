@@ -1,7 +1,7 @@
 #pragma once
 
 #include <fom-network/FOMNetworkExport.h>
-#include <fom-network/packets/FOMPacket.h>
+#include <fom-network/packets/PacketTypes.h>
 
 #pragma warning(push)
 #pragma warning(disable : 26495)
@@ -18,12 +18,12 @@ namespace FOMNetwork {
  */
 struct IWriter {
   virtual ~IWriter() = default;
-  virtual void Write(RakNet::BitStream& bs, const FOMDataUnion& data) const = 0;
+  virtual void Write(RakNet::BitStream& bs, const uint8_t* data) const = 0;
 };
 
 struct IReader {
   virtual ~IReader() = default;
-  virtual FOMDataUnion Read(RakNet::BitStream& bs) const = 0;
+  virtual bool Read(RakNet::BitStream& bs, uint8_t* dataBuffer) const = 0;
 };
 
 class BaseSerializer {
@@ -81,9 +81,10 @@ class FOM_API EmptyPacketSerializer : public IWriter, public IReader {
     static EmptyPacketSerializer s;
     return s;
   }
-  void Write(RakNet::BitStream& bs, const FOMDataUnion& d) const override {}
-  FOMDataUnion Read(RakNet::BitStream& bs) const override {
-    return FOMDataUnion{};
+  void Write(RakNet::BitStream& bs, const uint8_t* data) const override {}
+  bool Read(RakNet::BitStream& bs, uint8_t* dataBuffer) const override {
+    // There isn't any struct data to read since it's empty.
+    return true;
   }
 };
 
@@ -97,72 +98,80 @@ class FOM_API EmptyPacketSerializer : public IWriter, public IReader {
  * for you.
  * --------------------------------------------------
  */
-#define SERIALIZER_BOTH(TYPE, FIELD)                                          \
-  class FOM_API TYPE##Serializer : public BaseSerializer,                     \
-                                   public IWriter,                            \
-                                   public IReader {                           \
-   public:                                                                    \
-    static TYPE##Serializer& GetInstance() {                                  \
-      static TYPE##Serializer s;                                              \
-      return s;                                                               \
-    }                                                                         \
-    void Write(RakNet::BitStream& bs, const FOMDataUnion& d) const override { \
-      WriteData(bs, d.FIELD);                                                 \
-    }                                                                         \
-    FOMDataUnion Read(RakNet::BitStream& bs) const override {                 \
-      FOMDataUnion data{};                                                    \
-      data.FIELD = ReadData(bs);                                              \
-      return data;                                                            \
-    }                                                                         \
-    void WriteData(RakNet::BitStream& bs,                                     \
-                   const FOMNetwork::Packet::TYPE& v) const;                  \
-    FOMNetwork::Packet::TYPE ReadData(RakNet::BitStream& bs) const;           \
+#define SERIALIZER_BOTH(TYPE, FIELD)                                       \
+  class FOM_API TYPE##Serializer : public BaseSerializer,                  \
+                                   public IWriter,                         \
+                                   public IReader {                        \
+   public:                                                                 \
+    static TYPE##Serializer& GetInstance() {                               \
+      static TYPE##Serializer s;                                           \
+      return s;                                                            \
+    }                                                                      \
+    void Write(RakNet::BitStream& bs,                                      \
+               const uint8_t* dataBuffer) const override {                 \
+      const FOMNetwork::Packet::TYPE* data =                               \
+          reinterpret_cast<const FOMNetwork::Packet::TYPE*>(dataBuffer);   \
+      WriteData(bs, *data);                                                \
+    }                                                                      \
+    bool Read(RakNet::BitStream& bs, uint8_t* dataBuffer) const override { \
+      FOMNetwork::Packet::TYPE* data =                                     \
+          reinterpret_cast<FOMNetwork::Packet::TYPE*>(dataBuffer);         \
+      return ReadData(bs, *data);                                          \
+    }                                                                      \
+    void WriteData(RakNet::BitStream& bs,                                  \
+                   const FOMNetwork::Packet::TYPE& v) const;               \
+    bool ReadData(RakNet::BitStream& bs,                                   \
+                  FOMNetwork::Packet::TYPE& data) const;                   \
   };
 
-#define SERIALIZER_WRITE(TYPE, FIELD)                                         \
-  class FOM_API TYPE##Serializer : public BaseSerializer, public IWriter {    \
-   public:                                                                    \
-    static TYPE##Serializer& GetInstance() {                                  \
-      static TYPE##Serializer s;                                              \
-      return s;                                                               \
-    }                                                                         \
-    void Write(RakNet::BitStream& bs, const FOMDataUnion& d) const override { \
-      WriteData(bs, d.FIELD);                                                 \
-    }                                                                         \
-    void WriteData(RakNet::BitStream& bs,                                     \
-                   const FOMNetwork::Packet::TYPE& v) const;                  \
+#define SERIALIZER_WRITE(TYPE, FIELD)                                      \
+  class FOM_API TYPE##Serializer : public BaseSerializer, public IWriter { \
+   public:                                                                 \
+    static TYPE##Serializer& GetInstance() {                               \
+      static TYPE##Serializer s;                                           \
+      return s;                                                            \
+    }                                                                      \
+    void Write(RakNet::BitStream& bs,                                      \
+               const uint8_t* dataBuffer) const override {                 \
+      const FOMNetwork::Packet::TYPE* data =                               \
+          reinterpret_cast<const FOMNetwork::Packet::TYPE*>(dataBuffer);   \
+      WriteData(bs, *data);                                                \
+    }                                                                      \
+    void WriteData(RakNet::BitStream& bs,                                  \
+                   const FOMNetwork::Packet::TYPE& v) const;               \
   };
 
-#define SERIALIZER_READ(TYPE, FIELD)                                       \
+#define SERIALIZER_READ(TYPE)                                              \
   class FOM_API TYPE##Serializer : public BaseSerializer, public IReader { \
    public:                                                                 \
     static TYPE##Serializer& GetInstance() {                               \
       static TYPE##Serializer s;                                           \
       return s;                                                            \
     }                                                                      \
-    FOMDataUnion Read(RakNet::BitStream& bs) const override {              \
-      FOMDataUnion data{};                                                 \
-      data.FIELD = ReadData(bs);                                           \
-      return data;                                                         \
+    bool Read(RakNet::BitStream& bs, uint8_t* dataBuffer) const override { \
+      FOMNetwork::Packet::TYPE* data =                                     \
+          reinterpret_cast<FOMNetwork::Packet::TYPE*>(dataBuffer);         \
+      return ReadData(bs, *data);                                          \
     }                                                                      \
-    FOMNetwork::Packet::TYPE ReadData(RakNet::BitStream& bs) const;        \
+    bool ReadData(RakNet::BitStream& bs,                                   \
+                  FOMNetwork::Packet::TYPE& data) const;                   \
   };
 
 /**
  * Declare all of the serializers. Keep in mind that they must be:
  * <PacketTypeName>Serializer
  */
-SERIALIZER_READ(LoginRequest, loginRequest)
+SERIALIZER_READ(LoginRequest)
 SERIALIZER_WRITE(LoginRequestReturn, loginRequestReturn)
-SERIALIZER_READ(Login, login)
+SERIALIZER_READ(Login)
 SERIALIZER_WRITE(LoginReturn, loginReturn)
-SERIALIZER_READ(CheckName, checkName)
+SERIALIZER_READ(CheckName)
 SERIALIZER_WRITE(CheckNameReturn, checkNameReturn)
-SERIALIZER_READ(CreateCharacter, createCharacter)
+SERIALIZER_READ(CreateCharacter)
 SERIALIZER_BOTH(RegisterWorld, registerWorld)
-SERIALIZER_READ(WorldOverview, worldOverview)
+SERIALIZER_READ(WorldOverview)
 SERIALIZER_WRITE(WorldOverviewReturn, worldOverviewReturn)
-SERIALIZER_READ(WorldLogin, worldLogin)
+SERIALIZER_READ(WorldLogin)
 SERIALIZER_WRITE(WorldLoginReturn, worldLoginReturn)
 SERIALIZER_BOTH(PlayerEnteringWorld, playerEnteringWorld)
 SERIALIZER_BOTH(PlayerEnteringWorldReturn, playerEnteringWorldReturn)
