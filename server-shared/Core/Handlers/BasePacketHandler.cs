@@ -3,26 +3,16 @@ using FOMServer.Shared.Core.Packets;
 
 namespace FOMServer.Shared.Core.Handlers
 {
-    /// <summary>
-    /// An abstract class for implementing packet handlers for specific packet IDs.
-    /// </summary>
-    /// <typeparam name="TPacketData">The data type of the packet.</typeparam>
-    public abstract class BasePacketHandler<TPacketData> : IPacketHandler where TPacketData : unmanaged
+    public abstract class BasePacketHandler<TPacket> : IPacketHandler where TPacket : unmanaged
     {
-        /// <summary>
-        /// Handles an incoming packet by extracting its data and passing it to the type-specific handler.
-        /// </summary>
         public void Handle(in PacketRef packet)
         {
             Handle(
                 packet.Sender,
-                packet.Data<TPacketData>()
+                packet.Data<TPacket>()
             );
         }
 
-        /// <summary>
-        /// Handles the data from an incoming packet.
-        /// </summary>
-        public abstract void Handle(NetworkAddress sender, in TPacketData packet);
+        public abstract void Handle(NetworkAddress sender, in TPacket packet);
     }
 }

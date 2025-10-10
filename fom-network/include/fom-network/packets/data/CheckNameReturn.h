@@ -7,7 +7,7 @@ namespace Packet {
 
 #pragma pack(push, 1)
 struct CheckNameReturn {
-  uint32_t existingPlayerD;
+  uint32_t existingPlayerID;
 };
 #pragma pack(pop)
 

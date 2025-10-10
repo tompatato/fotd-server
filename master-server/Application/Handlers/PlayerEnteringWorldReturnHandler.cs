@@ -31,13 +31,13 @@ namespace FOMServer.World.Application.Handlers
         {
             var player = _playerService.Get(p.PlayerID);
             if (player == null)
-                throw new InvalidOperationException($"Player not found for address {sender}");
+                throw new InvalidOperationException($"Player {p.PlayerID} not found");
 
             var worldServer = _worldServerService.Get(sender);
             if (worldServer == null)
                 throw new InvalidOperationException($"World server not found for address {sender}");
 
-            using var response = QueuePacket.Create<WorldLoginReturn>();
+            using var response = new PacketBuilder<WorldLoginReturn>();
             ref var rData = ref response.Data;
 
             rData.WorldID = worldServer.ID;
@@ -48,12 +48,8 @@ namespace FOMServer.World.Application.Handlers
             else
                 rData.Status = WorldLoginReturn.StatusCode.WORLD_LOGIN_RETURN_INVALID;
 
-            _packetSender.Send(
-                response,
-                player.ClientAddress,
-                PacketPriority.MEDIUM_PRIORITY,
-                PacketReliability.RELIABLE_ORDERED
-            );
+            response.WithAddress(player.ClientAddress);
+            _packetSender.Send(response.Build());
         }
     }
 }

@@ -6,7 +6,6 @@ bool PlayerEnteringWorldReturnSerializer::ReadData(
     RakNet::BitStream& bs, Packet::PlayerEnteringWorldReturn& data) const {
   bs.ReadCompressed(data.status);
   bs.ReadCompressed(data.playerID);
-
   return true;
 }
 

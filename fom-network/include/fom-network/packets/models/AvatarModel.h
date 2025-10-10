@@ -1,7 +1,7 @@
 #pragma once
 
 #include <fom-network/Common.h>
-#include <fom-network/FOMNetworkEnums.h>
+#include <fom-network/FOMNetworkTypes.h>
 
 namespace FOMNetwork {
 namespace Packet {
@@ -20,6 +20,16 @@ struct AvatarModel {
   uint16_t bottoms;
   uint16_t shoes;
   uint16_t gloves;
+
+  uint8_t showArmor;
+  uint16_t armorHead;
+  uint16_t armorGlasses;
+  uint16_t armorShoulder;
+  uint16_t armorArm;
+  uint16_t armorTorso;
+  uint16_t armorLeg;
+
+  uint8_t rank;
 };
 #pragma pack(pop)
 

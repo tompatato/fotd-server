@@ -1,6 +1,6 @@
 using FOMServer.Master.Core.Networking;
 using FOMServer.Master.Core.Players;
-using FOMServer.Shared.Core;
+using FOMServer.Shared.Core.Constants;
 using FOMServer.Shared.Core.Enums;
 using FOMServer.Shared.Core.Handlers;
 using FOMServer.Shared.Core.Networking;
@@ -32,7 +32,7 @@ namespace FOMServer.Master.Application.Handlers
 
         public override void Handle(NetworkAddress sender, in LoginRequest p)
         {
-            using var response = QueuePacket.Create<LoginRequestReturn>();
+            using var response = new PacketBuilder<LoginRequestReturn>();
             ref var rData = ref response.Data;
 
             unsafe
@@ -52,7 +52,8 @@ namespace FOMServer.Master.Application.Handlers
             else
                 rData.Status = LoginRequestReturn.StatusCode.LOGIN_REQUEST_SUCCESS;
 
-            _packetSender.Send(response, sender, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE_ORDERED);
+            response.WithAddress(sender);
+            _packetSender.Send(response.Build());
         }
     }
 }

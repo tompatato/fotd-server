@@ -1,8 +1,7 @@
 using FOMServer.Master.Application.Packets;
 using FOMServer.Master.Core.Networking;
 using FOMServer.Master.Core.Players;
-using FOMServer.Shared.Core;
-using FOMServer.Shared.Core.Enums;
+using FOMServer.Shared.Core.Constants;
 using FOMServer.Shared.Core.Handlers;
 using FOMServer.Shared.Core.Networking;
 using FOMServer.Shared.Core.Packets;
@@ -53,15 +52,18 @@ namespace FOMServer.Master.Application.Handlers
 
             player.HasCharacter = true;
 
-            using var response = QueuePacket.Create<LoginReturn>();
+            using var response = new PacketBuilder<LoginReturn>();
             ref var rData = ref response.Data;
+
             rData.Status = LoginReturn.StatusCode.LOGIN_RETURN_SUCCESS;
             rData.PlayerID = player.ID;
             rData.AccountType = 3;
             rData.IsVolunteer = false;
             rData.ClientVersion = GlobalConstants.ClientVersion;
             rData.WorldOverview = _worldOverviewFactory.Create(player);
-            _packetSender.Send(response, sender, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE_ORDERED);
+
+            response.WithAddress(sender);
+            _packetSender.Send(response.Build());
         }
     }
 }

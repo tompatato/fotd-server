@@ -29,6 +29,7 @@ namespace FOMServer.Shared.Application.Networking
         {
             _shutdownManager = shutdownManager;
             _logService = logService;
+            _packetQueue = Channel.CreateUnbounded<PacketRef>();
 
             // Build the map by extracting the PacketIdentifier from each handler's generic packet struct argument.
             _handlers = handlers.ToDictionary(h =>
@@ -49,14 +50,6 @@ namespace FOMServer.Shared.Application.Networking
 
                 return packetIDAttr.ID;
             });
-
-            _packetQueue = Channel.CreateUnbounded<PacketRef>(
-                new UnboundedChannelOptions
-                {
-                    SingleReader = false,
-                    SingleWriter = true
-                }
-            );
         }
 
         /// <summary>

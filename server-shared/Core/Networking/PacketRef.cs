@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.Text;
 using FOMServer.Shared.Core.Enums;
 using FOMServer.Shared.Core.Packets;
 
@@ -11,33 +12,58 @@ namespace FOMServer.Shared.Core.Networking
     /// Using this allows us to have raw buffers for packets and
     /// avoid allocating lots of memory for each individually.
     /// </remarks>
-    public struct PacketRef : IDisposable
+    public readonly struct PacketRef
     {
-        public readonly PacketIdentifier ID;
-        public readonly NetworkAddress Sender;
-        private readonly Memory<byte> _data;
+        public readonly int RefIndex;
+        public readonly int BufferVersion;
+        private readonly PacketIdentifier _id;
+        private readonly NetworkAddress _sender;
+        private readonly ReadOnlyMemory<byte> _data;
         private readonly PacketBuffer _parentBuffer;
-        private int _disposed;
 
         public PacketRef(
+            int refIndex,
+            int bufferVersion,
             PacketIdentifier id,
             NetworkAddress sender,
-            Memory<byte> data,
+            in ReadOnlyMemory<byte> data,
             PacketBuffer parentBuffer
         )
         {
-            ID = id;
-            Sender = sender;
+            RefIndex = refIndex;
+            BufferVersion = bufferVersion;
+            _id = id;
+            _sender = sender;
             _data = data;
             _parentBuffer = parentBuffer;
         }
 
-        public ref TPacket Data<TPacket>() where TPacket : unmanaged
+        public readonly PacketIdentifier ID
         {
-            if (Volatile.Read(ref _disposed) == 1)
+            get
+            {
+                if (_parentBuffer.IsPacketDisposed(in this))
+                    throw new ObjectDisposedException(nameof(PacketRef));
+                return _id;
+            }
+        }
+
+        public readonly NetworkAddress Sender
+        {
+            get
+            {
+                if (_parentBuffer.IsPacketDisposed(in this))
+                    throw new ObjectDisposedException(nameof(PacketRef));
+                return _sender;
+            }
+        }
+
+        public readonly ref readonly TPacket Data<TPacket>() where TPacket : unmanaged
+        {
+            if (_parentBuffer.IsPacketDisposed(in this))
                 throw new ObjectDisposedException(nameof(PacketRef));
 
-            if (!PacketHelpers.IsPacketOfType<TPacket>(ID))
+            if (!PacketHelpers.IsPacketOfType<TPacket>(_id))
                 throw new InvalidOperationException($"PacketRef does not contain data of type {typeof(TPacket)}");
 
             return ref MemoryMarshal.AsRef<TPacket>(_data.Span);
@@ -45,10 +71,34 @@ namespace FOMServer.Shared.Core.Networking
 
         public void Dispose()
         {
-            if (Interlocked.CompareExchange(ref _disposed, 1, 0) != 0)
-                return;
+            _parentBuffer.DisposePacket(in this);
+        }
 
-            _parentBuffer.Free(this);
+        public override readonly string ToString()
+        {
+            int packetSize = PacketHelpers.GetPacketSize(_id);
+            var sb = new StringBuilder(32 + (packetSize * 3));
+
+            sb.Append(_id);
+            sb.Append(" [");
+            sb.Append(packetSize);
+            sb.Append(" bytes]: ");
+
+            if (!_parentBuffer.IsPacketDisposed(in this))
+            {
+                // Append as hex pairs separated by spaces
+                var data = _data.Span;
+                for (int i = 0; i < packetSize; i++)
+                {
+                    sb.Append(data[i].ToString("X2"));
+                    if (i < packetSize - 1)
+                        sb.Append(' ');
+                }
+            }
+            else
+                sb.Append("<disposed>");
+
+            return sb.ToString();
         }
     }
 }
