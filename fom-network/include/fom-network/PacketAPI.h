@@ -47,31 +47,45 @@ ASSERT_BLITTABLE(ReceivedPackets)
  */
 #pragma pack(push, 1)
 struct SendPacket {
-  /* The identifier for the packet being sent. */
+  /**
+   * The identifier for the packet being sent.
+   */
   FOMNetwork::PacketIdentifier id;
 
-  /* A pointer to the memory containing the packet data. */
+  /**
+   * A pointer to the memory containing the packet data.
+   */
   uint8_t* data;
 
-  /* The number of network addresses in the packet. */
+  /**
+   * The number of network addresses in the packet.
+   */
   uint32_t numNetworkAddresses;
 
-  /* An array of network addresses to either send the packet to or
+  /**
+   * An array of network addresses to either send the packet to or
    * exclude from a broadcast.
-   **/
+   */
   FOMNetwork::NetworkAddress* networkAddresses;
 
-  /* The priority of the packet to be sent to the networking library. */
+  /**
+   * The priority of the packet to be sent to the networking library.
+   */
   uint8_t priority;
 
-  /* The reliability of the packet to be sent to the networking library. */
+  /**
+   * The reliability of the packet to be sent to the networking library.
+   */
   uint8_t reliability;
 
-  /* The ordering channel for the packet to be sent to the networking library.
+  /**
+   * The ordering channel for the packet to be sent to the networking library.
    */
   uint8_t orderingChannel;
 
-  /* A boolean indicating whether or not the packet should be a broadcast. */
+  /**
+   * A boolean indicating whether or not the packet should be a broadcast.
+   */
   int8_t broadcast;
 };
 #pragma pack(pop)
@@ -129,7 +143,10 @@ FOM_API int32_t FOMNetwork_ProcessPackets(RakPeerInterface* peer,
  * @param peer A pointer to the network interface.
  * @param packets A buffer of packet structures to serialize and send.
  * @param count The number of packets in the buffer.
- * @return The number of packets sent, -1 on error.
+ * @return int32_t The number of packets sent or a status code on error.
+ * @retval >=0 The number of packets sent.
+ * @retval -1 No packets were provided to send.
+ * @retval -2 A broadcast packet specified more than one network address.
  */
 FOM_API int32_t FOMNetwork_Send(RakPeerInterface* peer,
                                 const SendPacket* packets, int32_t count);
