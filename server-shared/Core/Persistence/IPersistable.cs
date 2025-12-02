@@ -4,11 +4,18 @@ namespace FOMServer.Shared.Core.Persistence
     /// Handler for persistence change events.
     /// </summary>
     /// <param name="entity">The entity that changed.</param>
-    /// <param name="associations">
-    /// Entities that should be considered as dependent on the persistence
+    /// <param name="association">
+    /// An entity that should be considered as dependent on the persistence
     /// of the changed entity.
     /// </param>
-    public delegate bool PersistenceChangedHandler(IPersistable entity, IEnumerable<IPersistable>? associations);
+    /// <param name="additionalAssociations">
+    /// Additional entities to be considered dependent.
+    /// </param>
+    /// <returns>True if the change was enqueued, false if rejected (e.g., entity is waiting for persistence).</returns>
+    public delegate bool PersistenceChangedHandler(
+        IPersistable entity,
+        IPersistable? association = null,
+        IEnumerable<IPersistable>? additionalAssociations = null);
 
     /// <summary>
     /// Marks a domain entity as persistable.
@@ -18,6 +25,6 @@ namespace FOMServer.Shared.Core.Persistence
         /// <summary>
         /// Raised when the object's state changes and requires persistence.
         /// </summary>
-        event PersistenceChangedHandler OnChanged;
+        event PersistenceChangedHandler? OnPersistableChange;
     }
 }

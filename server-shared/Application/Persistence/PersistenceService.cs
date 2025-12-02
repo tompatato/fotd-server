@@ -9,7 +9,7 @@ namespace FOMServer.Shared.Application.Persistence
     /// <summary>
     /// Coordinates persistence requests across entities.
     /// </summary>
-    public class PersistenceService : IPersistenceService
+    public class PersistenceService : IPersistenceService, IServerStartable
     {
         private const int PersistenceDelayMs = 50;
 
@@ -108,10 +108,13 @@ namespace FOMServer.Shared.Application.Persistence
 
         public void Register(IPersistable entity)
         {
-            entity.OnChanged += Enqueue;
+            entity.OnPersistableChange += Enqueue;
         }
 
-        private bool Enqueue(IPersistable entity, IEnumerable<IPersistable>? associations)
+        private bool Enqueue(
+            IPersistable entity,
+            IPersistable? association = null,
+            IEnumerable<IPersistable>? additionalAssociations = null)
         {
             var state = _entityStates.GetOrCreateValue(entity);
 
@@ -122,9 +125,15 @@ namespace FOMServer.Shared.Application.Persistence
             var version = Volatile.Read(in state.Version);
 
             // Record blocking dependencies on each association
-            if (associations != null)
+            if (association != null)
             {
-                foreach (var assoc in associations)
+                var assocState = _entityStates.GetOrCreateValue(association);
+                assocState.AddBlockingDependency(entity, version);
+            }
+
+            if (additionalAssociations != null)
+            {
+                foreach (var assoc in additionalAssociations)
                 {
                     var assocState = _entityStates.GetOrCreateValue(assoc);
                     assocState.AddBlockingDependency(entity, version);
@@ -157,7 +166,7 @@ namespace FOMServer.Shared.Application.Persistence
             });
 
             // Ensure the entity goes through the persistence loop so waits get processed
-            Enqueue(entity, null);
+            Enqueue(entity);
 
             // Block future enqueues after we've queued this one
             Interlocked.Exchange(ref state.IsWaiting, 1);

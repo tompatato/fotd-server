@@ -15,19 +15,13 @@ namespace FOMServer.Master.Application.Players
 
         protected override Player Load(uint id, NetworkAddress clientAddress)
         {
-            var playerDto = _playerRepository.GetByID(id);
-            if (playerDto == null)
+            var playerDTO = _playerRepository.GetByID(id);
+            if (playerDTO == null)
                 throw new InvalidOperationException($"Player {id} not found in database");
 
             var avatar = _playerRepository.GetAvatar(id);
 
-            return new Player
-            {
-                ID = id,
-                ClientAddress = clientAddress,
-                Username = playerDto.username,
-                HasAvatar = avatar != null
-            };
+            return new Player(id, clientAddress, playerDTO.username, avatar);
         }
     }
 }

@@ -1,15 +1,11 @@
-using FOMServer.Master.Core.DTOs;
+using FOMServer.Shared.Core.DTOs;
 using FOMServer.Shared.Core.Enums;
+using FOMServer.Shared.Core.Players;
 
 namespace FOMServer.Master.Core.Players
 {
-    public interface IPlayerRepository
+    public interface IPlayerRepository : IPlayerRepositoryBase
     {
-        /// <summary>
-        /// Gets the player by their ID.
-        /// </summary>
-        PlayerDto? GetByID(uint id);
-
         /// <summary>
         /// Gets the player ID for the given username.
         /// </summary>
@@ -21,14 +17,9 @@ namespace FOMServer.Master.Core.Players
         uint? GetIDByName(string name);
 
         /// <summary>
-        /// Loads the avatar for the given player ID.
-        /// </summary>
-        AvatarDto? GetAvatar(uint playerID);
-
-        /// <summary>
         /// Creates a new avatar for the given player.
         /// </summary>
-        AvatarDto? CreateAvatar(
+        AvatarDTO? CreateAvatar(
             uint playerID,
             Faction faction,
             string name,

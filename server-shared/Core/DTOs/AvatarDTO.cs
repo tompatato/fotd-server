@@ -1,10 +1,9 @@
 using FOMServer.Shared.Core.Enums;
 
-namespace FOMServer.Master.Core.DTOs
+namespace FOMServer.Shared.Core.DTOs
 {
-    public class AvatarDto
+    public class AvatarDTO
     {
-        public uint player_id { get; init; }
         public string name { get; init; } = "";
         public Faction faction { get; init; }
         public AvatarSex sex { get; init; }

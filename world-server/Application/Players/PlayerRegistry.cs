@@ -6,13 +6,29 @@ namespace FOMServer.World.Application.Players
 {
     public class PlayerRegistry : BasePlayerRegistry<Player>, IPlayerRegistry
     {
+        private readonly IPlayerRepository _playerRepository;
+
+        public PlayerRegistry(IPlayerRepository playerRepository)
+        {
+            _playerRepository = playerRepository;
+        }
+
         protected override Player Load(uint id, NetworkAddress clientAddress)
         {
-            return new Player
-            {
-                ID = id,
-                ClientAddress = clientAddress
-            };
+            var playerDTO = _playerRepository.GetByID(id);
+            if (playerDTO == null)
+                throw new InvalidOperationException($"Player {id} not found in database");
+
+            var avatarDTO = _playerRepository.GetAvatar(id);
+            if (avatarDTO == null)
+                throw new InvalidOperationException($"Avatar for player {id} not found in database");
+
+            var attributeDTOs = _playerRepository.GetAttributes(id);
+            var attributeValues = new int[PlayerAttributes.AttributeCount];
+            foreach (var attr in attributeDTOs)
+                attributeValues[attr.attribute_id] = attr.value;
+
+            return new Player(id, clientAddress, avatarDTO, attributeValues);
         }
     }
 }

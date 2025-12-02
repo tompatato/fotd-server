@@ -1,28 +1,18 @@
 using Dapper;
-using FOMServer.Master.Core.DTOs;
 using FOMServer.Master.Core.Players;
+using FOMServer.Shared.Core.DTOs;
 using FOMServer.Shared.Core.Enums;
 using FOMServer.Shared.Infrastructure.Database;
+using FOMServer.Shared.Infrastructure.Players;
 using MySqlConnector;
 
 namespace FOMServer.Master.Infrastructure.Repositories
 {
-    public class DbPlayerRepository : IPlayerRepository
+    public class DbPlayerRepository : DbPlayerRepositoryBase, IPlayerRepository
     {
-        private IDbConnectionFactory _dbConnectionFactory;
-
         public DbPlayerRepository(IDbConnectionFactory dbConnectionFactory)
+            : base(dbConnectionFactory)
         {
-            _dbConnectionFactory = dbConnectionFactory;
-        }
-
-        public PlayerDto? GetByID(uint id)
-        {
-            using var connection = _dbConnectionFactory.Create();
-            return connection.QuerySingleOrDefault<PlayerDto>(
-                "SELECT `id`, `username` FROM `player` WHERE `id` = @id",
-                new { id }
-            );
         }
 
         public uint? GetIDByUsername(string username)
@@ -43,16 +33,7 @@ namespace FOMServer.Master.Infrastructure.Repositories
             );
         }
 
-        public AvatarDto? GetAvatar(uint playerID)
-        {
-            using var connection = _dbConnectionFactory.Create();
-            return connection.QueryFirstOrDefault<AvatarDto?>(
-                "SELECT `player_id`, `name`, `faction`, `sex`, `skin_color`, `face`, `hair` FROM `avatar` WHERE `player_id` = @playerID",
-                new { playerID }
-            );
-        }
-
-        public AvatarDto? CreateAvatar(
+        public AvatarDTO? CreateAvatar(
             uint playerID,
             Faction faction,
             string name,
@@ -74,9 +55,8 @@ namespace FOMServer.Master.Infrastructure.Repositories
                     new { playerID, faction, name, biography, sex, skinColor, face, hair }
                 );
 
-                return new AvatarDto
+                return new AvatarDTO
                 {
-                    player_id = playerID,
                     name = name,
                     faction = faction,
                     sex = sex,
@@ -90,5 +70,6 @@ namespace FOMServer.Master.Infrastructure.Repositories
                 return null;
             }
         }
+
     }
 }

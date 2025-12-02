@@ -1,6 +1,7 @@
 using FOMServer.Application.Core;
 using FOMServer.Shared.Core;
 using FOMServer.Shared.Core.Enums;
+using FOMServer.Shared.Core.Persistence;
 using FOMServer.Shared.Extensions;
 using FOMServer.Shared.Infrastructure.Database;
 using FOMServer.World.Application;
@@ -10,6 +11,8 @@ using FOMServer.World.Core;
 using FOMServer.World.Core.Networking;
 using FOMServer.World.Core.Players;
 using FOMServer.World.Infrastructure.Database;
+using FOMServer.World.Infrastructure.Persistence;
+using FOMServer.World.Infrastructure.Players;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -36,6 +39,7 @@ namespace FOMServer.World
             services.AddServerShared();
             services.AddWorldServices();
             services.AddRepositories();
+            services.AddPersistenceHandlers();
 
             services.AddSingleton<Server>();
             return services.BuildServiceProvider();
@@ -88,6 +92,13 @@ namespace FOMServer.World
 
         private static ServiceCollection AddRepositories(this ServiceCollection services)
         {
+            services.AddSingleton<IPlayerRepository, DbPlayerRepository>();
+            return services;
+        }
+
+        private static ServiceCollection AddPersistenceHandlers(this ServiceCollection services)
+        {
+            services.AddSingleton<IPersistenceHandler, DbPlayerAttributesPersistenceHandler>();
             return services;
         }
     }
