@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using FOMServer.Shared.Core.Enums;
 using FOMServer.Shared.Core.Persistence;
+using FOMServer.Shared.Core.Players;
 using FOMServer.World.Core.Exceptions;
 
 namespace FOMServer.World.Core.Players
@@ -20,15 +22,13 @@ namespace FOMServer.World.Core.Players
     /// <see cref="AttributeDeadlockException"/> if acquisition times out.
     /// </para>
     /// </remarks>
-    public sealed class PlayerAttributes : IPersistable
+    public class PlayerAttributes : IPersistable
     {
         public const int AttributeCount = (int)PlayerAttribute.NUM_ATTRIBUTES;
 
-        private const int DeadlockSpinThreshold = 10_000_000;
-
         private static readonly AttributeMetadata[] s_metadata;
 
-        private readonly Player _player;
+        private readonly PlayerSession _session;
         private readonly int[] _values;
         private readonly int[] _locks;
 
@@ -44,9 +44,9 @@ namespace FOMServer.World.Core.Players
             s_metadata[(int)PlayerAttribute.XP] = new() { Max = int.MaxValue, LockRequired = false };
         }
 
-        public PlayerAttributes(Player player, int[]? initialValues = null)
+        public PlayerAttributes(PlayerSession session, int[]? initialValues = null)
         {
-            _player = player;
+            _session = session;
             _values = new int[(int)PlayerAttribute.NUM_ATTRIBUTES];
             _locks = new int[(int)PlayerAttribute.NUM_ATTRIBUTES];
 
@@ -54,9 +54,9 @@ namespace FOMServer.World.Core.Players
                 initialValues.CopyTo(_values, 0);
         }
 
-        public event PersistenceChangedHandler? OnPersistableChange;
+        public event PersistableChangeCallback? OnPersistableChange;
 
-        public uint PlayerID => _player.ID;
+        public uint PlayerID => _session.ID;
 
         /// <summary>
         /// Gets the current value of an attribute, clamped to [0, Max].
@@ -87,7 +87,7 @@ namespace FOMServer.World.Core.Players
                 Thread.SpinWait(1);
 
             Volatile.Write(ref _values[index], Math.Min((int)value, metadata.Max));
-            OnPersistableChange?.Invoke(this, _player);
+            OnPersistableChange?.Invoke(this, _session);
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace FOMServer.World.Core.Players
                 Thread.SpinWait(1);
 
             var result = (uint)Math.Clamp(Interlocked.Add(ref _values[index], delta), 0, metadata.Max);
-            OnPersistableChange?.Invoke(this, _player);
+            OnPersistableChange?.Invoke(this, _session);
             return result;
         }
 
@@ -138,22 +138,24 @@ namespace FOMServer.World.Core.Players
             private bool _changed;
             private bool _disposed;
 
-            internal LockedAttribute(PlayerAttributes parent, PlayerAttribute attribute)
+            public LockedAttribute(PlayerAttributes parent, PlayerAttribute attribute)
             {
                 _parent = parent;
                 _attribute = attribute;
                 _changed = false;
                 _disposed = false;
 
+                // Attempt to acquire the lock with a 100ms timeout to avoid deadlocks.
                 int index = (int)attribute;
-                int spins = 0;
+                var spinner = new SpinWait();
+                long timeoutTimestamp = Stopwatch.GetTimestamp() + (Stopwatch.Frequency / 10);
 
                 while (Interlocked.CompareExchange(ref _parent._locks[index], 1, 0) != 0)
                 {
-                    if (++spins > DeadlockSpinThreshold)
-                        throw new AttributeDeadlockException(attribute);
+                    spinner.SpinOnce();
 
-                    Thread.SpinWait(1);
+                    if (spinner.NextSpinWillYield && Stopwatch.GetTimestamp() > timeoutTimestamp)
+                        throw new AttributeDeadlockException(attribute);
                 }
             }
 
@@ -200,7 +202,7 @@ namespace FOMServer.World.Core.Players
                 Volatile.Write(ref _parent._locks[(int)_attribute], 0);
 
                 if (_changed)
-                    _parent.OnPersistableChange?.Invoke(_parent, _parent._player);
+                    _parent.OnPersistableChange?.Invoke(_parent, _parent._session);
             }
         }
 
