@@ -3,8 +3,9 @@ using System.Diagnostics.Metrics;
 using System.Runtime.CompilerServices;
 using FOMServer.Shared.Core.Enums;
 using FOMServer.Shared.Core.Packets;
+using FOMServer.Shared.Infrastructure.FOMNetwork;
 
-namespace FOMServer.Shared.Core.Networking
+namespace FOMServer.Shared.Application.Networking
 {
     /// <summary>
     /// A buffer for holding packet data that has been

@@ -1,4 +1,6 @@
-namespace FOMServer.Shared.Core.Networking
+using FOMServer.Shared.Application.Networking;
+
+namespace FOMServer.Shared.Infrastructure.FOMNetwork
 {
     public interface IPacketService
     {
@@ -24,6 +26,6 @@ namespace FOMServer.Shared.Core.Networking
         /// <summary>
         /// Sends packets to the specified destinations.
         /// </summary>
-        void Send(IntPtr peer, Span<SendPacket> packets);
+        void Send(IntPtr peer, ReadOnlySpan<SendPacket> packets);
     }
 }
