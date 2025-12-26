@@ -9,8 +9,6 @@ namespace FOMNetwork {
  * associated sizes.
  */
 const std::unordered_map<uint8_t, size_t> FOMDataSerializer::PacketSizes = {
-    {ID_FOM_PACKET_READ_ERROR, sizeof(Packet::ReadPacketError)},
-
     // RakNet Packets
     {ID_ALREADY_CONNECTED, sizeof(Packet::AlreadyConnected)},
     {ID_CONNECTION_ATTEMPT_FAILED, sizeof(Packet::ConnectionAttemptFailed)},
@@ -27,6 +25,10 @@ const std::unordered_map<uint8_t, size_t> FOMDataSerializer::PacketSizes = {
 
     // Game Packets
     {ID_REGISTER_WORLD, sizeof(Packet::RegisterWorld)},
+    {ID_LOGIN_REQUEST, sizeof(Packet::LoginRequest)},
+    {ID_LOGIN_REQUEST_RETURN, sizeof(Packet::LoginRequestReturn)},
+    {ID_LOGIN, sizeof(Packet::Login)},
+    {ID_LOGIN_TOKEN_CHECK, sizeof(Packet::LoginTokenCheck)},
 };
 
 /**
@@ -35,6 +37,8 @@ const std::unordered_map<uint8_t, size_t> FOMDataSerializer::PacketSizes = {
  */
 static const std::unordered_map<uint32_t, IWriter*> writerMap = {
     {ID_REGISTER_WORLD, &RegisterWorldSerializer::GetInstance()},
+    {ID_LOGIN_REQUEST_RETURN, &LoginRequestReturnSerializer::GetInstance()},
+    {ID_LOGIN_TOKEN_CHECK, &LoginTokenCheckSerializer::GetInstance()},
 };
 
 static const std::unordered_map<uint32_t, IReader*> readerMap = {
@@ -53,6 +57,9 @@ static const std::unordered_map<uint32_t, IReader*> readerMap = {
 
     // Game Packets
     {ID_REGISTER_WORLD, &RegisterWorldSerializer::GetInstance()},
+    {ID_LOGIN_REQUEST, &LoginRequestSerializer::GetInstance()},
+    {ID_LOGIN, &LoginSerializer::GetInstance()},
+    {ID_LOGIN_TOKEN_CHECK, &LoginTokenCheckSerializer::GetInstance()},
 };
 
 bool FOMDataSerializer::Write(RakNet::BitStream& bs, const PacketIdentifier id,
@@ -76,32 +83,15 @@ bool FOMDataSerializer::Read(RakNet::BitStream& bs, const PacketIdentifier id,
                              uint8_t* dataBuffer) {
   const auto* reader = GetReader(id);
   if (!reader) {
-    Packet::ReadPacketError* data =
-        reinterpret_cast<Packet::ReadPacketError*>(dataBuffer);
-    data->offendingID = id;
-    data->errorCode = Packet::ReadPacketErrorCode::ERROR_UNHANDLED_PACKET_ID;
-    return true;
+    return false;
   }
 
   // Make sure to catch any deserialization errors so that
   // the library does not crash the consuming application.
   try {
-    bool ret = reader->Read(bs, dataBuffer);
-    if (!ret) {
-      Packet::ReadPacketError* data =
-          reinterpret_cast<Packet::ReadPacketError*>(dataBuffer);
-      data->offendingID = id;
-      data->errorCode = Packet::ReadPacketErrorCode::ERROR_READ;
-      return true;
-    }
-
-    return ret;
+    return reader->Read(bs, dataBuffer);
   } catch (const std::exception& e) {
-    Packet::ReadPacketError* data =
-        reinterpret_cast<Packet::ReadPacketError*>(dataBuffer);
-    data->offendingID = id;
-    data->errorCode = Packet::ReadPacketErrorCode::ERROR_READ;
-    return true;
+    return false;
   }
 }
 
