@@ -1,7 +1,7 @@
-using FOMServer.Shared.Application.Players;
-using FOMServer.Shared.Core.Packets;
+using FOMServer.Shared.Application.Player;
+using FOMServer.Shared.Core.Packets.Types;
 using FOMServer.Shared.Core.Players;
-using FOMServer.World.Core.Players;
+using FOMServer.World.Core.Player;
 
 namespace FOMServer.World.Application.Players
 {
@@ -20,19 +20,9 @@ namespace FOMServer.World.Application.Players
             if (playerDTO == null)
                 throw new InvalidOperationException($"Player {id} not found in database");
 
-            var avatarDTO = _playerRepository.GetAvatar(id);
-            if (avatarDTO == null)
-                throw new InvalidOperationException($"Avatar for player {id} not found in database");
-
-            var attributeDTOs = _playerRepository.GetAttributes(id);
-            var attributeValues = new int[PlayerAttributes.AttributeCount];
-            foreach (var attr in attributeDTOs)
-                attributeValues[attr.attribute_id] = attr.value;
-
             var session = new PlayerSession(id, clientAddress);
-            var attributes = new PlayerAttributes(session, attributeValues);
 
-            return new Player(session, avatarDTO, attributes);
+            return new Player(session);
         }
     }
 }
