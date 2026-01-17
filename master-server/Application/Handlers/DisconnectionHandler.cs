@@ -1,5 +1,5 @@
 using FOMServer.Master.Core.Networking;
-using FOMServer.Master.Core.Player;
+using FOMServer.Master.Core.Players;
 using FOMServer.Shared.Core.Enums;
 using FOMServer.Shared.Core.Handlers;
 using FOMServer.Shared.Core.Logging;
@@ -40,18 +40,14 @@ namespace FOMServer.Master.Application.Handlers
 
         private bool TryWorldServerUnregister(NetworkAddress sender)
         {
-            var worldServers = _worldServerRegistry.GetAll();
-            foreach (var server in worldServers)
-            {
-                if (!server.ServerAddress.Equals(sender))
-                    continue;
+            var unregistered = _worldServerRegistry.Unregister(sender);
+            if (unregistered.Length == 0)
+                return false;
 
-                _logService.WriteMessage(LogLevel.Info, $"World '{server.ID}' Disconnected");
-                _worldServerRegistry.Unregister(server.ID);
-                return true;
-            }
+            foreach (var worldID in unregistered)
+                _logService.WriteMessage(LogLevel.Info, $"World '{worldID}' Disconnected");
 
-            return false;
+            return true;
         }
 
         private bool TryPlayerLogout(NetworkAddress sender)
