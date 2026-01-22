@@ -2,17 +2,13 @@ using FOMServer.Application.Core;
 using FOMServer.Shared.Core;
 using FOMServer.Shared.Core.Enums;
 using FOMServer.Shared.Extensions;
-using FOMServer.Shared.Infrastructure.Database;
+using FOMServer.Shared.Infrastructure;
 using FOMServer.World.Application;
 using FOMServer.World.Application.Networking;
-using FOMServer.World.Application.Players;
 using FOMServer.World.Core;
 using FOMServer.World.Core.Networking;
-using FOMServer.World.Core.Players;
-using FOMServer.World.Infrastructure.Database;
-using FOMServer.World.Infrastructure.Players;
+using FOMServer.World.Infrastructure;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace FOMServer.World
 {
@@ -31,8 +27,8 @@ namespace FOMServer.World
             // Run before anything else so that the cached settings in this class are available.
             services.AddConfiguration();
 
-            // Start the log service as early as possible so that everything is logged.
-            services.StartLogService(shutdownManager);
+            // Configure logging as early as possible so that everything is logged.
+            services.ConfigureLogging(shutdownManager);
 
             services.AddServerShared();
             services.AddWorldServices();
@@ -86,14 +82,11 @@ namespace FOMServer.World
             services.AddSingleton<IMasterPacketSender>(sp => sp.GetRequiredService<MasterPacketSender>());
 
             services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
-            services.AddSingleton<IPlayerRegistry, PlayerRegistry>();
-            services.AddSingleton<ILoginService, LoginService>();
             return services;
         }
 
         private static ServiceCollection AddRepositories(this ServiceCollection services)
         {
-            services.AddSingleton<IPlayerRepository, DbPlayerRepository>();
             return services;
         }
 

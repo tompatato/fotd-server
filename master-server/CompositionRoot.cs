@@ -2,17 +2,13 @@ using FluentMigrator.Runner;
 using FOMServer.Application.Core;
 using FOMServer.Master.Application;
 using FOMServer.Master.Application.Networking;
-using FOMServer.Master.Application.Players;
 using FOMServer.Master.Core;
 using FOMServer.Master.Core.Networking;
-using FOMServer.Master.Core.Players;
-using FOMServer.Master.Infrastructure.Factories;
-using FOMServer.Master.Infrastructure.Players;
+using FOMServer.Master.Infrastructure;
 using FOMServer.Shared.Core;
 using FOMServer.Shared.Extensions;
-using FOMServer.Shared.Infrastructure.Database;
+using FOMServer.Shared.Infrastructure;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace FOMServer.Master
 {
@@ -30,8 +26,8 @@ namespace FOMServer.Master
             // Run before anything else so that the cached settings in this class are available.
             services.AddConfiguration();
 
-            // Start the log service as early as possible so that everything is logged.
-            services.StartLogService(shutdownManager);
+            // Configure logging as early as possible so that everything is logged.
+            services.ConfigureLogging(shutdownManager);
 
             services.AddServerShared();
             services.AddMasterServices();
@@ -71,8 +67,6 @@ namespace FOMServer.Master
             services.AddSingleton<IWorldPacketSender>(sp => sp.GetRequiredService<WorldPacketSender>());
 
             services.AddSingleton<IWorldServerRegistry, WorldServerRegistry>();
-            services.AddSingleton<IPlayerRegistry, PlayerRegistry>();
-            services.AddSingleton<ILoginService, LoginService>();
             return services;
         }
 
@@ -89,17 +83,15 @@ namespace FOMServer.Master
             {
                 rb.AddMySql8()
                   .WithGlobalConnectionString(s_dbSettings!.ConnectionString)
-                  .ScanIn(typeof(Server).Assembly).For.Migrations();
-            })
-            .AddLogging(lb => lb.AddFluentMigratorConsole());
+                  .ScanIn(typeof(Shared.Extensions.ServiceCollectionExtensions).Assembly)
+                  .For.Migrations();
+            });
 
             return services;
         }
 
         private static ServiceCollection AddRepositories(this ServiceCollection services)
         {
-            services.AddSingleton<ILoginRepository, DbLoginRepository>();
-            services.AddSingleton<IPlayerRepository, DbPlayerRepository>();
             return services;
         }
     }
