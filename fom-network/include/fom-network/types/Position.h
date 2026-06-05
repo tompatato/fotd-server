@@ -10,7 +10,6 @@ struct Position {
   int16_t x;
   int16_t y;
   int16_t z;
-  uint16_t rot;
 };
 #pragma pack(pop)
 

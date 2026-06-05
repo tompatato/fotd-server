@@ -5,6 +5,7 @@
 #include "TypeSerializer.h"
 
 namespace FOMNetwork {
+namespace Type {
 
 class AvatarSerializer : protected TypeSerializer<Type::Avatar> {
  public:
@@ -22,23 +23,25 @@ class AvatarSerializer : protected TypeSerializer<Type::Avatar> {
     WriteBits(bs, data.unknown1, 6);
     WriteBits(bs, data.legacyFactionId, 4);
 
-    for (int i = 0; i < Enum::NUM_BASIC_EQUIPMENT_SLOTS; ++i)
-      WriteBits(bs, data.equipmentSlots[i], 12);
+    WriteBits(bs, data.shirt, 12);
+    WriteBits(bs, data.bottoms, 12);
+    WriteBits(bs, data.shoes, 12);
 
-    bool hasExtendedEquipment = false;
-    for (int i = Enum::NUM_BASIC_EQUIPMENT_SLOTS; i < Enum::NUM_EQUIPMENT_SLOTS;
-         ++i) {
-      if (data.equipmentSlots[i] != 0) {
-        hasExtendedEquipment = true;
-        break;
-      }
-    }
+    bool hasAttachments = data.hat || data.head || data.eyes || data.shoulder ||
+                          data.arms || data.torso || data.back || data.legs ||
+                          data.hands;
 
-    bs.Write(hasExtendedEquipment);
-    if (hasExtendedEquipment) {
-      for (int i = Enum::NUM_BASIC_EQUIPMENT_SLOTS;
-           i < Enum::NUM_EQUIPMENT_SLOTS; ++i)
-        WriteBits(bs, data.equipmentSlots[i], 12);
+    bs.Write(hasAttachments);
+    if (hasAttachments) {
+      WriteBits(bs, data.hat, 12);
+      WriteBits(bs, data.head, 12);
+      WriteBits(bs, data.eyes, 12);
+      WriteBits(bs, data.shoulder, 12);
+      WriteBits(bs, data.arms, 12);
+      WriteBits(bs, data.torso, 12);
+      WriteBits(bs, data.back, 12);
+      WriteBits(bs, data.legs, 12);
+      WriteBits(bs, data.hands, 12);
     }
 
     bs.Write(data.isCommander == 1);
@@ -64,17 +67,22 @@ class AvatarSerializer : protected TypeSerializer<Type::Avatar> {
     if (!ReadBits(bs, data.unknown1, 6)) return false;
     if (!ReadBits(bs, data.legacyFactionId, 4)) return false;
 
-    for (int i = 0; i < Enum::NUM_BASIC_EQUIPMENT_SLOTS; ++i) {
-      if (!ReadBits(bs, data.equipmentSlots[i], 12)) return false;
-    }
+    if (!ReadBits(bs, data.shirt, 12)) return false;
+    if (!ReadBits(bs, data.bottoms, 12)) return false;
+    if (!ReadBits(bs, data.shoes, 12)) return false;
 
-    bool hasExtendedEquipment;
-    if (!bs.Read(hasExtendedEquipment)) return false;
-    if (hasExtendedEquipment) {
-      for (int i = Enum::NUM_BASIC_EQUIPMENT_SLOTS;
-           i < Enum::NUM_EQUIPMENT_SLOTS; ++i) {
-        if (!ReadBits(bs, data.equipmentSlots[i], 12)) return false;
-      }
+    bool hasAttachments;
+    if (!bs.Read(hasAttachments)) return false;
+    if (hasAttachments) {
+      if (!ReadBits(bs, data.hat, 12)) return false;
+      if (!ReadBits(bs, data.head, 12)) return false;
+      if (!ReadBits(bs, data.eyes, 12)) return false;
+      if (!ReadBits(bs, data.shoulder, 12)) return false;
+      if (!ReadBits(bs, data.arms, 12)) return false;
+      if (!ReadBits(bs, data.torso, 12)) return false;
+      if (!ReadBits(bs, data.back, 12)) return false;
+      if (!ReadBits(bs, data.legs, 12)) return false;
+      if (!ReadBits(bs, data.hands, 12)) return false;
     }
 
     bool isCommander, unknown2, unknown3, isGroupLeader;
@@ -91,4 +99,5 @@ class AvatarSerializer : protected TypeSerializer<Type::Avatar> {
   }
 };
 
+}  // namespace Type
 }  // namespace FOMNetwork

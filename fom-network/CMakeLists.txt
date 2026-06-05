@@ -14,6 +14,7 @@ set(FOMNETWORK_SRC
 
   # Types
   "src/types/ItemListSerializer.cpp"
+  "src/types/WorldUpdateSerializer.cpp"
 
   # Packets
   "src/packets/RegisterWorldSerializer.cpp"
@@ -32,6 +33,8 @@ set(FOMNETWORK_SRC
   "src/packets/PlayerLeavingWorldSerializer.cpp"
   "src/packets/RegisterClientSerializer.cpp"
   "src/packets/RegisterClientReturnSerializer.cpp"
+  "src/packets/UpdateSerializer.cpp"
+  "src/packets/WorldUpdateSerializer.cpp"
 )
 set(FOMNETWORK_INC
   # Core API
@@ -50,8 +53,9 @@ set(FOMNETWORK_INC
   "include/fom-network/enums/SerializationStatus.h"
   "include/fom-network/enums/AccountType.h"
   "include/fom-network/enums/WorldId.h"
-  "include/fom-network/enums/Player.h"
+  "include/fom-network/enums/Avatar.h"
   "include/fom-network/enums/ItemType.h"
+  "include/fom-network/enums/ItemSlot.h"
   "include/fom-network/enums/ItemSecurity.h"
   "include/fom-network/enums/ItemQuality.h"
   "include/fom-network/enums/ApartmentType.h"
@@ -79,6 +83,8 @@ set(FOMNETWORK_INC
   "src/types/ItemListSerializer.h"
   "include/fom-network/types/Position.h"
   "src/types/PositionSerializer.h"
+  "include/fom-network/types/PositionRotation.h"
+  "src/types/PositionRotationSerializer.h"
   "include/fom-network/types/PlayerAttributes.h"
   "src/types/PlayerAttributesSerializer.h"
   "include/fom-network/types/PlayerSkill.h"
@@ -91,6 +97,8 @@ set(FOMNETWORK_INC
   "include/fom-network/types/FactionPerk.h"
   "include/fom-network/types/FactionPerks.h"
   "src/types/FactionPerksSerializer.h"
+  "include/fom-network/types/WorldUpdate.h"
+  "src/types/WorldUpdateSerializer.h"
 
   # RakNet Packets
   "include/fom-network/packets/raknet/AlreadyConnected.h"
@@ -123,6 +131,8 @@ set(FOMNETWORK_INC
   "include/fom-network/packets/PlayerLeavingWorld.h"
   "include/fom-network/packets/RegisterClient.h"
   "include/fom-network/packets/RegisterClientReturn.h"
+  "include/fom-network/packets/Update.h"
+  "include/fom-network/packets/WorldUpdate.h"
 )
 set(FOMNETWORK_TEST
     "tests/FOMDataSerializer_test.cpp"

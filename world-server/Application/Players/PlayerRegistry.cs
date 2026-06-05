@@ -9,14 +9,19 @@ namespace FOMServer.World.Application.Players
     {
         private readonly IPersistenceService _persistenceService;
         private readonly TimeProvider _timeProvider;
+        private readonly IPlayerUpdateService _playerUpdateService;
         private readonly ConcurrentDictionary<uint, Player> _players = new();
         private readonly ConcurrentDictionary<NetworkAddress, Player> _playersByAddress = new();
         private readonly ConcurrentDictionary<uint, PendingPlayer> _pendingPlayers = new();
 
-        public PlayerRegistry(IPersistenceService persistenceService, TimeProvider timeProvider)
+        public PlayerRegistry(
+            IPersistenceService persistenceService,
+            TimeProvider timeProvider,
+            IPlayerUpdateService playerUpdateService)
         {
             _persistenceService = persistenceService;
             _timeProvider = timeProvider;
+            _playerUpdateService = playerUpdateService;
         }
 
         public Player? Get(uint playerId)
@@ -27,6 +32,11 @@ namespace FOMServer.World.Application.Players
         public Player? Get(NetworkAddress address)
         {
             return _playersByAddress.GetValueOrDefault(address);
+        }
+
+        public IEnumerable<Player> GetAll()
+        {
+            return _players.Values;
         }
 
         public Player PrepareForClient(uint playerId, uint clientBinaryAddress)
@@ -45,7 +55,7 @@ namespace FOMServer.World.Application.Players
 
             if (pending.IsExpired(_timeProvider.GetUtcNow()))
             {
-                _pendingPlayers.TryRemove(new KeyValuePair<uint, PendingPlayer>(playerId, pending));
+                _pendingPlayers.TryRemove(new(playerId, pending));
                 return null;
             }
 
@@ -54,7 +64,7 @@ namespace FOMServer.World.Application.Players
                 return null;
             }
 
-            if (!_pendingPlayers.TryRemove(new KeyValuePair<uint, PendingPlayer>(playerId, pending)))
+            if (!_pendingPlayers.TryRemove(new(playerId, pending)))
             {
                 return null;
             }
@@ -69,17 +79,20 @@ namespace FOMServer.World.Application.Players
 
             _playersByAddress[sender] = player;
             _persistenceService.Register(player);
+            _playerUpdateService.RegisterRecipient(player);
             return player;
         }
 
         public void Logout(Player player)
         {
+            _playerUpdateService.UnregisterRecipient(player);
+
             _persistenceService.WaitForPersistence(
                 player,
                 () =>
                 {
-                    _playersByAddress.TryRemove(new KeyValuePair<NetworkAddress, Player>(player.Address, player));
-                    _players.TryRemove(new KeyValuePair<uint, Player>(player.Id, player));
+                    _playersByAddress.TryRemove(new(player.Address, player));
+                    _players.TryRemove(new(player.Id, player));
                 });
         }
 

@@ -8,6 +8,5 @@ namespace FOMServer.Shared.Core.Packets.Types
         public short X;
         public short Y;
         public short Z;
-        public ushort Rotation;
     }
 }

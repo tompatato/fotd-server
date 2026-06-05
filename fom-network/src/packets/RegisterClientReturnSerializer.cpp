@@ -9,22 +9,23 @@
 #include "../types/PlayerAttributesSerializer.h"
 #include "../types/PlayerProfileSerializer.h"
 #include "../types/PlayerSkillsSerializer.h"
-#include "../types/PositionSerializer.h"
+#include "../types/PositionRotationSerializer.h"
 #include "PacketSerializers.h"
 
 namespace FOMNetwork {
+namespace Packet {
 
 void RegisterClientReturnSerializer::Write(
     RakNet::BitStream& bs, const Packet::RegisterClientReturn* data) const {
-  ItemListSerializer itemListSerializer;
-  ItemSerializer itemSerializer;
-  AvatarSerializer avatarSerializer;
-  PlayerAttributesSerializer attributesSerializer;
-  PositionSerializer positionSerializer;
-  PlayerProfileSerializer profileSerializer;
-  FactionEmblemSerializer emblemSerializer;
-  PlayerSkillsSerializer skillsSerializer;
-  FactionPerksSerializer perksSerializer;
+  Type::ItemListSerializer itemListSerializer;
+  Type::ItemSerializer itemSerializer;
+  Type::AvatarSerializer avatarSerializer;
+  Type::PlayerAttributesSerializer attributesSerializer;
+  Type::PositionRotationSerializer positionSerializer;
+  Type::PlayerProfileSerializer profileSerializer;
+  Type::FactionEmblemSerializer emblemSerializer;
+  Type::PlayerSkillsSerializer skillsSerializer;
+  Type::FactionPerksSerializer perksSerializer;
 
   bs.WriteCompressed(data->worldId);
   bs.WriteCompressed(data->playerId);
@@ -32,7 +33,9 @@ void RegisterClientReturnSerializer::Write(
 
   itemListSerializer.Write(bs, data->inventory);
 
-  for (int i = 0; i < Enum::NUM_EQUIPMENT_SLOTS; ++i) {
+  for (int i = 0;
+       i < Enum::ITEM_SLOT_EQUIPMENT_END - Enum::ITEM_SLOT_EQUIPMENT_START;
+       ++i) {
     bs.Write(data->equipment[i].id != 0);
     if (data->equipment[i].id != 0)
       itemSerializer.Write(bs, data->equipment[i]);
@@ -82,4 +85,5 @@ void RegisterClientReturnSerializer::Write(
   perksSerializer.Write(bs, data->factionPerks);
 }
 
+}  // namespace Packet
 }  // namespace FOMNetwork

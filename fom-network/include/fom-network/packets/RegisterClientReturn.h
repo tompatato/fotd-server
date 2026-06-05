@@ -2,7 +2,7 @@
 
 #include <fom-network/Interop.h>
 #include <fom-network/constants/PlayerConstants.h>
-#include <fom-network/enums/Player.h>
+#include <fom-network/enums/ItemSlot.h>
 #include <fom-network/types/Avatar.h>
 #include <fom-network/types/FactionEmblem.h>
 #include <fom-network/types/FactionPerks.h>
@@ -11,7 +11,7 @@
 #include <fom-network/types/PlayerAttributes.h>
 #include <fom-network/types/PlayerProfile.h>
 #include <fom-network/types/PlayerSkills.h>
-#include <fom-network/types/Position.h>
+#include <fom-network/types/PositionRotation.h>
 
 namespace FOMNetwork {
 namespace Packet {
@@ -30,7 +30,8 @@ struct RegisterClientReturn {
   uint32_t playerId;
   RegisterClientReturnStatus status;
   Type::ItemList inventory;
-  Type::Item equipment[Enum::NUM_EQUIPMENT_SLOTS];
+  Type::Item equipment[Enum::ITEM_SLOT_EQUIPMENT_END -
+                       Enum::ITEM_SLOT_EQUIPMENT_START];
   Type::Item weapons[Constants::NUM_WEAPON_SLOTS];
   Type::Item unknownSlots[Constants::NUM_UNKNOWN_ITEM_SLOTS];
   Type::ItemList storage;
@@ -43,7 +44,7 @@ struct RegisterClientReturn {
   uint16_t avatarCacheCount;
   Type::Avatar avatarCache[MAX_AVATAR_CACHE];
   uint8_t unknown3;
-  Type::Position safezoneCenter;
+  Type::PositionRotation safezoneCenter;
   uint32_t safezoneRadius;
   uint32_t nodeId;
   uint8_t unknown4;
@@ -51,7 +52,7 @@ struct RegisterClientReturn {
   Type::FactionEmblem factionEmblem;
   uint8_t factionName[BufferSizes::FACTION_NAME];
   Type::PlayerSkills skills;
-  Type::Position spawnPosition;
+  Type::PositionRotation spawnPosition;
   uint8_t spawnAtPosition;
   Type::FactionPerks factionPerks;
 };

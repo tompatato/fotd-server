@@ -165,9 +165,14 @@ expensive IO. This maximizes throughput so that it can handle them as quickly as
   processing, maximizing throughput. Handlers may process packets out of order, but this
   is acceptable for most game logic.
 
-- **Update Thread**: Using `PeriodicTimer`, this thread runs periodic operations based on
-  elapsed time and performs tasks not directly related to packet handling (e.g., timed events,
-  cleanup, scheduled actions).
+- **Tick Service**: A single shared loop drives all periodic work not tied to packet handling
+  (timed events, cleanup, batched player-state broadcasts, and — later — alien AI). Subsystems
+  opt in by implementing `ITickable` (a `TickInterval` plus a `TickAsync`) and registering it;
+  each server registers its own tickables, which the service receives as an injected collection. The loop wakes on a fixed base period
+  (the smallest registered interval) using `PeriodicTimer` and counts wake-ups to decide which
+  tickables are due, staggering equal-interval tickables so they don't bunch onto the same
+  wake-up. Tickables run serially, so a heavy tick delays the others  finer timing
+  within a tick is the tickable's own responsibility.
 
 - **Logging Thread**: In general, logging is an operation that makes use of blocking IO.
   A dedicated thread with a lock-free queue allows for asynchronous logging that does
@@ -194,7 +199,9 @@ new packet types and handlers.
 Multiple `NetworkManager` instances can coexist (e.g., one for client connections, one for
 server-to-server communication). To prevent clients from spoofing internal packets, network
 managers can "claim" packet IDs using `ClaimPacketId()`. When a packet with a claimed ID
-is received by a different network manager, it is ignored and logged.
+is received by a different network manager, it is ignored and logged. A claim can opt out of the
+warning by passing `PacketClaimBehavior.IgnoreSilently` — used for IDs (such as RakNet connection
+packets) that are legitimately expected to arrive on more than one manager.
 
 ### Database Persistence
 
