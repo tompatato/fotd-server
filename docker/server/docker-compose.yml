@@ -7,7 +7,7 @@ x-world-server: &world-server-base
     - db
     - master-server
   environment: &world-server-env
-    Server__PublicHost: "127.0.0.1"
+    Server__ClientHost: "127.0.0.1"
     Server__MasterServerHost: "master-server"
     Database__ConnectionString: "Host=db;Port=3306;Database=fom_server;Username=admin;Password=password;"
   volumes:
