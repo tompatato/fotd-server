@@ -13,8 +13,12 @@ type JSON already lives in the repo. The live half needs the client running.
 tools/re/
   symdb.py     static symbol + type database over disassembly/*.json (stdlib only)
   memory.py    live process memory: find PID, module bases, read/write/scan via /proc
-  fomre.py     CLI tying the two together
-  tests/       unittest suite over the committed JSON (no game, CI-safe)
+  ghidra.py    headless-Ghidra bridge: decompile / xref against the FOTD project
+  fomre.py     CLI tying them together
+  tests/       unittest suite over the committed JSON (no game/Ghidra, CI-safe)
+disassembly/scripts/
+  decompile.py one function -> decompiled C (PyGhidra postScript, JSON out)
+  xref.py      references to/from an address or function (PyGhidra postScript)
 ```
 
 ## The three questions this answers
@@ -27,11 +31,11 @@ members, print a struct's layout, map an enum value to its name.
 
 **2. Does Ghidra have a CLI?**
 Yes — `analyzeHeadless` and **PyGhidra** (`pyghidra_launcher.py --headless`).
-This repo already drives it via `just ghidra-gen` / `just ghidra-dump`
-(see [`disassembly/README.md`](../../disassembly/README.md)). Those rebuild/export
-the labelled project headless. Ghidra is **not installed on this machine yet**;
-to enable on-demand decompilation/xref scripts, install **Ghidra 12.0.4**
-(version-pinned) and set `GHIDRA_INSTALL_DIR`.
+This repo drives it via `just ghidra-gen` / `just ghidra-dump`
+(see [`disassembly/README.md`](../../disassembly/README.md)) to rebuild/export the
+labelled project headless. `ghidra.py` adds on-demand **decompile** and **xref**
+on top: it runs `decompile.py` / `xref.py` as headless postScripts against the
+built `disassembly/FOTD` project and parses their JSON. See *Ghidra setup* below.
 
 **3. Application memory values?**
 The Windows client runs as a normal Linux process under Wine/Proton, so its PE
@@ -56,7 +60,35 @@ python3 tools/re/fomre.py pid                            # find client + module 
 python3 tools/re/fomre.py read CShell.dll:0x103c3fa8 --type ptr
 python3 tools/re/fomre.py struct CShell.dll:0x1030dff0 /FOM/Types/Item/ItemDefinition
 python3 tools/re/fomre.py scan u32 1000                  # find addresses holding 1000
+
+# --- Ghidra (needs the FOTD project + a Ghidra 12.0.4 install; see below) ---
+python3 tools/re/fomre.py decompile "FOM::Player::FillUpdate"     # -> decompiled C
+python3 tools/re/fomre.py xref "FOM::Player::FillUpdate"          # callers
+python3 tools/re/fomre.py xref "FOM::Player::SendUpdate" --direction from
 ```
+
+## Ghidra setup (for `decompile` / `xref`)
+
+These need a **Ghidra 12.0.4** install (the version the `disassembly/` export is
+pinned to) and the labelled project built once with `just ghidra-gen`.
+
+Ghidra 12.0.4 requires a **JDK in [21, 24]** and **PyGhidra** on **Python
+3.10–3.13** (the bundled `jpype` wheels stop at 3.13). If the host's default JDK
+or Python is newer, point Ghidra at compatible ones — `ghidra.py` resolves them:
+
+- Ghidra: `$GHIDRA_INSTALL_DIR` → `tools/re/ghidra.local.json` `install_dir` → `/opt/ghidra`
+- JDK: `$FOTD_GHIDRA_JDK` / `$JAVA_HOME` → `ghidra.local.json` `jdk`
+
+`tools/re/ghidra.local.json` (gitignored) holds this machine's paths, e.g.:
+
+```json
+{ "install_dir": "/path/to/ghidra_12.0.4_PUBLIC", "jdk": "/path/to/jdk-21" }
+```
+
+PyGhidra installs into a Ghidra-managed venv on first `ghidra-gen`; if the
+default `python3` is unsupported, create the venv from a 3.10–3.13 interpreter
+and the launcher reuses it. Without any of this, `decompile`/`xref` raise a clear
+`GhidraUnavailable` — the static DB and live-memory commands are unaffected.
 
 A read/struct target is either a **symbol name** (resolved via the DB) or an
 explicit `program:0xADDR` (the in-image address, as stored in the JSON) — use the

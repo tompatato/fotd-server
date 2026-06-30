@@ -25,6 +25,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import ghidra  # noqa: E402
 import memory  # noqa: E402
 import symdb  # noqa: E402
 
@@ -35,9 +36,11 @@ def _db() -> symdb.SymbolDb:
 
 def _resolve_target(db: symdb.SymbolDb, target: str) -> tuple[str, int]:
     """Return (program, absolute_in_image_addr) from a symbol name or prog:addr."""
-    if ":" in target and not target.lower().endswith((".dll", ".exe", ".lto")):
+    # prog:addr form (e.g. CShell.dll:0x1030dff0) — distinct from a C++ "::" name.
+    if "::" not in target and ":" in target:
         prog, _, addr_s = target.partition(":")
-        return prog, int(addr_s, 0)
+        if prog.lower().endswith((".dll", ".exe", ".lto")):
+            return prog, int(addr_s, 0)
     matches = db.resolve(target)
     if not matches:
         sub = db.search(target)
@@ -212,6 +215,40 @@ def cmd_scan(args):
         print(f"  ... {len(addrs) - args.show} more")
 
 
+def cmd_decompile(args):
+    db = _db()
+    prog, addr = _resolve_target(db, args.target)
+    try:
+        res = ghidra.decompile(prog, hex(addr), timeout=args.timeout)
+    except ghidra.GhidraUnavailable as e:
+        raise SystemExit(str(e))
+    if "error" in res:
+        raise SystemExit(f"{prog}!{addr:#x}: {res['error']}")
+    print(f"// {res['program']}!{res['namespace']}::{res['name']} "
+          f"@ {res['entry']}  {res['signature']}")
+    print(res.get("c", ""))
+
+
+def cmd_xref(args):
+    db = _db()
+    prog, addr = _resolve_target(db, args.target)
+    try:
+        res = ghidra.xref(prog, hex(addr), args.direction, timeout=args.timeout)
+    except ghidra.GhidraUnavailable as e:
+        raise SystemExit(str(e))
+    if "error" in res:
+        raise SystemExit(f"{prog}!{addr:#x}: {res['error']}")
+    sym = res.get("symbol") or hex(addr)
+    print(f"{res['count']} xref(s) {res['direction']} {prog}!{sym} ({res['target']}):")
+    for r in res["refs"]:
+        if res["direction"] == "from":
+            tgt = r.get("toSymbol") or r["to"]
+            print(f"  {r['from']} -> {r['to']:<10} {r['type']:<14} {tgt or ''}")
+        else:
+            fn = r.get("fromFunction") or ""
+            print(f"  {r['from']:<10} {r['type']:<14} {fn}")
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(prog="fomre", description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -258,6 +295,17 @@ def main(argv=None):
     sp.add_argument("--limit", type=int, default=100000)
     sp.add_argument("--show", type=int, default=20)
     sp.set_defaults(fn=cmd_scan)
+
+    sp = sub.add_parser("decompile", help="decompile a function to C (Ghidra headless)")
+    sp.add_argument("target", help="symbol name, or prog:0xADDR")
+    sp.add_argument("--timeout", type=int, default=300)
+    sp.set_defaults(fn=cmd_decompile)
+
+    sp = sub.add_parser("xref", help="list references to/from a function (Ghidra headless)")
+    sp.add_argument("target", help="symbol name, or prog:0xADDR")
+    sp.add_argument("--direction", choices=["to", "from"], default="to")
+    sp.add_argument("--timeout", type=int, default=300)
+    sp.set_defaults(fn=cmd_xref)
 
     args = p.parse_args(argv)
     args.fn(args)
