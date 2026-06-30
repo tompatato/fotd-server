@@ -32,8 +32,9 @@ if (anything written) SendPacket(packet, WORLD, 1, 1, 2);
 - **Batching:** writes are counted (`local_104`), capped below 10 — up to 10
   `WorldUpdate::Write` records may accumulate in one packet before
   `SendPacket(..., WORLD, ...)` flushes to the **world server**.
-- **Transport:** `ID_UPDATE` (= 126, see server vault) as a RakNet
-  `VariableSizedPacket` with an `ID_TIMESTAMP` prefix.
+- **Transport:** `ID_UPDATE` (= 126) as a RakNet `VariableSizedPacket` with an
+  `ID_TIMESTAMP` prefix — see [[Packet Transport]] for the envelope and
+  [[WorldUpdate Wire Format]] for the serialized body.
 
 ## `FillUpdate` — where each field comes from
 

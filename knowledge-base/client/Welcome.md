@@ -9,10 +9,21 @@ are cited so any claim can be re-checked.
 
 ## Start here
 
+**Foundations**
 - [[Client Architecture]] — the three binaries and the engine they run on
 - [[SharedMemory]] — the in-process state blackboard everything reads from
+
+**Player state → server**
 - [[Player Update Flow]] — how the client reports your state to the world server
-- [[WorldUpdate]] — the structure that carries that state
+- [[WorldUpdate]] — the structure that carries that state ([[Avatar]], [[PositionRotation]])
+- [[WorldUpdate Wire Format]] — the exact bit-packed `ID_UPDATE` body
+
+**Protocol**
+- [[Packet Transport]] — the `VariableSizedPacket` envelope and `SendPacket`
+- [[Login Handshake]] — the master-server login + credential hashing
+
+**Game data**
+- [[Item Definitions]] — the `g_ItemDefTable` item catalog
 
 ## How these notes were produced
 

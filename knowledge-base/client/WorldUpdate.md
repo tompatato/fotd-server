@@ -49,8 +49,8 @@ assembled by `FillUpdate` and sent by `SendUpdate` — see [[Player Update Flow]
 ## In-memory vs. on the wire
 
 This 200-byte struct is the **in-memory** form. What goes on the wire is the
-bit-packed output of `FOM::Types::WorldUpdate::Write(update, bitStream)`, so the
-wire layout is the BitStream serialization — not a raw `memcpy` of these 200
-bytes. The server's managed mirror is
+bit-packed output of `FOM::Types::WorldUpdate::Write(update, bitStream)`,
+documented field-by-field in [[WorldUpdate Wire Format]] — not a raw `memcpy` of
+these 200 bytes. The server's managed mirror is
 [`server-shared/Core/Packets/Types/WorldUpdate.cs`](../../server-shared/Core/Packets/Types/WorldUpdate.cs),
 whose `Type { Invalid=0, Player=1, Character=2 }` matches the `type` byte here.
