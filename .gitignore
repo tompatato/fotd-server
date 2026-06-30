@@ -25,3 +25,9 @@ __pycache__/
 *.rep/
 *.lock
 *.lock~
+
+# RE harness: machine-specific Ghidra/JDK paths
+tools/re/ghidra.local.json
+
+# Stray top-level Obsidian vault config (real vaults are client/ and server/)
+/knowledge-base/.obsidian/
