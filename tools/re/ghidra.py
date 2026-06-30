@@ -14,10 +14,13 @@ fomre (static DB + live memory) works without any of this.
 
 from __future__ import annotations
 
+import fcntl
 import json
 import os
 import re
 import subprocess
+import tempfile
+from contextlib import contextmanager
 from pathlib import Path
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -71,6 +74,23 @@ def project_built() -> bool:
     return (_PROJECT_DIR / f"{_PROJECT_NAME}.gpr").is_file()
 
 
+# Headless Ghidra holds an exclusive lock on the project, so only one analysis
+# can run at a time. Serialize across processes (e.g. parallel agents) with a
+# cross-process file lock — callers queue instead of failing on a locked project.
+_LOCK_PATH = Path(tempfile.gettempdir()) / "fomre-ghidra-FOTD.lock"
+
+
+@contextmanager
+def _project_lock(timeout: int):
+    f = open(_LOCK_PATH, "w")
+    try:
+        fcntl.flock(f, fcntl.LOCK_EX)  # blocks until the project is free
+        yield
+    finally:
+        fcntl.flock(f, fcntl.LOCK_UN)
+        f.close()
+
+
 def _env() -> dict:
     env = dict(os.environ)
     # Ghidra 12.0.4 requires a JDK in [21, 24]; this host's default may be newer.
@@ -94,7 +114,11 @@ def _run(program: str, script: str, args: list[str], timeout: int = 300) -> dict
         "-process", program, "-noanalysis", "-readOnly",
         "-scriptPath", str(_SCRIPTS), "-postScript", script, *args,
     ]
-    proc = subprocess.run(cmd, capture_output=True, text=True, env=_env(), timeout=timeout)
+    # Serialize concurrent callers; allow extra wall-clock for queueing behind
+    # another in-flight analysis.
+    with _project_lock(timeout):
+        proc = subprocess.run(cmd, capture_output=True, text=True, env=_env(),
+                              timeout=timeout)
     blob = "\n".join([proc.stdout or "", proc.stderr or ""])
     result = extract_result(blob)
     if result is None:
