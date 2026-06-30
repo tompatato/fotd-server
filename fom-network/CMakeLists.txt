@@ -36,6 +36,7 @@ set(FOMNETWORK_SRC
   "src/packets/UpdateSerializer.cpp"
   "src/packets/WorldUpdateSerializer.cpp"
   "src/packets/ChatSerializer.cpp"
+  "src/packets/MoveItemsSerializer.cpp"
 )
 set(FOMNETWORK_INC
   # Core API
