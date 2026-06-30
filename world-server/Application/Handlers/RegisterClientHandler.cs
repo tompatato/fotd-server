@@ -62,6 +62,17 @@ namespace FOMServer.World.Application.Handlers
                 rData.Attributes.Values[(int)AttributeType.SprintSpeedMultiplier] = 4000;
             }
 
+            // Placeholder: grant one recognizable item so inventory delivery can be
+            // verified end-to-end (real inventory loading is out of scope here).
+            rData.Inventory.ItemCount = 1;
+            rData.Inventory.Items[0].Id = 1001; // instance id (non-zero)
+            rData.Inventory.Items[0].Base.Type = ItemType.ChronoEnervonPistolEP24;
+            rData.Inventory.Items[0].Base.Value = 1;
+            rData.Inventory.Items[0].Base.MaxDurability = 100;
+            rData.Inventory.Items[0].Base.Durability = 100;
+            rData.Inventory.Items[0].Base.Security = ItemSecurity.Normal;
+            rData.Inventory.Items[0].Base.Quality = ItemQuality.Standard;
+
             rData.Profile.PlayerName = "Naruto Uzumaki";
             rData.NodeId = 1;
 
