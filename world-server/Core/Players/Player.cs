@@ -1,3 +1,4 @@
+using FOMServer.Shared.Core.Enums;
 using FOMServer.Shared.Core.Packets.Types;
 using FOMServer.Shared.Core.Persistence;
 
@@ -10,10 +11,11 @@ namespace FOMServer.World.Core.Players
         private readonly Lock _currentUpdateLock = new();
         private WorldUpdate.CharacterUpdate _currentUpdate;
 
-        // Authoritative in-memory backpack. Session-scoped for now: mutations raise
-        // OnPersistableChange so the future DB-backed inventory step captures them,
-        // but nothing subscribes yet, so items only survive re-entry within a session.
-        private readonly List<Item> _inventory = new();
+        // Authoritative in-memory inventory. Each entry carries the item plus its
+        // placement (which container/slot it occupies); mutations raise
+        // OnPersistableChange so the DB-backed persistence handler captures them,
+        // which is what lets equipped gear survive a logout.
+        private readonly List<PlacedItem> _inventory = new();
 
         public Player(uint id, int[]? initialAttributes = null)
         {
@@ -45,22 +47,47 @@ namespace FOMServer.World.Core.Players
 
         /// <summary>
         /// Adds an item to the player's backpack and signals the change for
-        /// persistence.
+        /// persistence. New items always land in the backpack; equipping is a
+        /// subsequent <see cref="MoveItems"/>.
         /// </summary>
         public void AddItem(in Item item)
         {
             lock (_syncRoot)
             {
-                _inventory.Add(item);
+                _inventory.Add(new PlacedItem
+                {
+                    Item = item,
+                    Container = ItemContainer.Inventory,
+                    Slot = 0,
+                });
             }
 
             OnPersistableChange?.Invoke(this);
         }
 
         /// <summary>
-        /// Returns a snapshot copy of the player's backpack for packet building.
+        /// Returns a snapshot copy of the player's items (all containers) for
+        /// lookups by id, e.g. resolving the equipped weapon on fire/reload.
         /// </summary>
         public Item[] SnapshotInventory()
+        {
+            lock (_syncRoot)
+            {
+                var items = new Item[_inventory.Count];
+                for (var i = 0; i < _inventory.Count; i++)
+                {
+                    items[i] = _inventory[i].Item;
+                }
+
+                return items;
+            }
+        }
+
+        /// <summary>
+        /// Returns a snapshot copy of the player's items with their placement, for
+        /// persistence and for routing into the world-entry container arrays.
+        /// </summary>
+        public PlacedItem[] SnapshotPlacements()
         {
             lock (_syncRoot)
             {
@@ -69,17 +96,51 @@ namespace FOMServer.World.Core.Players
         }
 
         /// <summary>
-        /// Replaces the backpack with the given items (e.g. loaded from the
+        /// Replaces the inventory with the given placed items (e.g. loaded from the
         /// database on world entry). Does <b>not</b> raise the persistence event —
         /// this is an authoritative load, not a change to persist back.
         /// </summary>
-        public void LoadInventory(IEnumerable<Item> items)
+        public void LoadInventory(IEnumerable<PlacedItem> items)
         {
             lock (_syncRoot)
             {
                 _inventory.Clear();
                 _inventory.AddRange(items);
             }
+        }
+
+        /// <summary>
+        /// Moves the items with the given instance ids into a container/slot in
+        /// response to <c>ID_MOVE_ITEMS</c> (e.g. equipping gear), so the placement
+        /// is persisted and restored on the next world entry. Returns whether any
+        /// item was moved.
+        /// </summary>
+        public bool MoveItems(ReadOnlySpan<uint> ids, ItemContainer dest, byte destSlot)
+        {
+            var moved = false;
+            lock (_syncRoot)
+            {
+                for (var i = 0; i < _inventory.Count; i++)
+                {
+                    if (!Contains(ids, _inventory[i].Item.Id))
+                    {
+                        continue;
+                    }
+
+                    var placed = _inventory[i];
+                    placed.Container = dest;
+                    placed.Slot = destSlot;
+                    _inventory[i] = placed;
+                    moved = true;
+                }
+            }
+
+            if (moved)
+            {
+                OnPersistableChange?.Invoke(this);
+            }
+
+            return moved;
         }
 
         /// <summary>
@@ -95,15 +156,15 @@ namespace FOMServer.World.Core.Players
             {
                 for (var i = 0; i < _inventory.Count; i++)
                 {
-                    if (_inventory[i].Id != itemId)
+                    if (_inventory[i].Item.Id != itemId)
                     {
                         continue;
                     }
 
-                    var item = _inventory[i];
-                    item.Base.Value = value;
-                    _inventory[i] = item;
-                    updated = item;
+                    var placed = _inventory[i];
+                    placed.Item.Base.Value = value;
+                    _inventory[i] = placed;
+                    updated = placed.Item;
                     changed = true;
                     break;
                 }
@@ -128,7 +189,7 @@ namespace FOMServer.World.Core.Players
             {
                 for (var i = 0; i < _inventory.Count; i++)
                 {
-                    if (_inventory[i].Id == itemId)
+                    if (_inventory[i].Item.Id == itemId)
                     {
                         _inventory.RemoveAt(i);
                         removed = true;
@@ -160,6 +221,19 @@ namespace FOMServer.World.Core.Players
             {
                 return _currentUpdate;
             }
+        }
+
+        private static bool Contains(ReadOnlySpan<uint> ids, uint id)
+        {
+            foreach (var candidate in ids)
+            {
+                if (candidate == id)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

@@ -1,3 +1,5 @@
+using FOMServer.Shared.Core.Constants;
+using FOMServer.Shared.Core.Enums;
 using FOMServer.Shared.Core.Handlers;
 using FOMServer.Shared.Core.Networking;
 using FOMServer.Shared.Core.Packets;
@@ -40,10 +42,21 @@ namespace FOMServer.World.Application.Handlers
                 return;
             }
 
-            // Minimal echo: the client only applies a move once the server confirms it,
-            // so reflect the validated request back verbatim. There is no authoritative
-            // inventory model yet (see RegisterClientHandler), so the move is not persisted
-            // or validated against real container contents.
+            // Record where the items now live so the placement is persisted and
+            // restored on the next world entry (e.g. equipping gear). Container
+            // contents are still trusted from the client — the ids are matched
+            // against the player's inventory but not otherwise validated.
+            var idCount = Math.Min((int)p.IdCount, BufferSizes.MaxItemListSize);
+            var ids = new uint[idCount];
+            for (var i = 0; i < idCount; i++)
+            {
+                ids[i] = p.Ids[i];
+            }
+
+            player.MoveItems(ids, (ItemContainer)p.Dest, p.DestSlot);
+
+            // The client only applies a move once the server confirms it, so reflect
+            // the validated request back verbatim.
             using var response = new PacketWriter<MoveItems>(sender);
             ref var rData = ref response.Data;
             rData = p;

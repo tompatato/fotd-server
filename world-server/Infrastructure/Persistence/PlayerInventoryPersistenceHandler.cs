@@ -7,9 +7,10 @@ using FOMServer.World.Core.Players;
 namespace FOMServer.World.Infrastructure.Persistence
 {
     /// <summary>
-    /// Persists a <see cref="Player"/>'s backpack to the database whenever the
-    /// player is marked dirty, as a whole-inventory sync (the repository deletes
-    /// the player's rows and reinserts the current set in one transaction).
+    /// Persists a <see cref="Player"/>'s inventory — items and their container/slot
+    /// placement — to the database whenever the player is marked dirty, as a
+    /// whole-inventory sync (the repository deletes the player's rows and reinserts
+    /// the current set in one transaction).
     /// </summary>
     internal sealed class PlayerInventoryPersistenceHandler : IPersistenceHandler
     {
@@ -30,7 +31,7 @@ namespace FOMServer.World.Infrastructure.Persistence
                     $"{nameof(PlayerInventoryPersistenceHandler)} cannot persist {entity.GetType().Name}");
             }
 
-            var items = player.SnapshotInventory();
+            var items = player.SnapshotPlacements();
             var rows = new List<ItemDto>(items.Length);
             foreach (var item in items)
             {

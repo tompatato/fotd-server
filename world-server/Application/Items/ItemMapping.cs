@@ -1,21 +1,21 @@
 using FOMServer.Shared.Core.Dtos;
 using FOMServer.Shared.Core.Enums;
 using FOMServer.Shared.Core.Packets.Types;
+using FOMServer.World.Core.Players;
 
 namespace FOMServer.World.Application.Items
 {
     /// <summary>
-    /// Converts between the wire/domain <see cref="Item"/> and the persisted
+    /// Converts between the domain <see cref="PlacedItem"/> and the persisted
     /// <see cref="ItemDto"/>. The 4 <c>ItemBase.BalanceValues</c> bytes pack into a
-    /// single little-endian u32 column.
+    /// single little-endian u32 column; the item's container/slot placement is
+    /// persisted so equipped gear is restored to its slot on the next world entry.
     /// </summary>
     internal static class ItemMapping
     {
-        // Backpack is the only container modelled so far.
-        private const byte BackpackContainer = 0;
-
-        public static unsafe ItemDto ToDto(Item item, uint playerId)
+        public static unsafe ItemDto ToDto(PlacedItem placed, uint playerId)
         {
+            var item = placed.Item;
             ref var b = ref item.Base;
             var balance = (uint)(b.BalanceValues[0]
                 | (b.BalanceValues[1] << 8)
@@ -26,8 +26,8 @@ namespace FOMServer.World.Application.Items
             {
                 id = item.Id,
                 player_id = playerId,
-                container = BackpackContainer,
-                slot = 0,
+                container = (byte)placed.Container,
+                slot = placed.Slot,
                 type = (ushort)b.Type,
                 value = b.Value,
                 max_durability = b.MaxDurability,
@@ -44,7 +44,7 @@ namespace FOMServer.World.Application.Items
             };
         }
 
-        public static unsafe Item FromDto(ItemDto dto)
+        public static unsafe PlacedItem FromDto(ItemDto dto)
         {
             var item = new Item { Id = dto.id };
             ref var b = ref item.Base;
@@ -64,7 +64,13 @@ namespace FOMServer.World.Application.Items
             b.BalanceValues[1] = (byte)((dto.balance_values >> 8) & 0xFF);
             b.BalanceValues[2] = (byte)((dto.balance_values >> 16) & 0xFF);
             b.BalanceValues[3] = (byte)((dto.balance_values >> 24) & 0xFF);
-            return item;
+
+            return new PlacedItem
+            {
+                Item = item,
+                Container = (ItemContainer)dto.container,
+                Slot = dto.slot,
+            };
         }
     }
 }

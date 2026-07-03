@@ -1,4 +1,3 @@
-using FOMServer.Shared.Core.Constants;
 using FOMServer.Shared.Core.Enums;
 using FOMServer.Shared.Core.Handlers;
 using FOMServer.Shared.Core.Networking;
@@ -72,15 +71,16 @@ namespace FOMServer.World.Application.Handlers
                 rData.Attributes.Values[(int)AttributeType.SprintSpeedMultiplier] = 4000;
             }
 
-            // Deliver the player's authoritative backpack (loaded from the DB above,
-            // so it persists across sessions).
-            var inventory = player.SnapshotInventory();
-            var itemCount = Math.Min(inventory.Length, BufferSizes.MaxItemListSize);
-            rData.Inventory.ItemCount = (uint)itemCount;
-            for (var i = 0; i < itemCount; i++)
-            {
-                rData.Inventory.Items[i] = inventory[i];
-            }
+            // Deliver the player's authoritative inventory (loaded from the DB
+            // above, so it persists across sessions), routing each item into the
+            // container slot that matches its persisted placement. This is what
+            // makes equipped gear come back equipped rather than in the backpack.
+            var backpackCount = InventoryLayout.Populate(
+                rData.Equipment[..],
+                rData.Weapons[..],
+                rData.Inventory.Items[..],
+                player.SnapshotPlacements());
+            rData.Inventory.ItemCount = (uint)backpackCount;
 
             rData.Profile.PlayerName = "Naruto Uzumaki";
             rData.NodeId = 1;
