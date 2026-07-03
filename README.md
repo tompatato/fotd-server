@@ -8,7 +8,7 @@ using their own private servers.
 
 ### Prerequisites
 
-- [**.NET 9.0**](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)
+- [**.NET 10.0**](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
 - [**Docker**](https://docs.docker.com/engine/install/): In addition to a development server, Docker is necessary to build the project on Linux.
   This is because the included RakNet library requires GCC 4.8 to build, which is not available on
   modern operating systems.
@@ -32,6 +32,9 @@ One of the caveats is that building the C++ components requires GCC 4.8, which i
 To address this, a Docker container is provided that handles building the project. `just docker-build` will build both the C++ and
 C# components and publish the servers for you. `just publish` additionally drops a host-visible copy in `build/linux/{master,world}`.
 
+The Docker build images are (re)built automatically, but you can build them explicitly with `just docker-images`.
+Build output lands in `out/build/<config>/…`; the deployable artifact is published to `out/publish/{master,world}`.
+
 ### Testing
 
 #### Windows
@@ -52,11 +55,37 @@ just test-dotnet
 ### Development Server
 
 ```bash
-# Start the database server.
-just db-up
+# Bring up the whole stack: database, master server, and world server(s).
+just server-up
 
-# Start the master server (automatically starts the database server if not running)
-just ms-up
+# …or start pieces individually (each dependency is started automatically):
+just db-up   # MariaDB (persistence)
+just ms-up   # master server (login / world directory)
+just ws-up   # world server(s)
+
+# Tear everything back down.
+just server-down
 ```
 
+The database schema is created and kept up to date automatically: the **master
+server runs the [FluentMigrator](https://fluentmigrator.github.io/) migrations on
+startup** (see `server-shared/Infrastructure/Migrations`), so a fresh database
+needs no manual setup.
+
 Using Visual Studio you can also debug the servers directly as long as a database server is running.
+
+### Connecting a client
+
+The servers speak the original **Face of Mankind** client's protocol over
+RakNet/UDP. Point a client at your master server by launching it with
+`+MasterServer <host>` (the master listens on `61000/udp`; a world server *N*
+listens on `61000 + N`). The client handshake, character creation, and world
+handoff are documented in the knowledge base below.
+
+## Documentation
+
+- [`docs/architecture.md`](docs/architecture.md) — deep dive into packet flow, threading, routing, and persistence.
+- [`docs/adding-packet-handlers.md`](docs/adding-packet-handlers.md) — step-by-step guide for adding a packet type end to end.
+- [`docs/packet-identifiers.md`](docs/packet-identifiers.md) — the full packet-id space and what the emulator implements so far.
+- [`knowledge-base/server`](knowledge-base/server) — server runtime/protocol notes (topology, ports, item & inventory lifecycle).
+- [`knowledge-base/client`](knowledge-base/client) — reverse-engineering notes on the original client (login, inventory, GM commands, weapons/ammo, …).

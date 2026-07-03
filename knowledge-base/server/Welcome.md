@@ -10,5 +10,6 @@ runtime/protocol picture and the points where the client (documented in the
 ## Start here
 
 - [[Server Topology]] — processes, ports, login/world handoff, `ID_UPDATE`
+- [[Items and Inventory]] — backpack model, `/spawn` granting, ammo (fire/reload), and DB persistence
 
 > The reverse-engineered client side lives in the sibling **client** vault.

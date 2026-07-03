@@ -34,6 +34,12 @@ to the master with `+MasterServer <host>` (default port 61000).
 > `Server:ClientHost` (it refuses to start if blank). The compose env var is
 > `Server__ClientHost`.
 
+> ⚠️ **Logout is incomplete.** On leaving a world the world server forwards a
+> `PlayerMigrateWorld` to the master, but `PlayerMigrateWorldHandler` only handles
+> migration to a *pending destination world* — there is no return-to-login path, so
+> a client that chooses "log out" hangs on "Logging Out". A hard disconnect
+> (`ConnectionLost`/`Disconnection`) tears the session down cleanly instead.
+
 ## Receiving the client's state — `ID_UPDATE`
 
 `ID_UPDATE` (= 126) carries the player's `WorldUpdate` (the client's *Player
