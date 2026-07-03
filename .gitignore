@@ -13,6 +13,7 @@ Thumbs.db
 CMakeUserPresets.json
 .claude/**/*.local.json
 /local.just
+/fom-docker.sh
 
 # Build Artifacts
 /out
