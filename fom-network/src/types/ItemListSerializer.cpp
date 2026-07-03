@@ -1,5 +1,7 @@
 #include "ItemListSerializer.h"
 
+#include <fom-network/constants/PlayerConstants.h>
+
 #include <map>
 #include <vector>
 
@@ -12,8 +14,11 @@ void ItemListSerializer::Write(RakNet::BitStream& bs,
   if (itemCount > BufferSizes::MAX_ITEM_LIST_SIZE)
     itemCount = BufferSizes::MAX_ITEM_LIST_SIZE;
 
+  // Leading container metadata. The +0x14 field is the capacity the client
+  // subtracts used slots from to decide free space; sending 0 makes every add
+  // fail with "not enough space", so report a fixed capacity for now.
   bs.WriteCompressed((uint16_t)0);
-  bs.WriteCompressed((uint32_t)0);
+  bs.WriteCompressed((uint32_t)Constants::DEFAULT_ITEM_LIST_CAPACITY);
   bs.WriteCompressed((uint32_t)0);
   bs.WriteCompressed((uint32_t)0);
 
