@@ -25,6 +25,25 @@ namespace FOMServer.World.Tests
         }
 
         [Fact]
+        public void MoveItems_IntoOccupiedEquipmentSlot_DisplacesOccupantToBackpack()
+        {
+            var player = new Player(PlayerId);
+            player.AddItem(new Item { Id = 10 });
+            player.AddItem(new Item { Id = 20 });
+
+            // Equip one shirt, then equip another into the same slot.
+            player.MoveItems([10u], ItemContainer.Equipment, (byte)ItemSlot.Shirt);
+            player.MoveItems([20u], ItemContainer.Equipment, (byte)ItemSlot.Shirt);
+
+            var placements = player.SnapshotPlacements().ToDictionary(p => p.Item.Id);
+
+            // The newcomer holds the slot; the previous occupant returns to the backpack.
+            Assert.Equal(ItemContainer.Equipment, placements[20u].Container);
+            Assert.Equal((byte)ItemSlot.Shirt, placements[20u].Slot);
+            Assert.Equal(ItemContainer.Inventory, placements[10u].Container);
+        }
+
+        [Fact]
         public void MoveItems_UnknownId_DoesNotMove()
         {
             var player = new Player(PlayerId);

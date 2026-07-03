@@ -120,6 +120,30 @@ namespace FOMServer.World.Core.Players
             var moved = false;
             lock (_syncRoot)
             {
+                // Equipment and weapon slots hold a single item. When an item moves
+                // in, displace whatever already occupies that slot (and isn't itself
+                // being moved) back to the backpack — the client performs this
+                // equip-swap locally, so the server must mirror it or two items end
+                // up sharing one slot and one is lost on the next world entry.
+                if (dest is ItemContainer.Equipment or ItemContainer.Weapons)
+                {
+                    for (var i = 0; i < _inventory.Count; i++)
+                    {
+                        var occupant = _inventory[i];
+                        if (occupant.Container != dest
+                            || occupant.Slot != destSlot
+                            || Contains(ids, occupant.Item.Id))
+                        {
+                            continue;
+                        }
+
+                        occupant.Container = ItemContainer.Inventory;
+                        occupant.Slot = 0;
+                        _inventory[i] = occupant;
+                        moved = true;
+                    }
+                }
+
                 for (var i = 0; i < _inventory.Count; i++)
                 {
                     if (!Contains(ids, _inventory[i].Item.Id))
