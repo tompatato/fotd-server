@@ -125,11 +125,29 @@ not by index — so the server resolves ids against the player's containers.
 | Off | Field | Type |
 | --- | --- | --- |
 | `0x430` | `playerId` | u32 |
-| `0x434` | `dest` | u8 (target container) |
+| `0x434` | `dest` | u8 (target/context — see below) |
+| `0x435` | (extra u8) | **only present when `dest == 3`** |
 | `0x438` | `items` | `ItemList` (the added stacks) |
 
 The server announces additions by sending a whole `ItemList` for the target
 container — i.e. the same `ItemList::Write` format above.
+
+`dest` is a `switch` in `HandlePacket_ID_ITEMS_ADDED` (rva `0x197030`) selecting
+where items go and how the UI refreshes — **not** the `Player::Inventory` memory
+offset. Confirmed cases (no `case 0` — sending `0` silently drops the items):
+
+| `dest` | Handling |
+| --- | --- |
+| `1` | merge into `PLAYERDATA_INVENTORY` (backpack) + refresh — the plain "added to your inventory" path |
+| `3` | storage; a following `u8` sub-selects inventory(1)/terminal-storage(2)/storage(3) |
+| `4` | terminal storage (+ chat notice) |
+| `5` | `PLAYERDATA_STORAGE` |
+| `6` | `PLAYERDATA_INVENTORY` (minimal) |
+| `7` | inventory + reload hook |
+| `8` | inventory + equip/weapon handling |
+
+The `dest`/`src` bytes in `ID_MOVE_ITEMS` are a *different* small-id space (the
+five `Player::Inventory` containers); do not conflate them with these.
 
 ## Live decode
 
@@ -153,5 +171,6 @@ fomre decompile "CShell.dll:0x1023d2c0"   # ItemList::Write
 ```
 
 See [[Item Definitions]] (type → catalog record), [[Packet Transport]] (the
-compressed-int / bit codecs), and [[WorldUpdate Wire Format]] (the same
-BitStream serialization style for player state).
+compressed-int / bit codecs), [[WorldUpdate Wire Format]] (the same BitStream
+serialization style for player state), and [[Game Master Commands]] (`/spawn`,
+which embeds an `Item` and grants it via `ID_ITEMS_ADDED`).

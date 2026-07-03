@@ -69,6 +69,11 @@ fingerprint (ban evasion / `DUPLICATE_IP`-style enforcement).
 `isNewPlayer`, `clientVersion`, ban details, `factionMOTD`, `defaultApartment` +
 `defaultApartmentWorldId`, and `loginWorldId` (the world to enter).
 
+> `accountType` here is also the client's **staff access level** — the client
+> treats the byte numerically and gates GM commands on it (e.g. `>= 22` for the
+> top tier), independent of the bounded `AccountType` enum. See
+> [[Account Access Levels]].
+
 > The server's `LoginHandler` maps to a subset of these — `InvalidLogin`,
 > `CreateCharacter`, `Success` — and a missing account returns `CreateCharacter`
 > for a fresh login. (Server-side detail; see the server vault.)

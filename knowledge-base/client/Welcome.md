@@ -27,6 +27,12 @@ are cited so any claim can be re-checked.
 **Game data**
 - [[Item Definitions]] — the `g_ItemDefTable` item catalog
 - [[Inventory]] — item containers and the inventory wire protocol
+- [[Weapons and Ammo]] — loaded ammo (`ItemBase.value`), clips, and the fire/reload flow
+
+**Commands & access**
+- [[Game Master Commands]] — the `ID_GAMEMASTER` packet and `/spawn` wire format
+- [[Account Access Levels]] — how the client gates staff commands by account level
+- [[Keyboard Text Entry]] — why some keys don't type under Wine (XWayland layout)
 
 ## How these notes were produced
 
