@@ -34,3 +34,15 @@ void FOMNetwork_Server_Shutdown(FOMNetworkPeer* server) {
   rakPeer->Shutdown(1000, 0);
   RakNetworkFactory::DestroyRakPeerInterface(rakPeer);
 }
+
+void FOMNetwork_Server_CloseConnection(FOMNetworkPeer* server,
+                                       uint32_t binaryAddress, uint16_t port) {
+  auto rakPeer = static_cast<RakPeerInterface*>(server);
+  if (!rakPeer) {
+    return;
+  }
+
+  // Send a disconnection notification so the client tears down this connection
+  // gracefully (RakNet buffers the request, so this is safe to call off-thread).
+  rakPeer->CloseConnection(SystemAddress(binaryAddress, port), true);
+}

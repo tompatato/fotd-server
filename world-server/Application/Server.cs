@@ -127,6 +127,10 @@ namespace FOMServer.World.Application
             networkManager.ClaimPacketId(PacketIdentifier.ID_PLAYER_MIGRATE_WORLD);
             networkManager.ClaimPacketId(PacketIdentifier.ID_PLAYER_LEAVING_WORLD);
 
+            // Clients send ID_WORLD_LOGOUT to the master, which forwards it here over
+            // the master<->world link. Claim it so a client can't inject it directly.
+            networkManager.ClaimPacketId(PacketIdentifier.ID_WORLD_LOGOUT);
+
             // Initialize the packet sender for communication with the master server.
             var packetSender = _serviceProvider.GetRequiredService<MasterPacketSender>();
             packetSender.Initialize(networkManager);
@@ -177,7 +181,10 @@ namespace FOMServer.World.Application
             var packetSender = _serviceProvider.GetRequiredService<ClientPacketSender>();
             packetSender.Initialize(networkManager);
 
-            networkManager.Configure(peer, _serverService.Shutdown);
+            networkManager.Configure(
+                peer,
+                _serverService.Shutdown,
+                (p, address) => _serverService.CloseConnection(p, address.BinaryAddress, address.Port));
 
             _logger.LogInformation("Listening for clients on port {ClientPort}", _clientPort);
 

@@ -183,5 +183,13 @@ namespace FOMServer.Master.Core.Players
                 PendingWorld = null;
             }
         }
+
+        public void LeaveWorld()
+        {
+            lock (_syncRoot)
+            {
+                CurrentWorld = null;
+            }
+        }
     }
 }

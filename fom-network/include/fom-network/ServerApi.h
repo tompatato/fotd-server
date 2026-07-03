@@ -27,6 +27,18 @@ FOM_API FOMNetworkPeer* FOMNetwork_Server_Startup(uint16_t port,
  */
 FOM_API void FOMNetwork_Server_Shutdown(FOMNetworkPeer* server);
 
+/**
+ * Closes the connection to a single connected client, sending it a
+ * disconnection notification so it can tear down its side gracefully.
+ *
+ * @param server The server interface instance.
+ * @param binaryAddress The client's binary IPv4 address (network order).
+ * @param port The client's port.
+ */
+FOM_API void FOMNetwork_Server_CloseConnection(FOMNetworkPeer* server,
+                                               uint32_t binaryAddress,
+                                               uint16_t port);
+
 #ifdef __cplusplus
 }
 #endif

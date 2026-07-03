@@ -12,5 +12,11 @@ namespace FOMServer.Shared.Infrastructure.FOMNetwork
         /// Shuts down the server interface.
         /// </summary>
         void Shutdown(IntPtr server);
+
+        /// <summary>
+        /// Closes the connection to a single connected client, sending it a
+        /// disconnection notification.
+        /// </summary>
+        void CloseConnection(IntPtr server, uint binaryAddress, ushort port);
     }
 }

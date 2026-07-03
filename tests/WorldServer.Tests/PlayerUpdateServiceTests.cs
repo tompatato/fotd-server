@@ -197,6 +197,11 @@ namespace FOMServer.World.Tests
                 packet.Release();
                 throw new InvalidOperationException("Player updates are sent per-recipient, not broadcast");
             }
+
+            public void Disconnect(in Types.NetworkAddress address)
+            {
+                throw new InvalidOperationException("Player updates never disconnect clients");
+            }
         }
     }
 }
