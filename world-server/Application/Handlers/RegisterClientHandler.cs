@@ -1,9 +1,12 @@
+using FOMServer.Shared.Core.Constants;
 using FOMServer.Shared.Core.Enums;
 using FOMServer.Shared.Core.Handlers;
 using FOMServer.Shared.Core.Networking;
 using FOMServer.Shared.Core.Packets;
 using FOMServer.Shared.Core.Packets.Types;
+using FOMServer.Shared.Core.Repositories;
 using FOMServer.Shared.Metadata;
+using FOMServer.World.Application.Items;
 using FOMServer.World.Core.Networking;
 using FOMServer.World.Core.Players;
 
@@ -13,15 +16,18 @@ namespace FOMServer.World.Application.Handlers
     internal class RegisterClientHandler : PacketHandlerBase<RegisterClient>
     {
         private readonly IPlayerRegistry _playerRegistry;
+        private readonly IItemRepository _itemRepository;
         private readonly IClientPacketSender _clientPacketSender;
         private readonly ILogger<RegisterClientHandler> _logger;
 
         public RegisterClientHandler(
             IPlayerRegistry playerRegistry,
+            IItemRepository itemRepository,
             IClientPacketSender clientPacketSender,
             ILogger<RegisterClientHandler> logger)
         {
             _playerRegistry = playerRegistry;
+            _itemRepository = itemRepository;
             _clientPacketSender = clientPacketSender;
             _logger = logger;
         }
@@ -34,6 +40,10 @@ namespace FOMServer.World.Application.Handlers
                 _logger.LogWarning("Client '{Sender}' attempted to register unexpected player {PlayerId}", sender, p.PlayerId);
                 return;
             }
+
+            // Load the player's persisted backpack so it survives across sessions.
+            var persisted = _itemRepository.GetByPlayer(player.Id);
+            player.LoadInventory(persisted.Select(ItemMapping.FromDto));
 
             using var response = new PacketWriter<RegisterClientReturn>(sender);
             ref var rData = ref response.Data;
@@ -62,16 +72,15 @@ namespace FOMServer.World.Application.Handlers
                 rData.Attributes.Values[(int)AttributeType.SprintSpeedMultiplier] = 4000;
             }
 
-            // Placeholder: grant one recognizable item so inventory delivery can be
-            // verified end-to-end (real inventory loading is out of scope here).
-            rData.Inventory.ItemCount = 1;
-            rData.Inventory.Items[0].Id = 1001; // instance id (non-zero)
-            rData.Inventory.Items[0].Base.Type = ItemType.ChronoEnervonPistolEP24;
-            rData.Inventory.Items[0].Base.Value = 1;
-            rData.Inventory.Items[0].Base.MaxDurability = 100;
-            rData.Inventory.Items[0].Base.Durability = 100;
-            rData.Inventory.Items[0].Base.Security = ItemSecurity.Normal;
-            rData.Inventory.Items[0].Base.Quality = ItemQuality.Standard;
+            // Deliver the player's authoritative backpack (loaded from the DB above,
+            // so it persists across sessions).
+            var inventory = player.SnapshotInventory();
+            var itemCount = Math.Min(inventory.Length, BufferSizes.MaxItemListSize);
+            rData.Inventory.ItemCount = (uint)itemCount;
+            for (var i = 0; i < itemCount; i++)
+            {
+                rData.Inventory.Items[i] = inventory[i];
+            }
 
             rData.Profile.PlayerName = "Naruto Uzumaki";
             rData.NodeId = 1;

@@ -1,8 +1,10 @@
 using FOMServer.Shared.Application;
 using FOMServer.Shared.Core;
 using FOMServer.Shared.Core.Enums;
+using FOMServer.Shared.Core.Persistence;
 using FOMServer.Shared.Core.Ticking;
 using FOMServer.Shared.Infrastructure;
+using FOMServer.World.Infrastructure.Persistence;
 using FOMServer.World.Application;
 using FOMServer.World.Application.Items;
 using FOMServer.World.Application.Networking;
@@ -129,6 +131,7 @@ namespace FOMServer.World
 
         private static ServiceCollection AddPersistenceHandlers(this ServiceCollection services)
         {
+            services.AddSingleton<IPersistenceHandler, PlayerInventoryPersistenceHandler>();
             return services;
         }
     }

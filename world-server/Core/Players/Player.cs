@@ -69,6 +69,20 @@ namespace FOMServer.World.Core.Players
         }
 
         /// <summary>
+        /// Replaces the backpack with the given items (e.g. loaded from the
+        /// database on world entry). Does <b>not</b> raise the persistence event —
+        /// this is an authoritative load, not a change to persist back.
+        /// </summary>
+        public void LoadInventory(IEnumerable<Item> items)
+        {
+            lock (_syncRoot)
+            {
+                _inventory.Clear();
+                _inventory.AddRange(items);
+            }
+        }
+
+        /// <summary>
         /// Sets the <see cref="ItemBase.Value"/> of the backpack item with the
         /// given instance id (e.g. a weapon's loaded rounds or a clip's remaining
         /// rounds) and returns the updated item. Returns false if no such item.
