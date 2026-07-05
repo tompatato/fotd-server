@@ -13,10 +13,14 @@ Thumbs.db
 CMakeUserPresets.json
 .claude/**/*.local.json
 /local.just
+/fom-docker.sh
 
 # Build Artifacts
 /out
 /build
+
+# JetBrains IDE config (per-user, not shared)
+.idea/
 
 # Ghidra Project
 __pycache__/
