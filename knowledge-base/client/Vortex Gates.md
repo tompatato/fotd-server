@@ -60,6 +60,39 @@ here for completeness and left partly unconfirmed.
 > as opposed to the terminal's sub-type 7 destination selection. Confirmed live:
 > the client sends only sub-type 1 while standing in a gate.
 
+## Two distinct vortex interactions
+
+RE of the client's window model (deeper dive) shows the vortex is **two separate
+mechanisms**, not one:
+
+1. **Walk-in gate** — `CWindowVortexImp`. Stand in a gate, a countdown runs
+   (`"{N} sec"`), and on completion the client sends `ID_VORTEX_GATE {sub 1}` to
+   the world. **No destination** is chosen — it is a fixed-destination portal.
+   This is what a player standing in a gate uses today.
+2. **Vortex terminal** — `CWindowTerminalVortex`, titled *"World Service Control"*
+   (string `985`), with a companion `CWINDOW_NODE_SELECTION` (`986`). This is the
+   destination **picker** (world list + node list) and the only path that lets a
+   player choose where to go. Its events emit:
+   - event 4 (shown): **`ID_WORLDSERVICE` (165)** `{disc 0x12, playerId}` → world
+     — note this is a *second* unimplemented packet the terminal depends on;
+   - event 5: `ID_VORTEX_GATE {sub 5}` → **master** (destination-list request);
+   - event 9: `ID_VORTEX_GATE {sub 7, world, node}` → world (travel confirm).
+
+**Window lifecycle:** every window (both of the above) is pre-created once in
+`CWindowMgr::InitAllWindows` → `CreateWindow` (vortex terminal ctor `FUN_10176fc0`,
+window id `CWINDOW_TERMINAL_VORTEX`). So `GetWindow(CWINDOW_TERMINAL_VORTEX)`
+always returns the object; sub-type 6 only *populates* it. What **shows/activates**
+the terminal was not found in the packet layer — it is almost certainly a
+client-side **world-object interaction** (walking up to a vortex-terminal console,
+like the market/apartment terminals), which is world-content driven, not
+packet-driven. The walk-in gate does **not** open the terminal.
+
+**Implication for world selection:** the fixed walk-in gate cannot offer a picker.
+Native selection requires the client to actually *show* `CWindowTerminalVortex`
+(needs a reachable vortex-terminal object in-world, or RE of the object-use
+trigger), plus server support for `ID_WORLDSERVICE` (165) and the `ID_VORTEX_GATE`
+sub-type 5→6 list — on top of the sub-type 7 travel that already works.
+
 ## Flow (world travel)
 
 ```
