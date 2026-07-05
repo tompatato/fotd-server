@@ -8,6 +8,7 @@ using FOMServer.Shared.Metadata;
 using FOMServer.World.Application.Items;
 using FOMServer.World.Core.Networking;
 using FOMServer.World.Core.Players;
+using FOMServer.World.Core.WorldObjects;
 
 namespace FOMServer.World.Application.Handlers
 {
@@ -17,17 +18,20 @@ namespace FOMServer.World.Application.Handlers
         private readonly IPlayerRegistry _playerRegistry;
         private readonly IItemRepository _itemRepository;
         private readonly IClientPacketSender _clientPacketSender;
+        private readonly IWorldObjectService _worldObjectService;
         private readonly ILogger<RegisterClientHandler> _logger;
 
         public RegisterClientHandler(
             IPlayerRegistry playerRegistry,
             IItemRepository itemRepository,
             IClientPacketSender clientPacketSender,
+            IWorldObjectService worldObjectService,
             ILogger<RegisterClientHandler> logger)
         {
             _playerRegistry = playerRegistry;
             _itemRepository = itemRepository;
             _clientPacketSender = clientPacketSender;
+            _worldObjectService = worldObjectService;
             _logger = logger;
         }
 
@@ -89,6 +93,10 @@ namespace FOMServer.World.Application.Handlers
             rData.NodeId = 1;
 
             _clientPacketSender.Send(response.Build());
+
+            // Replay the objects already placed in the world so this client sees
+            // deployments made before it joined.
+            _worldObjectService.SendExistingTo(sender);
         }
     }
 }

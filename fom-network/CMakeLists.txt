@@ -38,6 +38,7 @@ set(FOMNETWORK_SRC
   "src/packets/RegisterClientReturnSerializer.cpp"
   "src/packets/UpdateSerializer.cpp"
   "src/packets/WorldUpdateSerializer.cpp"
+  "src/packets/WorldObjectsSerializer.cpp"
   "src/packets/ChatSerializer.cpp"
   "src/packets/MoveItemsSerializer.cpp"
   "src/packets/CheckMailSerializer.cpp"

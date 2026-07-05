@@ -26,6 +26,7 @@
 #include <fom-network/packets/RegisterWorld.h>
 #include <fom-network/packets/Update.h>
 #include <fom-network/packets/VortexGate.h>
+#include <fom-network/packets/WorldObjects.h>
 #include <fom-network/packets/WorldService.h>
 #include <fom-network/packets/WorldLogin.h>
 #include <fom-network/packets/WorldLoginReturn.h>
@@ -88,6 +89,7 @@ static const std::unordered_map<uint8_t, size_t> packetSizes = {
     {Enum::ID_REGISTER_CLIENT_RETURN, sizeof(Packet::RegisterClientReturn)},
     {Enum::ID_UPDATE, sizeof(Packet::Update)},
     {Enum::ID_WORLD_UPDATE, sizeof(Packet::WorldUpdate)},
+    {Enum::ID_WORLD_OBJECTS, sizeof(Packet::WorldObjects)},
     {Enum::ID_CHAT, sizeof(Packet::Chat)},
     {Enum::ID_MOVE_ITEMS, sizeof(Packet::MoveItems)},
     {Enum::ID_CHECK_MAIL, sizeof(Packet::CheckMail)},
@@ -127,6 +129,7 @@ static const std::unordered_map<uint32_t, IWriter*> writerMap = {
     {Enum::ID_REGISTER_CLIENT_RETURN,
      &Packet::RegisterClientReturnSerializer::GetInstance()},
     {Enum::ID_WORLD_UPDATE, &Packet::WorldUpdateSerializer::GetInstance()},
+    {Enum::ID_WORLD_OBJECTS, &Packet::WorldObjectsSerializer::GetInstance()},
     {Enum::ID_CHAT, &Packet::ChatSerializer::GetInstance()},
     {Enum::ID_MOVE_ITEMS, &Packet::MoveItemsSerializer::GetInstance()},
     {Enum::ID_MAIL, &Packet::MailSerializer::GetInstance()},

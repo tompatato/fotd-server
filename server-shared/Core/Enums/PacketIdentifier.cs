@@ -64,7 +64,8 @@ namespace FOMServer.Shared.Core.Enums
 
         // ID_ATTRIBUTE_CHANGE = 131,
         // ID_HIT = 132,
-        // ID_WORLD_OBJECTS = 133,
+        ID_WORLD_OBJECTS = 133,
+
         // ID_ATTACK = 134,
         ID_WEAPONFIRE = 135,
 

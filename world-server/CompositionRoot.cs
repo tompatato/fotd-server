@@ -9,10 +9,12 @@ using FOMServer.World.Application;
 using FOMServer.World.Application.Items;
 using FOMServer.World.Application.Networking;
 using FOMServer.World.Application.Players;
+using FOMServer.World.Application.WorldObjects;
 using FOMServer.World.Core;
 using FOMServer.World.Core.Items;
 using FOMServer.World.Core.Networking;
 using FOMServer.World.Core.Players;
+using FOMServer.World.Core.WorldObjects;
 using FOMServer.World.Infrastructure;
 using Microsoft.Extensions.Configuration;
 
@@ -113,6 +115,9 @@ namespace FOMServer.World
             services.AddSingleton<IPlayerRegistry, PlayerRegistry>();
             services.AddSingleton<IItemInstanceIdGenerator, ItemInstanceIdGenerator>();
             services.AddSingleton<IItemCatalog, ItemCatalog>();
+
+            services.AddSingleton<IWorldObjectRegistry, WorldObjectRegistry>();
+            services.AddSingleton<IWorldObjectService, WorldObjectService>();
             return services;
         }
 
