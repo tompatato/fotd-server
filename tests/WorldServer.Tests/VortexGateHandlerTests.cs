@@ -42,23 +42,21 @@ namespace FOMServer.World.Tests
         }
 
         [Fact]
-        public void EnterGate_ApprovesTravelToPrimaryWorldAtDefaultNode()
+        public void EnterGate_OpensVortexMenu()
         {
             var sender = new RecordingSender();
             var handler = CreateHandler(new Player(PlayerId), sender);
 
-            // A physical gate's activation (ENTER) carries no chosen destination.
+            // Gate activation (ENTER) opens the vortex terminal menu rather than
+            // travelling (provisional trigger; see handler notes).
             handler.Handle(ClientAddress, new VortexGate
             {
                 PlayerId = PlayerId,
                 Type = VortexGateType.Enter,
             });
 
-            var (id, approve) = Assert.Single(sender.Sent);
-            Assert.Equal(PacketIdentifier.ID_VORTEX_GATE, id);
-            Assert.Equal(VortexGateType.TravelApprove, approve.Type);
-            Assert.Equal(RunningWorld, approve.World);
-            Assert.Equal(1, approve.Node);
+            var (id, _) = Assert.Single(sender.Sent);
+            Assert.Equal(PacketIdentifier.ID_WORLDSERVICE, id);
         }
 
         [Fact]
@@ -172,7 +170,12 @@ namespace FOMServer.World.Tests
 
             public void Send(in QueuePacket packet)
             {
-                Sent.Add((packet.Id, MemoryMarshal.Read<VortexGate>(packet.Data)));
+                // Only vortex-gate replies carry a VortexGate body; other packets
+                // (e.g. the WorldService menu-open) are recorded by id only.
+                var data = packet.Id == PacketIdentifier.ID_VORTEX_GATE
+                    ? MemoryMarshal.Read<VortexGate>(packet.Data)
+                    : default;
+                Sent.Add((packet.Id, data));
                 packet.Release();
             }
 

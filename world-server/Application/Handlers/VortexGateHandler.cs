@@ -29,10 +29,6 @@ namespace FOMServer.World.Application.Handlers
     [PacketHandler]
     internal class VortexGateHandler : PacketHandlerBase<VortexGate>
     {
-        // Spawn node used when a gate carries no chosen destination; matches the
-        // node RegisterClientHandler currently spawns players at.
-        private const byte DefaultNode = 1;
-
         private readonly IPlayerRegistry _playerRegistry;
         private readonly IClientPacketSender _clientPacketSender;
         private readonly ServerSettings _serverSettings;
@@ -65,28 +61,30 @@ namespace FOMServer.World.Application.Handlers
                 return;
             }
 
-            // Two client-to-world sub-types drive travel: ENTER (1) fires when a
-            // physical gate's countdown elapses and carries no destination, while
-            // TRAVEL_REQUEST (7) is the terminal's confirmed world/node selection.
-            // Both are answered with an approve; anything else is ignored.
-            WorldId requestedWorld;
-            byte node;
-            switch (p.Type)
+            // TO BE REVISITED: opening the vortex menu from the walk-in gate is a
+            // stand-in. In the real game this "Vortex Network" terminal is shown by
+            // *using a placed vortex-terminal object*, which needs the object /
+            // placement system we don't have yet. Until then, gate entry (sub-type 1)
+            // asks the client to show the terminal via WorldService {open, vortex}.
+            // The menu opens but is not yet populated or wired to selection.
+            if (p.Type == VortexGateType.Enter)
             {
-                case VortexGateType.TravelRequest:
-                    requestedWorld = p.World;
-                    node = p.Node;
-                    break;
-                case VortexGateType.Enter:
-                    // A physical gate has no chosen destination, so keep the player
-                    // on the primary hosted world at the default spawn node.
-                    requestedWorld = _serverSettings.WorldIds[0];
-                    node = DefaultNode;
-                    break;
-                default:
-                    _logger.LogWarning("Player {PlayerId} sent unsupported vortex sub-type {Type}", player.Id, p.Type);
-                    return;
+                using var open = new PacketWriter<WorldService>(sender);
+                open.Data.PlayerId = player.Id;
+                _clientPacketSender.Send(open.Build());
+                _logger.LogDebug("Opened vortex menu (WorldService) for player {PlayerId}", player.Id);
+                return;
             }
+
+            // TRAVEL_REQUEST (7) is the terminal's confirmed world/node selection.
+            if (p.Type != VortexGateType.TravelRequest)
+            {
+                _logger.LogWarning("Player {PlayerId} sent unsupported vortex sub-type {Type}", player.Id, p.Type);
+                return;
+            }
+
+            WorldId requestedWorld = p.World;
+            byte node = p.Node;
 
             // Honour the requested world if this server actually hosts it (so
             // travel between the worlds this process serves works for real);

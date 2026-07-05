@@ -26,6 +26,7 @@
 #include <fom-network/packets/RegisterWorld.h>
 #include <fom-network/packets/Update.h>
 #include <fom-network/packets/VortexGate.h>
+#include <fom-network/packets/WorldService.h>
 #include <fom-network/packets/WorldLogin.h>
 #include <fom-network/packets/WorldLoginReturn.h>
 #include <fom-network/packets/WorldLogout.h>
@@ -78,6 +79,7 @@ static const std::unordered_map<uint8_t, size_t> packetSizes = {
     {Enum::ID_WORLD_LOGIN, sizeof(Packet::WorldLogin)},
     {Enum::ID_WORLD_LOGIN_RETURN, sizeof(Packet::WorldLoginReturn)},
     {Enum::ID_VORTEX_GATE, sizeof(Packet::VortexGate)},
+    {Enum::ID_WORLDSERVICE, sizeof(Packet::WorldService)},
     {Enum::ID_WORLD_LOGOUT, sizeof(Packet::WorldLogout)},
     {Enum::ID_PLAYER_MIGRATE_WORLD, sizeof(Packet::PlayerMigrateWorld)},
     {Enum::ID_PLAYER_WORLD_READY, sizeof(Packet::PlayerWorldReady)},
@@ -114,6 +116,7 @@ static const std::unordered_map<uint32_t, IWriter*> writerMap = {
     {Enum::ID_WORLD_LOGIN_RETURN,
      &Packet::WorldLoginReturnSerializer::GetInstance()},
     {Enum::ID_VORTEX_GATE, &Packet::VortexGateSerializer::GetInstance()},
+    {Enum::ID_WORLDSERVICE, &Packet::WorldServiceSerializer::GetInstance()},
     {Enum::ID_WORLD_LOGOUT, &Packet::WorldLogoutSerializer::GetInstance()},
     {Enum::ID_PLAYER_MIGRATE_WORLD,
      &Packet::PlayerMigrateWorldSerializer::GetInstance()},
@@ -157,6 +160,7 @@ static const std::unordered_map<uint32_t, IReader*> readerMap = {
      &Packet::CreateCharacterSerializer::GetInstance()},
     {Enum::ID_WORLD_LOGIN, &Packet::WorldLoginSerializer::GetInstance()},
     {Enum::ID_VORTEX_GATE, &Packet::VortexGateSerializer::GetInstance()},
+    {Enum::ID_WORLDSERVICE, &Packet::WorldServiceSerializer::GetInstance()},
     {Enum::ID_WORLD_LOGOUT, &Packet::WorldLogoutSerializer::GetInstance()},
     {Enum::ID_PLAYER_MIGRATE_WORLD,
      &Packet::PlayerMigrateWorldSerializer::GetInstance()},

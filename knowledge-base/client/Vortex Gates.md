@@ -81,17 +81,30 @@ mechanisms**, not one:
 **Window lifecycle:** every window (both of the above) is pre-created once in
 `CWindowMgr::InitAllWindows` → `CreateWindow` (vortex terminal ctor `FUN_10176fc0`,
 window id `CWINDOW_TERMINAL_VORTEX`). So `GetWindow(CWINDOW_TERMINAL_VORTEX)`
-always returns the object; sub-type 6 only *populates* it. What **shows/activates**
-the terminal was not found in the packet layer — it is almost certainly a
-client-side **world-object interaction** (walking up to a vortex-terminal console,
-like the market/apartment terminals), which is world-content driven, not
-packet-driven. The walk-in gate does **not** open the terminal.
+always returns the object; the terminal is *shown* separately via
+`CWindowMgr::ShowWindow` (sets the active-window pointer at `+0x1ac` and calls the
+window's `SetupControls`/activate/show vtable slots).
 
-**Implication for world selection:** the fixed walk-in gate cannot offer a picker.
-Native selection requires the client to actually *show* `CWindowTerminalVortex`
-(needs a reachable vortex-terminal object in-world, or RE of the object-use
-trigger), plus server support for `ID_WORLDSERVICE` (165) and the `ID_VORTEX_GATE`
-sub-type 5→6 list — on top of the sub-type 7 travel that already works.
+**What shows the terminal — solved.** The server opens terminals by sending
+**`ID_WORLDSERVICE` (165)**; the client handler `FUN_10197580` switches on
+`{outer, inner}` and shows the matching window. `{5, 0xc}` opens
+`CWINDOW_TERMINAL_VORTEX`. Confirmed live: sending `ID_WORLDSERVICE{5,0xc}` makes
+the "Vortex Network" menu render. The `{outer=5}` open-body format is in
+`FUN_100d4620` (id, inner disc, 2 bytes, 2 uints, 3 strings, two 10-entry lists
+whose entries are gated by a presence bit, and 6 trailing shorts).
+
+> **TO BE REVISITED — the real trigger is a placed terminal object.** In the game
+> this menu is opened by *using a vortex-terminal object* in the world (the same
+> way market/apartment terminals open). That needs the object/placement system,
+> which the emulator doesn't have yet (a major feature). As an interim stand-in,
+> the server opens the menu in response to the **walk-in gate's sub-type 1**. When
+> placements land, move the `ID_WORLDSERVICE{5,0xc}` open to the terminal-object
+> "use" path and stop hijacking the gate.
+
+**Remaining for functional selection:** the opened menu is still **empty** — it
+needs the destination list (populate the world/node pickers) and the
+selection/purchase requests wired up. Once a world/node is picked the client
+already emits `ID_VORTEX_GATE` sub-type 7, which the server approves today.
 
 ## Flow (world travel)
 

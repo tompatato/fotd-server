@@ -102,7 +102,8 @@ namespace FOMServer.Shared.Core.Enums
         // ID_SPLIT_CONTAINER = 162,
         // ID_SKILLS = 163,
         // ID_USE_ITEM = 164,
-        // ID_WORLDSERVICE = 165,
+        ID_WORLDSERVICE = 165,
+
         // ID_HACKING = 166,
         // 167
         // ID_CHEMICAL_LAB = 168,
