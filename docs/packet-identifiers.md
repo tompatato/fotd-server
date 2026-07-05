@@ -1,5 +1,24 @@
 # Packet Identifiers
 
+The original **Face of Mankind** client's full packet-id space (ids `104`+ are the
+game's own; lower ids are RakNet's `MessageIdentifiers`). This is the canonical
+reference — blank rows are ids with no known name yet. The managed enum
+([`server-shared/Core/Enums/PacketIdentifier.cs`](../server-shared/Core/Enums/PacketIdentifier.cs))
+and the native one
+([`fom-network/include/fom-network/enums/PacketIdentifier.h`](../fom-network/include/fom-network/enums/PacketIdentifier.h))
+mirror this list, keeping ids commented out until the emulator handles them.
+
+**What's wired up so far** is whatever the serializer maps in
+[`fom-network/src/FOMDataSerializer.cpp`](../fom-network/src/FOMDataSerializer.cpp)
+register (readers = client→server, writers = server→client) — that file is the
+source of truth. Beyond the login/world-handoff and `ID_UPDATE`/`ID_WORLD_UPDATE`
+flows, the item/combat packets are now live: `ID_GAMEMASTER` (`/spawn`),
+`ID_ITEMS_ADDED`, `ID_ITEMS_CHANGED`, `ID_ITEMS_REMOVED`, `ID_MOVE_ITEMS`,
+`ID_WEAPONFIRE`, and `ID_RELOAD`. `ID_WORLD_LOGOUT` completes the leave-a-world
+flow (the client's logout notification to master; the master forwards it to the
+world, which closes the client's world connection). See the **server** knowledge
+base for how they behave.
+
 | Type                        | ID  |
 | --------------------------- | --- |
 |                             | 104 |
