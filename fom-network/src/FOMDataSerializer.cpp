@@ -1,6 +1,7 @@
 #include "FOMDataSerializer.h"
 
 #include <fom-network/packets/Chat.h>
+#include <fom-network/packets/CheckMail.h>
 #include <fom-network/packets/CheckName.h>
 #include <fom-network/packets/CheckNameReturn.h>
 #include <fom-network/packets/CreateCharacter.h>
@@ -15,6 +16,7 @@
 #include <fom-network/packets/LoginRequestReturn.h>
 #include <fom-network/packets/LoginReturn.h>
 #include <fom-network/packets/LoginTokenCheck.h>
+#include <fom-network/packets/Mail.h>
 #include <fom-network/packets/MoveItems.h>
 #include <fom-network/packets/PlayerLeavingWorld.h>
 #include <fom-network/packets/PlayerMigrateWorld.h>
@@ -23,6 +25,8 @@
 #include <fom-network/packets/RegisterClientReturn.h>
 #include <fom-network/packets/RegisterWorld.h>
 #include <fom-network/packets/Update.h>
+#include <fom-network/packets/VortexGate.h>
+#include <fom-network/packets/WorldService.h>
 #include <fom-network/packets/WorldLogin.h>
 #include <fom-network/packets/WorldLoginReturn.h>
 #include <fom-network/packets/WorldLogout.h>
@@ -74,6 +78,8 @@ static const std::unordered_map<uint8_t, size_t> packetSizes = {
     {Enum::ID_LOGIN_RETURN, sizeof(Packet::LoginReturn)},
     {Enum::ID_WORLD_LOGIN, sizeof(Packet::WorldLogin)},
     {Enum::ID_WORLD_LOGIN_RETURN, sizeof(Packet::WorldLoginReturn)},
+    {Enum::ID_VORTEX_GATE, sizeof(Packet::VortexGate)},
+    {Enum::ID_WORLDSERVICE, sizeof(Packet::WorldService)},
     {Enum::ID_WORLD_LOGOUT, sizeof(Packet::WorldLogout)},
     {Enum::ID_PLAYER_MIGRATE_WORLD, sizeof(Packet::PlayerMigrateWorld)},
     {Enum::ID_PLAYER_WORLD_READY, sizeof(Packet::PlayerWorldReady)},
@@ -84,6 +90,8 @@ static const std::unordered_map<uint8_t, size_t> packetSizes = {
     {Enum::ID_WORLD_UPDATE, sizeof(Packet::WorldUpdate)},
     {Enum::ID_CHAT, sizeof(Packet::Chat)},
     {Enum::ID_MOVE_ITEMS, sizeof(Packet::MoveItems)},
+    {Enum::ID_CHECK_MAIL, sizeof(Packet::CheckMail)},
+    {Enum::ID_MAIL, sizeof(Packet::Mail)},
     {Enum::ID_ITEMS_ADDED, sizeof(Packet::ItemsAdded)},
     {Enum::ID_ITEMS_CHANGED, sizeof(Packet::ItemsChanged)},
     {Enum::ID_ITEMS_REMOVED, sizeof(Packet::ItemsRemoved)},
@@ -107,6 +115,8 @@ static const std::unordered_map<uint32_t, IWriter*> writerMap = {
     {Enum::ID_LOGIN_RETURN, &Packet::LoginReturnSerializer::GetInstance()},
     {Enum::ID_WORLD_LOGIN_RETURN,
      &Packet::WorldLoginReturnSerializer::GetInstance()},
+    {Enum::ID_VORTEX_GATE, &Packet::VortexGateSerializer::GetInstance()},
+    {Enum::ID_WORLDSERVICE, &Packet::WorldServiceSerializer::GetInstance()},
     {Enum::ID_WORLD_LOGOUT, &Packet::WorldLogoutSerializer::GetInstance()},
     {Enum::ID_PLAYER_MIGRATE_WORLD,
      &Packet::PlayerMigrateWorldSerializer::GetInstance()},
@@ -119,6 +129,7 @@ static const std::unordered_map<uint32_t, IWriter*> writerMap = {
     {Enum::ID_WORLD_UPDATE, &Packet::WorldUpdateSerializer::GetInstance()},
     {Enum::ID_CHAT, &Packet::ChatSerializer::GetInstance()},
     {Enum::ID_MOVE_ITEMS, &Packet::MoveItemsSerializer::GetInstance()},
+    {Enum::ID_MAIL, &Packet::MailSerializer::GetInstance()},
     {Enum::ID_ITEMS_ADDED, &Packet::ItemsAddedSerializer::GetInstance()},
     {Enum::ID_ITEMS_CHANGED, &Packet::ItemsChangedSerializer::GetInstance()},
     {Enum::ID_ITEMS_REMOVED, &Packet::ItemsRemovedSerializer::GetInstance()},
@@ -148,6 +159,8 @@ static const std::unordered_map<uint32_t, IReader*> readerMap = {
     {Enum::ID_CREATE_CHARACTER,
      &Packet::CreateCharacterSerializer::GetInstance()},
     {Enum::ID_WORLD_LOGIN, &Packet::WorldLoginSerializer::GetInstance()},
+    {Enum::ID_VORTEX_GATE, &Packet::VortexGateSerializer::GetInstance()},
+    {Enum::ID_WORLDSERVICE, &Packet::WorldServiceSerializer::GetInstance()},
     {Enum::ID_WORLD_LOGOUT, &Packet::WorldLogoutSerializer::GetInstance()},
     {Enum::ID_PLAYER_MIGRATE_WORLD,
      &Packet::PlayerMigrateWorldSerializer::GetInstance()},
@@ -160,6 +173,7 @@ static const std::unordered_map<uint32_t, IReader*> readerMap = {
     {Enum::ID_UPDATE, &Packet::UpdateSerializer::GetInstance()},
     {Enum::ID_CHAT, &Packet::ChatSerializer::GetInstance()},
     {Enum::ID_MOVE_ITEMS, &Packet::MoveItemsSerializer::GetInstance()},
+    {Enum::ID_CHECK_MAIL, &Packet::CheckMailSerializer::GetInstance()},
     {Enum::ID_GAMEMASTER, &Packet::GamemasterSerializer::GetInstance()},
     {Enum::ID_WEAPONFIRE, &Packet::WeaponFireSerializer::GetInstance()},
     {Enum::ID_RELOAD, &Packet::ReloadSerializer::GetInstance()},

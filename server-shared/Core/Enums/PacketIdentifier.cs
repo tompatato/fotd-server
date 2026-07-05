@@ -50,7 +50,7 @@ namespace FOMServer.Shared.Core.Enums
         ID_REGISTER_CLIENT_RETURN = 121,
         ID_CREATE_CHARACTER = 122,
 
-        // ID_VORTEX_GATE = 123,
+        ID_VORTEX_GATE = 123,
         ID_CHECK_NAME = 124,
         ID_CHECK_NAME_RETURN = 125,
 
@@ -72,8 +72,9 @@ namespace FOMServer.Shared.Core.Enums
         // ID_EXPLOSIVE = 137,
         ID_MOVE_ITEMS = 138,
 
-        // ID_CHECK_MAIL = 139,
-        // ID_MAIL = 140,
+        ID_CHECK_MAIL = 139,
+        ID_MAIL = 140,
+
         // ID_CHARACTER_UPDATE = 141,
         // ID_NAME_CHANGE = 142,
         // ID_UNLOAD_WEAPON = 143,
@@ -101,7 +102,8 @@ namespace FOMServer.Shared.Core.Enums
         // ID_SPLIT_CONTAINER = 162,
         // ID_SKILLS = 163,
         // ID_USE_ITEM = 164,
-        // ID_WORLDSERVICE = 165,
+        ID_WORLDSERVICE = 165,
+
         // ID_HACKING = 166,
         // 167
         // ID_CHEMICAL_LAB = 168,

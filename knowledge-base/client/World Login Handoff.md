@@ -111,5 +111,7 @@ fomre decompile "CShell.dll:0x101c0e10"   # builds/sends ID_WORLD_LOGIN
 fomre xref     "CShell.dll:0x101bfe00"    # who constructs the request
 ```
 
-See [[Login Handshake]] (the master login that precedes this), [[Packet
-Transport]] (the envelope + destination routing), and [[Client Architecture]].
+See [[Vortex Gates]] (the in-game trigger that stages `worldId`/`nodeId` into
+shared memory before this runs), [[Login Handshake]] (the master login that
+precedes this), [[Packet Transport]] (the envelope + destination routing), and
+[[Client Architecture]].
