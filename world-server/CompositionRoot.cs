@@ -1,12 +1,16 @@
 using FOMServer.Shared.Application;
 using FOMServer.Shared.Core;
 using FOMServer.Shared.Core.Enums;
+using FOMServer.Shared.Core.Persistence;
 using FOMServer.Shared.Core.Ticking;
 using FOMServer.Shared.Infrastructure;
+using FOMServer.World.Infrastructure.Persistence;
 using FOMServer.World.Application;
+using FOMServer.World.Application.Items;
 using FOMServer.World.Application.Networking;
 using FOMServer.World.Application.Players;
 using FOMServer.World.Core;
+using FOMServer.World.Core.Items;
 using FOMServer.World.Core.Networking;
 using FOMServer.World.Core.Players;
 using FOMServer.World.Infrastructure;
@@ -107,6 +111,8 @@ namespace FOMServer.World
             services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
 
             services.AddSingleton<IPlayerRegistry, PlayerRegistry>();
+            services.AddSingleton<IItemInstanceIdGenerator, ItemInstanceIdGenerator>();
+            services.AddSingleton<IItemCatalog, ItemCatalog>();
             return services;
         }
 
@@ -125,6 +131,7 @@ namespace FOMServer.World
 
         private static ServiceCollection AddPersistenceHandlers(this ServiceCollection services)
         {
+            services.AddSingleton<IPersistenceHandler, PlayerInventoryPersistenceHandler>();
             return services;
         }
     }
