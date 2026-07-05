@@ -50,7 +50,7 @@ namespace FOMServer.Shared.Core.Enums
         ID_REGISTER_CLIENT_RETURN = 121,
         ID_CREATE_CHARACTER = 122,
 
-        // ID_VORTEX_GATE = 123,
+        ID_VORTEX_GATE = 123,
         ID_CHECK_NAME = 124,
         ID_CHECK_NAME_RETURN = 125,
 

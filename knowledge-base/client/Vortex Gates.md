@@ -167,25 +167,40 @@ selection**, relayed through `ENTERING_WORLD_ID` / `ENTERING_NODE_ID` in
 [[SharedMemory]]. `ENTERING_WORLD_STATE` is the little state machine tying the two
 packets together (`1` = approved by vortex, `3` = world-login sent).
 
-## Implementing it server-side
+## Server-side status
 
-A world server handler for `ID_VORTEX_GATE` needs to:
+A first increment is implemented: `ID_VORTEX_GATE` (123) is defined natively and
+managed as a flat `{ playerId, type, world, node }` packet (only the travel arms
+4/7 are serialized; other sub-types are rejected on read). The world server's
+`VortexGateHandler` answers a sub-type 7 **travel request** with a sub-type 4
+**approve**, authorising the requested world if this process hosts it and
+otherwise redirecting to its primary world — so travel works on a single-server
+deployment (including genuine travel between the worlds one server hosts). The
+reconnect/respawn is then the existing [[World Login Handoff]].
 
-1. Uncomment `ID_VORTEX_GATE = 123` in both `PacketIdentifier` enums and add the
-   managed/native packet (a discriminated union keyed on `subType`; see
-   [[Packet Transport]] and the existing discriminated update packet for the
-   pattern).
-2. On **sub-type 7** from a world client: validate the player, that the target
-   `world` is **connected** to the current one, the aggression lockout
-   (`VortexEmitterCountdown`) is zero, and inventory rules; then reply with
-   **sub-type 4** `{playerId, world, node}` to approve (or an error path — the
-   client shows the strings above).
-3. Answer **sub-type 5** (to master) with **sub-type 6** carrying the destination
-   list the terminal renders.
+Not yet done: the destination-list exchange (sub-types 5→6), so the terminal
+shows the static string-table world list rather than a live/connected one; and
+node-accurate spawning (spawn node is still hard-coded in `RegisterClientHandler`
+because the chosen node is not yet threaded through the handoff).
+
+### What a fuller implementation still needs
+
+A world server handler for `ID_VORTEX_GATE` would additionally:
+
+1. Enforce the real gating on **sub-type 7** that the current handler skips:
+   that the target `world` is **connected** to the current one, the aggression
+   lockout (`VortexEmitterCountdown`) is zero, and inventory rules — replying
+   with an error path (the client shows the strings above) rather than always
+   approving.
+2. Answer **sub-type 5** (to master) with **sub-type 6** carrying the live
+   destination list the terminal renders, instead of relying on the static
+   string-table list.
+3. Thread the chosen `node` through the handoff so the player spawns at it
+   (today it is echoed in the approve but ignored at spawn).
 
 The subsequent `ID_WORLD_LOGIN` → `ID_WORLD_LOGIN_RETURN` is already covered by
-[[World Login Handoff]]; the vortex work is purely the approve/list exchange plus
-the connectivity/lockout rules.
+[[World Login Handoff]]; the remaining vortex work is the list exchange plus the
+connectivity/lockout rules and node placement.
 
 ## Reproduce
 
