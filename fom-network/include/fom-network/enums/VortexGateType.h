@@ -16,6 +16,7 @@ enum VortexGateType : uint8_t {
   VORTEX_GATE_TYPE_INVALID = 0,
   VORTEX_GATE_TYPE_ENTER = 1,           // client -> world: gate countdown elapsed
   VORTEX_GATE_TYPE_TRAVEL_APPROVE = 4,  // world -> client: travel authorized
+  VORTEX_GATE_TYPE_LIST_DATA = 6,       // world -> client: reachable destination list
   VORTEX_GATE_TYPE_TRAVEL_REQUEST = 7,  // client -> world: take me to world/node
 };
 

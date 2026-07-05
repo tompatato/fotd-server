@@ -17,6 +17,7 @@ namespace Packet {
 #pragma pack(push, 1)
 struct WorldService {
   uint32_t playerId;
+  uint8_t discriminator;  // request discriminator (client -> world); unused on write
 };
 #pragma pack(pop)
 

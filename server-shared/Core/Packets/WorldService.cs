@@ -11,5 +11,8 @@ namespace FOMServer.Shared.Core.Packets
     public struct WorldService
     {
         public uint PlayerId;
+
+        /// <summary>Request discriminator from the client; unused when the server writes.</summary>
+        public byte Discriminator;
     }
 }

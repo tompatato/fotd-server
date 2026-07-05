@@ -46,11 +46,10 @@ bool WorldServiceSerializer::Read(RakNet::BitStream& bs,
   if (!bs.ReadCompressed(data->playerId)) return false;
 
   // TO BE REVISITED: the vortex terminal sends its own world-service requests
-  // (open ack, destination list, node selection, purchase) whose per-discriminator
-  // bodies are not modelled yet. Accept the packet (consuming only the leading
-  // discriminator) so those requests don't surface as read errors.
-  uint8_t discriminator = 0;
-  if (!bs.ReadCompressed(discriminator)) return false;
+  // (open ack, destination list, node selection, purchase). Only the leading
+  // discriminator is read (the per-discriminator bodies are not modelled yet), so
+  // the handler can react to it without the packet surfacing as a read error.
+  if (!bs.ReadCompressed(data->discriminator)) return false;
 
   return true;
 }

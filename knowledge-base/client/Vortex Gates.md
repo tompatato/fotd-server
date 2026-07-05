@@ -101,10 +101,24 @@ whose entries are gated by a presence bit, and 6 trailing shorts).
 > placements land, move the `ID_WORLDSERVICE{5,0xc}` open to the terminal-object
 > "use" path and stop hijacking the gate.
 
-**Remaining for functional selection:** the opened menu is still **empty** — it
-needs the destination list (populate the world/node pickers) and the
-selection/purchase requests wired up. Once a world/node is picked the client
-already emits `ID_VORTEX_GATE` sub-type 7, which the server approves today.
+**Populating the menu — working.** When the terminal is shown it sends
+`ID_WORLDSERVICE` discriminator `0x12` to the world; the server answers with
+`ID_VORTEX_GATE` **sub-type 6** (destination list) and the client fills the menu
+(`FUN_10199270`→`FUN_10177a40`). Sub-type 6 wire format (`FUN_1026f2e0`):
+`count:u8`, then per entry `{ worldId:u8, ip:32 bits stored inverted, port:16 bits,
+extra:u16 }`, then three trailing u32s (player/grid context). Confirmed live: the
+menu populates with reachable worlds, node lists, and descriptions.
+
+> **TO BE REVISITED — hardcoded list.** The sub-type 6 body is currently a fixed
+> two-world list (Manhattan + Apartments at the local world endpoint) baked into
+> `VortexGateSerializer`. Native code should not know world topology — the real
+> list must be built from live data (the worlds/addresses the master knows are
+> online) and carried in the packet, not hardcoded.
+
+**Remaining for functional travel:** wire the menu's node selection + **Purchase**
+flow (the terminal likely uses further `ID_WORLDSERVICE` discriminators, and/or a
+purchase before it emits `ID_VORTEX_GATE` sub-type 7, which the server already
+approves). Node-accurate spawn is still pending too.
 
 ## Flow (world travel)
 

@@ -15,6 +15,7 @@ namespace FOMServer.Shared.Core.Enums
         Invalid = 0, // VORTEX_GATE_TYPE_INVALID
         Enter = 1, // VORTEX_GATE_TYPE_ENTER
         TravelApprove = 4, // VORTEX_GATE_TYPE_TRAVEL_APPROVE
+        ListData = 6, // VORTEX_GATE_TYPE_LIST_DATA
         TravelRequest = 7, // VORTEX_GATE_TYPE_TRAVEL_REQUEST
     }
 }
