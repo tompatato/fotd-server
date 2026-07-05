@@ -17,9 +17,8 @@ namespace FOMServer.World.Application.Handlers
     /// <remarks>
     /// TO BE REVISITED: still a thin slice. When the vortex terminal is shown it
     /// sends discriminator 0x12; we answer with the vortex destination list so the
-    /// menu populates. Other discriminators (node selection, purchase) and the real
-    /// destination data are not handled yet, and the menu is opened provisionally
-    /// from the walk-in gate rather than a placed terminal object.
+    /// menu populates. The menu is opened provisionally from the walk-in gate rather
+    /// than a placed terminal object, and node-level data is not sent yet.
     /// </remarks>
     [PacketHandler]
     internal class WorldServiceHandler : PacketHandlerBase<WorldService>
@@ -52,37 +51,62 @@ namespace FOMServer.World.Application.Handlers
                 return;
             }
 
+            // Identify the requesting player from their authenticated connection so
+            // the destination list can be scoped to them — some worlds/nodes are
+            // faction/rank restricted (see the access filter below).
+            //
+            // The terminal is often shown before the client finishes re-registering
+            // after a world transfer, so the player may not be known yet in that
+            // brief window; still answer (rather than drop the request and leave the
+            // menu half-populated), just without access filtering.
             var player = _playerRegistry.Get(sender);
             if (player is null)
             {
-                _logger.LogWarning("World service request from unregistered client '{Sender}'", sender);
-                return;
+                _logger.LogDebug(
+                    "Vortex list requested before player {PlayerId} finished registering; sending unfiltered", p.PlayerId);
             }
 
-            // Answer the just-shown vortex terminal with the reachable-destination
-            // list so the menu populates. All hosted worlds live on this one server,
-            // so they share its client endpoint.
             var serverAddress = new NetworkAddress { Address = _serverSettings.ClientIp! };
             var serverPort = ServerConstants.GetWorldClientPort(_serverSettings.WorldIds[0]);
-            var worlds = _serverSettings.WorldIds;
-            var count = Math.Min(worlds.Length, VortexGate.MaxDestinations);
 
             using var list = new PacketWriter<VortexGate>(sender);
             ref var rData = ref list.Data;
-            rData.PlayerId = player.Id;
+            rData.PlayerId = p.PlayerId;
             rData.Type = VortexGateType.ListData;
             rData.ServerIp = serverAddress.BinaryAddress;
             rData.ServerPort = serverPort;
-            rData.DestinationCount = (byte)count;
-            for (var i = 0; i < count; i++)
+
+            byte count = 0;
+            foreach (var world in _serverSettings.WorldIds)
             {
-                rData.Destinations[i] = worlds[i];
+                if (count >= VortexGate.MaxDestinations)
+                {
+                    break;
+                }
+
+                // TODO: faction/rank access control. Some worlds (and their nodes)
+                // are only reachable by certain factions or account types; once the
+                // world server carries that data, skip worlds this `player` may not
+                // travel to (and, when `player` is null, restrict to unrestricted
+                // worlds only). For now every hosted world is offered.
+                if (!CanTravelTo(player, world))
+                {
+                    continue;
+                }
+
+                rData.Destinations[count] = world;
+                count++;
             }
 
+            rData.DestinationCount = count;
             _clientPacketSender.Send(list.Build());
 
-            _logger.LogInformation(
-                "Sent vortex destination list ({Count} worlds) to player {PlayerId}", count, player.Id);
+            _logger.LogDebug(
+                "Sent vortex destination list ({Count} worlds) to player {PlayerId}", count, p.PlayerId);
         }
+
+        // Placeholder for per-player destination access. Everything is reachable
+        // until faction/rank/ticket rules and their data exist on the world server.
+        private static bool CanTravelTo(Player? player, WorldId world) => true;
     }
 }
