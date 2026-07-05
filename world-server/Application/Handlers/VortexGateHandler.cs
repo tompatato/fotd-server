@@ -97,7 +97,7 @@ namespace FOMServer.World.Application.Handlers
                 : _serverSettings.WorldIds[0];
             if (requestedWorld != destination)
             {
-                _logger.LogInformation(
+                _logger.LogDebug(
                     "Player {PlayerId} requested vortex to {Requested}; redirecting to hosted world {Destination}",
                     player.Id, requestedWorld, destination);
             }
@@ -110,7 +110,7 @@ namespace FOMServer.World.Application.Handlers
             rData.Node = node;
             _clientPacketSender.Send(response.Build());
 
-            _logger.LogInformation(
+            _logger.LogDebug(
                 "Approved vortex travel for player {PlayerId} to world {Destination} node {Node} (from sub-type {Type})",
                 player.Id, destination, node, p.Type);
         }
