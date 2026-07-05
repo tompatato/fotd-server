@@ -72,8 +72,9 @@ namespace FOMServer.Shared.Core.Enums
         // ID_EXPLOSIVE = 137,
         ID_MOVE_ITEMS = 138,
 
-        // ID_CHECK_MAIL = 139,
-        // ID_MAIL = 140,
+        ID_CHECK_MAIL = 139,
+        ID_MAIL = 140,
+
         // ID_CHARACTER_UPDATE = 141,
         // ID_NAME_CHANGE = 142,
         // ID_UNLOAD_WEAPON = 143,
