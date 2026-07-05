@@ -13,6 +13,7 @@ namespace FOMServer.Shared.Core.Enums
     public enum VortexGateType : byte
     {
         Invalid = 0, // VORTEX_GATE_TYPE_INVALID
+        Enter = 1, // VORTEX_GATE_TYPE_ENTER
         TravelApprove = 4, // VORTEX_GATE_TYPE_TRAVEL_APPROVE
         TravelRequest = 7, // VORTEX_GATE_TYPE_TRAVEL_REQUEST
     }

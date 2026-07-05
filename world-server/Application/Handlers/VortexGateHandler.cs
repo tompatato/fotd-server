@@ -29,6 +29,10 @@ namespace FOMServer.World.Application.Handlers
     [PacketHandler]
     internal class VortexGateHandler : PacketHandlerBase<VortexGate>
     {
+        // Spawn node used when a gate carries no chosen destination; matches the
+        // node RegisterClientHandler currently spawns players at.
+        private const byte DefaultNode = 1;
+
         private readonly IPlayerRegistry _playerRegistry;
         private readonly IClientPacketSender _clientPacketSender;
         private readonly ServerSettings _serverSettings;
@@ -61,27 +65,41 @@ namespace FOMServer.World.Application.Handlers
                 return;
             }
 
-            // Only the travel request reaches this handler (the serializer rejects
-            // the other sub-types), but guard anyway so an unexpected type is a
-            // no-op rather than a spurious approval.
-            if (p.Type != VortexGateType.TravelRequest)
+            // Two client-to-world sub-types drive travel: ENTER (1) fires when a
+            // physical gate's countdown elapses and carries no destination, while
+            // TRAVEL_REQUEST (7) is the terminal's confirmed world/node selection.
+            // Both are answered with an approve; anything else is ignored.
+            WorldId requestedWorld;
+            byte node;
+            switch (p.Type)
             {
-                _logger.LogWarning("Player {PlayerId} sent unsupported vortex sub-type {Type}", player.Id, p.Type);
-                return;
+                case VortexGateType.TravelRequest:
+                    requestedWorld = p.World;
+                    node = p.Node;
+                    break;
+                case VortexGateType.Enter:
+                    // A physical gate has no chosen destination, so keep the player
+                    // on the primary hosted world at the default spawn node.
+                    requestedWorld = _serverSettings.WorldIds[0];
+                    node = DefaultNode;
+                    break;
+                default:
+                    _logger.LogWarning("Player {PlayerId} sent unsupported vortex sub-type {Type}", player.Id, p.Type);
+                    return;
             }
 
             // Honour the requested world if this server actually hosts it (so
             // travel between the worlds this process serves works for real);
             // otherwise fall back to the primary world so single-server travel
             // still succeeds instead of stalling on an offline destination.
-            var destination = Array.IndexOf(_serverSettings.WorldIds, p.World) >= 0
-                ? p.World
+            var destination = Array.IndexOf(_serverSettings.WorldIds, requestedWorld) >= 0
+                ? requestedWorld
                 : _serverSettings.WorldIds[0];
-            if (p.World != destination)
+            if (requestedWorld != destination)
             {
                 _logger.LogInformation(
                     "Player {PlayerId} requested vortex to {Requested}; redirecting to hosted world {Destination}",
-                    player.Id, p.World, destination);
+                    player.Id, requestedWorld, destination);
             }
 
             using var response = new PacketWriter<VortexGate>(sender);
@@ -89,8 +107,12 @@ namespace FOMServer.World.Application.Handlers
             rData.PlayerId = p.PlayerId;
             rData.Type = VortexGateType.TravelApprove;
             rData.World = destination;
-            rData.Node = p.Node;
+            rData.Node = node;
             _clientPacketSender.Send(response.Build());
+
+            _logger.LogInformation(
+                "Approved vortex travel for player {PlayerId} to world {Destination} node {Node} (from sub-type {Type})",
+                player.Id, destination, node, p.Type);
         }
     }
 }

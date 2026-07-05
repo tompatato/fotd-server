@@ -42,6 +42,26 @@ namespace FOMServer.World.Tests
         }
 
         [Fact]
+        public void EnterGate_ApprovesTravelToPrimaryWorldAtDefaultNode()
+        {
+            var sender = new RecordingSender();
+            var handler = CreateHandler(new Player(PlayerId), sender);
+
+            // A physical gate's activation (ENTER) carries no chosen destination.
+            handler.Handle(ClientAddress, new VortexGate
+            {
+                PlayerId = PlayerId,
+                Type = VortexGateType.Enter,
+            });
+
+            var (id, approve) = Assert.Single(sender.Sent);
+            Assert.Equal(PacketIdentifier.ID_VORTEX_GATE, id);
+            Assert.Equal(VortexGateType.TravelApprove, approve.Type);
+            Assert.Equal(RunningWorld, approve.World);
+            Assert.Equal(1, approve.Node);
+        }
+
+        [Fact]
         public void TravelRequest_ForAnotherHostedWorld_IsHonoured()
         {
             var sender = new RecordingSender();

@@ -18,13 +18,18 @@ bool VortexGateSerializer::Read(RakNet::BitStream& bs,
   if (!bs.ReadCompressed(data->playerId)) return false;
   if (!bs.ReadCompressed(data->type)) return false;
 
-  // Only the travel request carries a world/node pair. Other sub-types have
-  // different (or empty) bodies and are not handled here, so reject them rather
-  // than misparse the remaining bits — this flags the packet as a read error
-  // that managed code can drop gracefully.
-  if (data->type != Enum::VORTEX_GATE_TYPE_TRAVEL_REQUEST) return false;
-  if (!bs.ReadCompressed(data->world)) return false;
-  if (!bs.ReadCompressed(data->node)) return false;
+  // The travel request/approve arms carry a world/node pair; other sub-types
+  // have different (or empty) bodies we don't model. Read the pair only for the
+  // travel arms and accept the rest without consuming their payload, so the
+  // packet still reaches the handler (which decides what to act on) instead of
+  // being dropped as a read error.
+  data->world = Enum::MASTER_SERVER;
+  data->node = 0;
+  if (data->type == Enum::VORTEX_GATE_TYPE_TRAVEL_REQUEST ||
+      data->type == Enum::VORTEX_GATE_TYPE_TRAVEL_APPROVE) {
+    if (!bs.ReadCompressed(data->world)) return false;
+    if (!bs.ReadCompressed(data->node)) return false;
+  }
 
   return true;
 }

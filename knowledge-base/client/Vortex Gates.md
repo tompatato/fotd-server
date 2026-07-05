@@ -37,6 +37,7 @@ the `subType` byte, then switches on `subType`:
 
 | subType | Direction | Extra payload | Meaning (RE) |
 | --- | --- | --- | --- |
+| 1 | **Client→World** | *(none)* | **gate activated** — a physical gate's countdown elapsed (see below) |
 | 2 | — | `ItemList` | vortex ticket / cost items (see [[Inventory]] `ItemList`) |
 | 3 | — | `uint`, `u8`, `u8` | *unconfirmed* (a message-box confirm variant) |
 | 4 | **Server→Client** | `world : u8`, `node : u8` | **travel approved** — go to `world`/`node` |
@@ -49,6 +50,15 @@ The two travel arms (4 and 7) share the identical `{world, node}` tail. Arms 2/3
 are reached from `CWindowMessageBox::OnEvent` confirmation dialogs (4 of the 8
 `FUN_101064c0` call sites) and are not on the world-travel path; they are recorded
 here for completeness and left partly unconfirmed.
+
+> **Sub-type 1 (gate activation)** was missed in the first pass because it is
+> absent from the `FUN_10105d80` serializer switch — it carries no payload beyond
+> `playerId`, so it falls through the default case. It is sent by
+> `CWindowVortexImp::Render` (rva `0x17d720`): a physical vortex gate shows a
+> countdown (`"{N} sec"`), and when that elapses the client sends
+> `{sub 1, playerId}` to the **world**. This is the trigger for a *walk-in* gate,
+> as opposed to the terminal's sub-type 7 destination selection. Confirmed live:
+> the client sends only sub-type 1 while standing in a gate.
 
 ## Flow (world travel)
 
@@ -169,19 +179,29 @@ packets together (`1` = approved by vortex, `3` = world-login sent).
 
 ## Server-side status
 
-A first increment is implemented: `ID_VORTEX_GATE` (123) is defined natively and
-managed as a flat `{ playerId, type, world, node }` packet (only the travel arms
-4/7 are serialized; other sub-types are rejected on read). The world server's
-`VortexGateHandler` answers a sub-type 7 **travel request** with a sub-type 4
-**approve**, authorising the requested world if this process hosts it and
-otherwise redirecting to its primary world — so travel works on a single-server
-deployment (including genuine travel between the worlds one server hosts). The
-reconnect/respawn is then the existing [[World Login Handoff]].
+A working increment is implemented and **verified against the live client**:
+`ID_VORTEX_GATE` (123) is defined natively and managed as a flat
+`{ playerId, type, world, node }` packet (the `world`/`node` tail is read only for
+the travel arms 4/7; other sub-types read `playerId`/`type` and are accepted so the
+handler — not the deserializer — decides what to act on). The world server's
+`VortexGateHandler` answers both client→world travel triggers with a sub-type 4
+**approve**:
+
+- **sub-type 1 (gate activation)** → approve travel to the primary hosted world at
+  the default spawn node (a walk-in gate carries no chosen destination);
+- **sub-type 7 (terminal request)** → approve the requested world if this process
+  hosts it, otherwise redirect to the primary world.
+
+The reconnect/respawn is then the existing [[World Login Handoff]]; the same-world
+round-trip (leave → migrate back → re-register) works. A depends-on prerequisite,
+the [[Mail Check]] handshake, had to land first — the client blocks the vortex
+until its on-entry mail poll is answered.
 
 Not yet done: the destination-list exchange (sub-types 5→6), so the terminal
-shows the static string-table world list rather than a live/connected one; and
+shows the static string-table world list rather than a live/connected one;
 node-accurate spawning (spawn node is still hard-coded in `RegisterClientHandler`
-because the chosen node is not yet threaded through the handoff).
+because the chosen node is not yet threaded through the handoff); and the real
+gating (connectivity / aggression lockout / inventory), which the handler skips.
 
 ### What a fuller implementation still needs
 
