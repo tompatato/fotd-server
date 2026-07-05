@@ -25,3 +25,6 @@ __pycache__/
 *.rep/
 *.lock
 *.lock~
+
+# RE harness: machine-specific Ghidra/JDK paths
+tools/re/ghidra.local.json
