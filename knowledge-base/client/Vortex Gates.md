@@ -109,16 +109,23 @@ whose entries are gated by a presence bit, and 6 trailing shorts).
 extra:u16 }`, then three trailing u32s (player/grid context). Confirmed live: the
 menu populates with reachable worlds, node lists, and descriptions.
 
-> **TO BE REVISITED — hardcoded list.** The sub-type 6 body is currently a fixed
-> two-world list (Manhattan + Apartments at the local world endpoint) baked into
-> `VortexGateSerializer`. Native code should not know world topology — the real
-> list must be built from live data (the worlds/addresses the master knows are
-> online) and carried in the packet, not hardcoded.
+The list is built dynamically from the world server's hosted `WorldIds` and its
+client endpoint (carried in the packet, not hardcoded), and travel between worlds
+one server hosts works — confirmed live travelling Manhattan → Tokyo on a single
+server (WorldIds `[1,4,3]`).
 
-**Remaining for functional travel:** wire the menu's node selection + **Purchase**
-flow (the terminal likely uses further `ID_WORLDSERVICE` discriminators, and/or a
-purchase before it emits `ID_VORTEX_GATE` sub-type 7, which the server already
-approves). Node-accurate spawn is still pending too.
+> **Gotcha — each entry has nested lists.** Beyond `{worldId, ip, port, extra}`,
+> every entry carries two `count`-prefixed nested lists (`FUN_100a9680` node data /
+> `FUN_100a6390` grid data). Omitting them makes the client overrun and crash when
+> a destination is used; writing their counts as `0` is safe. A world with empty
+> node data still travels (the node dropdown falls back to Default/Random Node),
+> but won't show its real node list — populating that needs per-world node master
+> data (`FUN_100a7ab0`: id, position, name, sub-lists) the emulator doesn't have.
+
+**Remaining:** the **Purchase** button emits `ID_VORTEX_GATE` **sub-type 8**
+(currently logged unsupported — travel still completes, but it should be handled
+to remove the warning and formalise the flow); real per-world node lists; and
+node-accurate spawn.
 
 ## Flow (world travel)
 

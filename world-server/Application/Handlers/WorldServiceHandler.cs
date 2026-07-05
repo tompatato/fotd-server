@@ -1,9 +1,11 @@
+using FOMServer.Shared.Core.Constants;
 using FOMServer.Shared.Core.Enums;
 using FOMServer.Shared.Core.Handlers;
 using FOMServer.Shared.Core.Networking;
 using FOMServer.Shared.Core.Packets;
 using FOMServer.Shared.Core.Packets.Types;
 using FOMServer.Shared.Metadata;
+using FOMServer.World.Core;
 using FOMServer.World.Core.Networking;
 using FOMServer.World.Core.Players;
 
@@ -27,15 +29,18 @@ namespace FOMServer.World.Application.Handlers
 
         private readonly IPlayerRegistry _playerRegistry;
         private readonly IClientPacketSender _clientPacketSender;
+        private readonly ServerSettings _serverSettings;
         private readonly ILogger<WorldServiceHandler> _logger;
 
         public WorldServiceHandler(
             IPlayerRegistry playerRegistry,
             IClientPacketSender clientPacketSender,
+            ServerSettings serverSettings,
             ILogger<WorldServiceHandler> logger)
         {
             _playerRegistry = playerRegistry;
             _clientPacketSender = clientPacketSender;
+            _serverSettings = serverSettings;
             _logger = logger;
         }
 
@@ -54,16 +59,30 @@ namespace FOMServer.World.Application.Handlers
                 return;
             }
 
-            // Answer the just-shown vortex terminal with its destination list so the
-            // menu populates. The list contents are currently hardcoded in the
-            // native serializer (see VortexGateSerializer, LIST_DATA arm).
+            // Answer the just-shown vortex terminal with the reachable-destination
+            // list so the menu populates. All hosted worlds live on this one server,
+            // so they share its client endpoint.
+            var serverAddress = new NetworkAddress { Address = _serverSettings.ClientIp! };
+            var serverPort = ServerConstants.GetWorldClientPort(_serverSettings.WorldIds[0]);
+            var worlds = _serverSettings.WorldIds;
+            var count = Math.Min(worlds.Length, VortexGate.MaxDestinations);
+
             using var list = new PacketWriter<VortexGate>(sender);
             ref var rData = ref list.Data;
             rData.PlayerId = player.Id;
             rData.Type = VortexGateType.ListData;
+            rData.ServerIp = serverAddress.BinaryAddress;
+            rData.ServerPort = serverPort;
+            rData.DestinationCount = (byte)count;
+            for (var i = 0; i < count; i++)
+            {
+                rData.Destinations[i] = worlds[i];
+            }
+
             _clientPacketSender.Send(list.Build());
 
-            _logger.LogInformation("Sent vortex destination list to player {PlayerId}", player.Id);
+            _logger.LogInformation(
+                "Sent vortex destination list ({Count} worlds) to player {PlayerId}", count, player.Id);
         }
     }
 }
