@@ -1,4 +1,5 @@
 using FOMServer.Shared.Core.Networking;
+using FOMServer.Shared.Core.Packets.Types;
 using FOMServer.World.Core.Networking;
 
 namespace FOMServer.World.Application.Networking
@@ -40,6 +41,16 @@ namespace FOMServer.World.Application.Networking
             }
 
             _packetSender.EnqueueSend(packet);
+        }
+
+        public void Disconnect(in NetworkAddress address)
+        {
+            if (_packetSender is null)
+            {
+                throw new InvalidOperationException("Packet sender not initialized");
+            }
+
+            _packetSender.Disconnect(address);
         }
     }
 }

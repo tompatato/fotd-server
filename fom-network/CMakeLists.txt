@@ -28,6 +28,7 @@ set(FOMNETWORK_SRC
   "src/packets/LoginReturnSerializer.cpp"
   "src/packets/WorldLoginSerializer.cpp"
   "src/packets/WorldLoginReturnSerializer.cpp"
+  "src/packets/WorldLogoutSerializer.cpp"
   "src/packets/PlayerMigrateWorldSerializer.cpp"
   "src/packets/PlayerWorldReadySerializer.cpp"
   "src/packets/PlayerLeavingWorldSerializer.cpp"

@@ -15,10 +15,18 @@ namespace FOMServer.Shared.Services.FOMNetwork
             FOMNetwork_Server_Shutdown(server);
         }
 
+        public void CloseConnection(IntPtr server, uint binaryAddress, ushort port)
+        {
+            FOMNetwork_Server_CloseConnection(server, binaryAddress, port);
+        }
+
         [LibraryImport("FOMNetwork")]
         private static partial IntPtr FOMNetwork_Server_Startup(ushort port, uint maxClients, int threadSleepMs);
 
         [LibraryImport("FOMNetwork")]
         private static partial void FOMNetwork_Server_Shutdown(IntPtr server);
+
+        [LibraryImport("FOMNetwork")]
+        private static partial void FOMNetwork_Server_CloseConnection(IntPtr server, uint binaryAddress, ushort port);
     }
 }

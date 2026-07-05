@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Threading.Channels;
 using FOMServer.Shared.Core;
 using FOMServer.Shared.Core.Enums;
@@ -29,6 +30,8 @@ namespace FOMServer.Shared.Application.Networking
 
         private IntPtr _peer;
         private Action<IntPtr>? _peerShutdown;
+        private Action<IntPtr, NetworkAddress>? _closeConnection;
+        private readonly ConcurrentQueue<NetworkAddress> _disconnectQueue = new();
         private readonly IShutdownManager _shutdownManager;
         private readonly ILogger<NetworkManager> _logger;
         private readonly IPacketService _packetService;
@@ -91,7 +94,10 @@ namespace FOMServer.Shared.Application.Networking
         /// <summary>
         /// Configures the network manager with the necessary parameters.
         /// </summary>
-        public void Configure(IntPtr peer, Action<IntPtr> peerShutdown)
+        public void Configure(
+            IntPtr peer,
+            Action<IntPtr> peerShutdown,
+            Action<IntPtr, NetworkAddress>? closeConnection = null)
         {
             if (_peer != IntPtr.Zero)
             {
@@ -100,6 +106,7 @@ namespace FOMServer.Shared.Application.Networking
 
             _peer = peer;
             _peerShutdown = peerShutdown;
+            _closeConnection = closeConnection;
         }
 
         /// <summary>
@@ -145,6 +152,21 @@ namespace FOMServer.Shared.Application.Networking
             _sendQueue.Writer.TryWrite(packet);
         }
 
+        public void Disconnect(in NetworkAddress address)
+        {
+            if (_peer == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("Peer is not configured");
+            }
+
+            if (_closeConnection is null)
+            {
+                throw new InvalidOperationException("This network manager cannot close client connections");
+            }
+
+            _disconnectQueue.Enqueue(address);
+        }
+
         public async ValueTask DisposeAsync()
         {
             _sendQueue.Writer.Complete();
@@ -187,6 +209,14 @@ namespace FOMServer.Shared.Application.Networking
 
                         sendBuffer.ReleasePending();
 
+                        shouldBackoff = false;
+                    }
+
+                    // Close any client connections requested this cycle. Done on
+                    // the network thread so peer access stays single-threaded.
+                    while (_disconnectQueue.TryDequeue(out var addressToClose))
+                    {
+                        _closeConnection!(_peer, addressToClose);
                         shouldBackoff = false;
                     }
 
