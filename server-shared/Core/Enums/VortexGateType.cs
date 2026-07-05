@@ -17,5 +17,6 @@ namespace FOMServer.Shared.Core.Enums
         TravelApprove = 4, // VORTEX_GATE_TYPE_TRAVEL_APPROVE
         ListData = 6, // VORTEX_GATE_TYPE_LIST_DATA
         TravelRequest = 7, // VORTEX_GATE_TYPE_TRAVEL_REQUEST
+        Purchase = 8, // VORTEX_GATE_TYPE_PURCHASE
     }
 }

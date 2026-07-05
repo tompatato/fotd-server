@@ -122,10 +122,15 @@ server (WorldIds `[1,4,3]`).
 > but won't show its real node list — populating that needs per-world node master
 > data (`FUN_100a7ab0`: id, position, name, sub-lists) the emulator doesn't have.
 
-**Remaining:** the **Purchase** button emits `ID_VORTEX_GATE` **sub-type 8**
-(currently logged unsupported — travel still completes, but it should be handled
-to remove the warning and formalise the flow); real per-world node lists; and
-node-accurate spawn.
+The **Purchase** button emits `ID_VORTEX_GATE` **sub-type 8** — a bare
+`{playerId}` notification (no destination); the client self-navigates to the
+selected world using the address from the sub-type 6 list. The handler accepts it
+(no server-side authorization needed while travel is free). All `WorldId`s are
+activated and hosted, so every world is a selectable destination on one server.
+
+**Remaining:** real per-world node lists (need master data); node-accurate spawn;
+real gating (connectivity / aggression-lockout / inventory / ticket cost); and the
+placement-based trigger (vs the stand-in walk-in gate).
 
 ## Flow (world travel)
 

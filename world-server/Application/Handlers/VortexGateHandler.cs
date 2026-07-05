@@ -76,6 +76,16 @@ namespace FOMServer.World.Application.Handlers
                 return;
             }
 
+            // PURCHASE (8) is the menu's confirm; it carries no destination — the
+            // client self-navigates to the world it selected using the address from
+            // the destination list. Nothing to authorize server-side (travel is free
+            // today), so just accept it.
+            if (p.Type == VortexGateType.Purchase)
+            {
+                _logger.LogDebug("Player {PlayerId} purchased vortex travel (client-driven)", player.Id);
+                return;
+            }
+
             // TRAVEL_REQUEST (7) is the terminal's confirmed world/node selection.
             if (p.Type != VortexGateType.TravelRequest)
             {

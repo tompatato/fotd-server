@@ -18,6 +18,7 @@ enum VortexGateType : uint8_t {
   VORTEX_GATE_TYPE_TRAVEL_APPROVE = 4,  // world -> client: travel authorized
   VORTEX_GATE_TYPE_LIST_DATA = 6,       // world -> client: reachable destination list
   VORTEX_GATE_TYPE_TRAVEL_REQUEST = 7,  // client -> world: take me to world/node
+  VORTEX_GATE_TYPE_PURCHASE = 8,        // client -> world: menu purchase (self-navigates)
 };
 
 }  // namespace Enum
