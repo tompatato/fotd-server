@@ -1,0 +1,205 @@
+# Vortex Gates
+
+How a player travels between worlds in-game. The **vortex** is the fiction's
+faster-than-light transit network; in the client it is a terminal
+(`CWindowTerminalVortex`) where you pick a **destination world** and a **node**
+(spawn point) within it, then confirm. The key surprise: the vortex packet does
+**not** connect you to anything itself. It is a short request/approve exchange
+over a single discriminated packet (`ID_VORTEX_GATE`, 123) whose only lasting
+effect is to stage the destination in [[SharedMemory]]; the actual server switch
+is then driven entirely by the existing [[World Login Handoff]].
+
+So vortex travel is two stages bolted together:
+
+```
+Vortex terminal ──ID_VORTEX_GATE──▶ approve ──stages ENTERING_WORLD_ID/NODE_ID──▶ [World Login Handoff]
+```
+
+`ID_VORTEX_GATE = 123` (`0x7b`) is **known but unimplemented** in the emulator —
+it is commented out in both `fom-network/include/fom-network/enums/PacketIdentifier.h:46`
+and `server-shared/Core/Enums/PacketIdentifier.cs:53`. This document is the RE
+needed to implement it.
+
+## The packet — a discriminated union
+
+Unlike most packets, `ID_VORTEX_GATE` is **one packet ID carrying several
+operations**, selected by a sub-type byte — the same shape as the
+[[WorldUpdate]] update union. Every arm shares a common prefix and then varies:
+
+```
+[ VariableSizedPacket base | playerId : compressed-uint | subType : u8 | <arm-specific> ]
+```
+
+Built by `FUN_101064c0` (`CShell.dll` rva `0x1064c0`) — it sets the vtable to
+`Packet_ID_VORTEX_GATE::vftable` and stamps the id byte `0x7b`. Serialized by
+`FUN_10105d80` (rva `0x105d80`), which writes the base, the compressed `playerId`,
+the `subType` byte, then switches on `subType`:
+
+| subType | Direction | Extra payload | Meaning (RE) |
+| --- | --- | --- | --- |
+| 2 | — | `ItemList` | vortex ticket / cost items (see [[Inventory]] `ItemList`) |
+| 3 | — | `uint`, `u8`, `u8` | *unconfirmed* (a message-box confirm variant) |
+| 4 | **Server→Client** | `world : u8`, `node : u8` | **travel approved** — go to `world`/`node` |
+| 5 | **Client→Master** | *(none)* | open vortex / request destination list |
+| 6 | Server→Client | *(list blob)* | terminal data — populate the vortex window |
+| 7 | **Client→World** | `world : u8`, `node : u8` | **travel request** — take me to `world`/`node` |
+
+Bytes are written with `FUN_10038910` = `BitStream::WriteCompressed(&b, 8, true)`.
+The two travel arms (4 and 7) share the identical `{world, node}` tail. Arms 2/3
+are reached from `CWindowMessageBox::OnEvent` confirmation dialogs (4 of the 8
+`FUN_101064c0` call sites) and are not on the world-travel path; they are recorded
+here for completeness and left partly unconfirmed.
+
+## Flow (world travel)
+
+```
+Player opens vortex terminal, selects world + node, clicks Travel
+Client  --ID_VORTEX_GATE{sub 7, playerId, world, node}-->  World server
+                                    World validates (connected? inventory? not locked out?)
+Client  <--ID_VORTEX_GATE{sub 4, playerId, world, node}--  World server (approve)
+        client stages ENTERING_WORLD_ID/NODE_ID, ENTERING_WORLD_STATE=1,
+        enters transfer state (FUN_101c0a60(0xb))
+        │
+        └── from here it is the ordinary [[World Login Handoff]]:
+Client  --ID_WORLD_LOGIN{worldId, nodeId, playerId}-->  Master   (reads ENTERING_* from shared memory)
+Client  <--ID_WORLD_LOGIN_RETURN{status, serverIp, serverPort}--  Master
+        (SUCCESS) connect to serverIp:serverPort  -- the destination world server
+```
+
+## Client send — `CWindowTerminalVortex::OnEvent` (rva `0x177290`)
+
+The terminal is an event-driven window; the relevant commands:
+
+- **event 6 — pick world**: stores the selection in `this[0x1a88]`, and refreshes
+  the world name / class / description panels from the string table (below).
+- **event 8 — pick node**: stores the sub-selection in `this[0x1a89]`, formatting
+  `"{0} - {1}"` and appending `" (Full account only)"` for nodes gated to full
+  accounts (see [[Account Access Levels]]).
+- **event 9 — confirm travel**: the guarded send. It requires all of:
+  - network connected, `0 < this[0x1a88] <= 0x1f` (a real world is selected),
+  - a live inventory (`GetPlayerData(PLAYERDATA_INVENTORY)`) — else string `1844`
+    *"Error: Your inventory is full!"*,
+  - a live avatar (`GetPlayerData(PLAYERDATA_AVATAR)`),
+  - a **connectivity check** (`FUN_10256800`) — else string `5642` *"You cannot buy
+    tickets to worlds that aren't connected to this one!"*
+
+  On success it builds `ID_VORTEX_GATE` sub-type **7** with
+  `{ playerId = SharedMemory[PLAYER_ID], world = this[0x1a88], node = this[0x1a89] }`
+  and `SendPacket(pkt, WORLD, 1, 3, 0)` — to the **world server the player is
+  currently in**, not the master (see [[Packet Transport]] for the destination
+  argument).
+
+- **event 5** sends `ID_VORTEX_GATE` sub-type **5** (playerId only) to the
+  **master** — the destination-list request; the master holds cross-world
+  topology so it is the authority on which worlds exist / are connected.
+
+## Destination model (world + node)
+
+Selecting a world (`this[0x1a88]`, 0–31) indexes three parallel string-table
+runs, so the terminal shows a name, a class, and a description:
+
+- **World names** — base `3100`: `3100 "- Please select world! -"`, `3101 NYC -
+  Manhattan`, `3102 NYC - Brooklyn`, `3103 Tokyo - Upper`, `3104 Apartment`,
+  `3105 Earth`, … `3118 NYC - Ground Zero`, … `3131 Training Center`,
+  `3133 All Worlds`. (~31 entries — matches the `<= 0x1f` cap in event 9.)
+- **World class** — base `3140`, indexed via `DAT_102e2954[sel*0x3c]`:
+  `3140 SAFEZONE`, `3141 CLASS I WORLD` … `3145 CLASS V WORLD`.
+- **World description** — base `3200`: e.g. `3201` (Manhattan), `3203` (Tokyo),
+  `3218` (Ground Zero).
+
+The node (`this[0x1a89]`, 0–25) selects a spawn point within the world:
+`3249 "Default Node"` (index 0), `3247 "Random Node"` (index 0x19 = 25), and
+per-world named nodes in between (`worldSel*0x14 + 0xcb1 + node`).
+`3248 "Destination: %1!s! - %2!s!"` is the confirmation summary. Panel labels:
+`985 "World Service Control"`, `986 "Node Selection"`.
+
+> The `node` chosen here is the same `nodeId` that ends up at offset `0x431` of
+> [[World Login Handoff|`ID_WORLD_LOGIN`]] — the vortex is where it originates.
+
+## Server-side gating (implied by the client)
+
+The client only *reports* failure strings; the checks are the server's to enforce.
+The RE surfaces at least:
+
+- **Connectivity** — you may only vortex to a world **connected to the current
+  one** (string `5642`). The vortex network is a graph, not all-to-all.
+- **Aggression lockout** — string `1806`: *"…your vortex access has been limited
+  due to your recent aggressive acts. Please wait another N seconds…"*. This is
+  the `VortexEmitterCountdown` attribute (`AttributeType` 51) counting down; while
+  non-zero the vortex refuses travel. Related in-world items:
+  `PortableVortexParticleEmitter` (106), `VortexTicket` (985), `VortexReactor`
+  (994), and the GM `Vortex` command (`GamemasterCommand` `0xc`).
+- **Inventory / avatar present** — the player must be fully spawned.
+
+## Client receive — `FUN_10199270`, dispatched from `FOM::HandlePacket`
+
+The reply reads `{ playerId, subType, world, node }` and, only if
+`playerId == SharedMemory[PLAYER_ID]`:
+
+- **subType 4 (approve)** →
+  ```
+  SharedMemory[ENTERING_WORLD_ID]    = world
+  SharedMemory[ENTERING_NODE_ID]     = node
+  SharedMemory[ENTERING_WORLD_STATE] = 1
+  FUN_101c0a60(0xb)                    // client enters the world-transfer state
+  ```
+- **subType 6 (list data)** → fetches the `CWINDOW_TERMINAL_VORTEX` window and
+  calls `FUN_10177a40` to repopulate the destination/node lists.
+
+## The bridge to World Login Handoff
+
+The staged shared-memory values are exactly what the `ID_WORLD_LOGIN` builder
+(`FUN_101c0e10`, see [[World Login Handoff]]) consumes:
+
+```c
+if (ReadUInt(ENTERING_WORLD_STATE) == <ready>) {
+    login.playerId = ReadUInt(PLAYER_ID);
+    login.worldId  = (u8) ReadUInt(ENTERING_WORLD_ID);   // <- vortex world
+    login.nodeId   = (u8) ReadUInt(ENTERING_NODE_ID);    // <- vortex node
+    ...send ID_WORLD_LOGIN to MASTER...
+    WriteUInt(ENTERING_WORLD_STATE, 3);                  // advance the handshake
+}
+```
+
+This closes the loop and answers the open question in [[World Login Handoff]]
+about where `ID_WORLD_LOGIN`'s `worldId`/`nodeId` come from: **the vortex node
+selection**, relayed through `ENTERING_WORLD_ID` / `ENTERING_NODE_ID` in
+[[SharedMemory]]. `ENTERING_WORLD_STATE` is the little state machine tying the two
+packets together (`1` = approved by vortex, `3` = world-login sent).
+
+## Implementing it server-side
+
+A world server handler for `ID_VORTEX_GATE` needs to:
+
+1. Uncomment `ID_VORTEX_GATE = 123` in both `PacketIdentifier` enums and add the
+   managed/native packet (a discriminated union keyed on `subType`; see
+   [[Packet Transport]] and the existing discriminated update packet for the
+   pattern).
+2. On **sub-type 7** from a world client: validate the player, that the target
+   `world` is **connected** to the current one, the aggression lockout
+   (`VortexEmitterCountdown`) is zero, and inventory rules; then reply with
+   **sub-type 4** `{playerId, world, node}` to approve (or an error path — the
+   client shows the strings above).
+3. Answer **sub-type 5** (to master) with **sub-type 6** carrying the destination
+   list the terminal renders.
+
+The subsequent `ID_WORLD_LOGIN` → `ID_WORLD_LOGIN_RETURN` is already covered by
+[[World Login Handoff]]; the vortex work is purely the approve/list exchange plus
+the connectivity/lockout rules.
+
+## Reproduce
+
+```bash
+fomre sym Vortex
+fomre decompile "CShell.dll:0x10177290"   # CWindowTerminalVortex::OnEvent (send)
+fomre decompile "CShell.dll:0x101064c0"   # Packet_ID_VORTEX_GATE ctor (id 0x7b)
+fomre decompile "CShell.dll:0x10105d80"   # serializer — the sub-type switch
+fomre decompile "CShell.dll:0x10199270"   # reply handler -> ENTERING_* shared memory
+fomre decompile "CShell.dll:0x101c0e10"   # ID_WORLD_LOGIN builder reads ENTERING_*
+fomre xref     "CShell.dll:0x101064c0"    # all 8 packet construction sites
+```
+
+See [[World Login Handoff]] (the second half of vortex travel), [[World Logout]]
+(the leave-world counterpart), [[SharedMemory]] (the `ENTERING_*` bridge),
+[[Packet Transport]] (envelope + `MASTER`/`WORLD` routing), and
+[[Client Architecture]].
